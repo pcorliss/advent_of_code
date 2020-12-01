@@ -2,4 +2,8 @@
 
 require_relative '2020'
 
-puts Advent::One.new(File.read('./input.txt')).sum
+ad = Advent::One.new(File.read('./input.txt'))
+puts "Sum: #{ad.sum}"
+puts "Mult: #{ad.mult}"
+puts "Triple: #{ad.triple_sum}"
+puts "Triple Mult: #{ad.triple_mult}"
