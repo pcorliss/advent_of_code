@@ -83,16 +83,24 @@ describe Advent::TwoPartTwo do
   end
 
   describe "#valid_password?" do
-    it "returns false if the password doesn't contain the char at the right point" do
+    it "returns false if the password doesn't contain the char at the first point" do
       expect(ad.valid_password?(1, 3, "a", "bbb")).to be_falsey
     end
 
-    it "returns false if the password does contain the char at the invalid point" do
-      expect(ad.valid_password?(1, 3, "a", "aaaa")).to be_falsey
+    it "returns false if the password doesn't contain the char at the second point" do
+      expect(ad.valid_password?(1, 3, "a", "bbb")).to be_falsey
     end
 
-    it "returns true if the password matches the constraints" do
+    it "returns false if the password does contain the char at both points" do
+      expect(ad.valid_password?(1, 3, "a", "aba")).to be_falsey
+    end
+
+    it "returns true if the password contains the char at the first point but not the second" do
       expect(ad.valid_password?(1, 3, "a", "aab")).to be_truthy
+    end
+
+    it "returns true if the password contains the char at the second point but not the first" do
+      expect(ad.valid_password?(1, 3, "a", "baa")).to be_truthy
     end
   end
 

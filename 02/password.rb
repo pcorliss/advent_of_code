@@ -39,8 +39,8 @@ module Advent
       end
     end
 
-    def valid_password?(valid_idx, invalid_idx, char, password)
-      password[valid_idx-1] == char && password[invalid_idx-1] != char
+    def valid_password?(valid_idx1, valid_idx2, char, password)
+      (password[valid_idx1-1] == char) ^ (password[valid_idx2-1] == char)
     end
 
     def valid_password_count
