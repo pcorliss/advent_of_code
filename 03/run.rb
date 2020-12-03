@@ -3,4 +3,6 @@
 require_relative 'traj'
 
 ad = Advent::Three.new(File.read('./input.txt'))
-# puts...
+ad.go_to_bottom!
+puts "Position: #{ad.pos}"
+puts "Trees: #{ad.trees}"

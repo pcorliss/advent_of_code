@@ -48,6 +48,12 @@ describe Advent::Three do
       ad = Advent::Three.new("#")
       expect(ad.trees).to eq(1)
     end
+
+    it "takes an optional slope" do
+      ad = Advent::Three.new(input, 1, 1)
+      ad.step!
+      expect(ad.pos).to eq([1,1])
+    end
   end
 
   describe "#step!" do
@@ -108,6 +114,22 @@ describe Advent::Three do
     it "produces a tree count" do
       ad.go_to_bottom!
       expect(ad.trees).to eq(7)
+    end
+  end
+
+  context "validation" do
+    {
+      [1, 1] => 2,
+      [3, 1] => 7,
+      [5, 1] => 3,
+      [7, 1] => 4,
+      [1, 2] => 2,
+    }.each do |slope, trees|
+      it "produces #{trees} trees for slope of #{slope}" do
+        ad = Advent::Three.new(input, *slope)
+        ad.go_to_bottom!
+        expect(ad.trees).to eq(trees)
+      end
     end
   end
 end

@@ -11,8 +11,10 @@ module Advent
     RIGHT=3
     DOWN=1
 
-    def initialize(input)
+    def initialize(input, right = RIGHT, down = DOWN)
       @pos = [0, 0]
+      @right = right
+      @down = down
       @input = input.lines.map { |l| l.chomp.chars }
       @height = @input.count
       @width = @input.first.count
@@ -23,8 +25,8 @@ module Advent
     def step!
       return if bottom?
       @pos = [
-        @pos[0] + RIGHT,
-        @pos[1] + DOWN,
+        @pos[0] + @right,
+        @pos[1] + @down,
       ]
 
       @trees += 1 if tree?
