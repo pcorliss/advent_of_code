@@ -91,6 +91,69 @@ describe Advent do
       it "is valid if it contains all fields" do
         expect(passport.valid?).to be_truthy
       end
+
+      context "birth year validation" do
+        it "at least 1920" do
+          passport.fields[:byr] = "1919"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:byr] = "1920"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "no more than 2002" do
+          passport.fields[:byr] = "2003"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:byr] = "2002"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "requires four digits" do
+          passport.fields[:byr] = "2002a"
+          expect(passport.valid?).to be_falsey
+        end
+      end
+
+      context "issue year validation" do
+        it "at least 2010" do
+          passport.fields[:iyr] = "2009"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:iyr] = "2010"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "no more than 2020" do
+          passport.fields[:iyr] = "2021"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:iyr] = "2020"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "requires four digits" do
+          passport.fields[:iyr] = "2012a"
+          expect(passport.valid?).to be_falsey
+        end
+      end
+
+      context "expiration year validation" do
+        it "at least 2020" do
+          passport.fields[:eyr] = "2019"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:eyr] = "2020"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "no more than 2030" do
+          passport.fields[:eyr] = "2031"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:eyr] = "2030"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "requires four digits" do
+          passport.fields[:eyr] = "2030a"
+          expect(passport.valid?).to be_falsey
+        end
+      end
     end
   end
 end
