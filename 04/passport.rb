@@ -33,11 +33,14 @@ module Advent
       pid
     )
 
-    YEAR_RESTRICTIONS = {
+    NUM_RESTRICTIONS = {
       byr: [1920, 2002, 4],
       iyr: [2010, 2020, 4],
       eyr: [2020, 2030, 4],
+      pid: [0, 999999999, 9],
     }
+
+    VALID_EYE_COLORS = %w(amb blu brn gry grn hzl oth)
 
     attr_reader :fields
 
@@ -49,7 +52,7 @@ module Advent
       end
     end
 
-    def valid_year?(field, min, max, digits)
+    def valid_num?(field, min, max, digits)
       return false unless field =~ /^\d{#{digits}}$/
       field_i = field.to_i
       return false if field_i > max || field_i < min
@@ -70,18 +73,25 @@ module Advent
       @fields[:hcl] =~ /^\#[0-9a-f]{6}$/
     end
 
+    def valid_eye?
+      VALID_EYE_COLORS.include? @fields[:ecl]
+    end
+
     def valid?
       return false unless REQUIRED_FIELDS.all? do |field|
         @fields.has_key? field
       end
 
-      return false unless YEAR_RESTRICTIONS.all? do |field, restrictions|
-        valid_year?(@fields[field], *restrictions)
+      return false unless NUM_RESTRICTIONS.all? do |field, restrictions|
+        valid_num?(@fields[field], *restrictions)
       end
 
       return false unless valid_height?
 
       return false unless valid_hair?
+
+      return false unless valid_eye?
+
 
       true
     end

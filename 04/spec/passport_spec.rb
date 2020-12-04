@@ -92,6 +92,19 @@ describe Advent do
         expect(passport.valid?).to be_truthy
       end
 
+      context "passport id validation" do
+        it "requires a nine digit number" do
+          passport.fields[:pid] = "0"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:pid] = "0000000000"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:pid] = "000000000a"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:pid] = "000000000"
+          expect(passport.valid?).to be_truthy
+        end
+      end
+
       context "birth year validation" do
         it "at least 1920" do
           passport.fields[:byr] = "1919"
@@ -174,7 +187,17 @@ describe Advent do
         end
 
         context "eye" do
+          %w(amb blu brn gry grn hzl oth).each do |valid_color|
+            it "allows #{valid_color} as an eye color" do
+              passport.fields[:ecl] = valid_color
+              expect(passport.valid?).to be_truthy
+            end
+          end
 
+          it "disallows an invalid color" do
+            passport.fields[:ecl] = "cake"
+            expect(passport.valid?).to be_falsey
+          end
         end
       end
 
