@@ -154,6 +154,64 @@ describe Advent do
           expect(passport.valid?).to be_falsey
         end
       end
+
+      context "color validation" do
+        context "hair" do
+          it "requires a hex value" do
+            passport.fields[:hcl] = "#00000"
+            expect(passport.valid?).to be_falsey
+            passport.fields[:hcl] = "#0000000"
+            expect(passport.valid?).to be_falsey
+            passport.fields[:hcl] = "#aaaaag"
+            expect(passport.valid?).to be_falsey
+            passport.fields[:hcl] = "0000000"
+            expect(passport.valid?).to be_falsey
+            passport.fields[:hcl] = "#000000"
+            expect(passport.valid?).to be_truthy
+            passport.fields[:hcl] = "#aaaaaa"
+            expect(passport.valid?).to be_truthy
+          end
+        end
+
+        context "eye" do
+
+        end
+      end
+
+      context "height validation" do
+        it "requires number followed by cm or in" do
+          passport.fields[:hgt] = "150aa"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "150"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "150cm"
+          expect(passport.valid?).to be_truthy
+          passport.fields[:hgt] = "60in"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "requires 150cm to 193cm" do
+          passport.fields[:hgt] = "149cm"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "194cm"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "150cm"
+          expect(passport.valid?).to be_truthy
+          passport.fields[:hgt] = "193cm"
+          expect(passport.valid?).to be_truthy
+        end
+
+        it "requires 59 to 76in" do
+          passport.fields[:hgt] = "58in"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "77in"
+          expect(passport.valid?).to be_falsey
+          passport.fields[:hgt] = "59in"
+          expect(passport.valid?).to be_truthy
+          passport.fields[:hgt] = "76in"
+          expect(passport.valid?).to be_truthy
+        end
+      end
     end
   end
 end

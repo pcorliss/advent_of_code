@@ -56,6 +56,20 @@ module Advent
       true
     end
 
+    def valid_height?
+      height = @fields[:hgt]
+      return false unless height =~ /^(\d+)(cm|in)$/
+      num = $1
+      metric = $2
+      return true if metric == "cm" && num.to_i >= 150 && num.to_i <= 193
+      return true if metric == "in" && num.to_i >= 59 && num.to_i <= 76
+      false
+    end
+
+    def valid_hair?
+      @fields[:hcl] =~ /^\#[0-9a-f]{6}$/
+    end
+
     def valid?
       return false unless REQUIRED_FIELDS.all? do |field|
         @fields.has_key? field
@@ -64,6 +78,10 @@ module Advent
       return false unless YEAR_RESTRICTIONS.all? do |field, restrictions|
         valid_year?(@fields[field], *restrictions)
       end
+
+      return false unless valid_height?
+
+      return false unless valid_hair?
 
       true
     end
