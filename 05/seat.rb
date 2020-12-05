@@ -18,6 +18,17 @@ module Advent
     def max_seat_id
       @seats.values.map(&:seat_id).max
     end
+
+    def missing_seat_id
+# sort, look for gap
+      last_seat = nil
+      @seats.values.sort_by(&:seat_id).each do |seat|
+        if !last_seat.nil? && seat.seat_id - last_seat.seat_id > 1
+          return seat.seat_id - 1
+        end
+        last_seat = seat
+      end
+    end
   end
 
   class Seat

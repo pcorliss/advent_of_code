@@ -31,6 +31,22 @@ describe Advent do
         expect(ad.max_seat_id).to eq(820)
       end
     end
+
+    describe "missing_seat_id" do
+      it "returns the missing seat given a contiguous list" do
+        input = <<~EOS
+          BFFFBBFLLR
+          BFFFBBFRLR
+          BFFFBBFLRL
+          BFFFBBFRLL
+          BFFFBBFLLL
+        EOS
+        ad = Advent::Five.new(input)
+        expected = Advent::Seat.new("BFFFBBFLRR").seat_id
+        expect(ad.missing_seat_id).to eq(expected)
+      end
+    end
+
     context "validation" do
       {
         BFFFBBFRRR: { row: 70,  col: 7, seat_id: 567 },
