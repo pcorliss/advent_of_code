@@ -45,5 +45,13 @@ describe Advent do
         end
       end
     end
+
+    describe "#unanimous_count" do
+      it "returns a number with the number of unaninmous yes answers" do
+        [3 , 0 , 1 , 1 , 1].each_with_index do |e, idx|
+          expect(ad.forms[idx].unanimous_count).to eq(e)
+        end
+      end
+    end
   end
 end
