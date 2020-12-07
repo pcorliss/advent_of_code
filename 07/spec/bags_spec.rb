@@ -26,24 +26,41 @@ describe Advent do
         expect(ad.rules.count).to eq(9)
       end
 
-      it "creates rule objects" do
-        expect(ad.rules.first).to be_a(Advent::BagReq)
+      it "parses the requirement" do
+        expect(ad.rules).to include({
+          'light red' => Set.new(['bright white', 'muted yellow']),
+        })
+      end
+
+      it "handles empty rule sets" do
+        expect(ad.rules).to include({
+          'dotted black' => Set.new,
+        })
+      end
+    end
+
+    describe "#holding_bags" do
+      it "returns an empty list of bags that can hold a color which can't be contained" do
+        expect(ad.holding_bags("light red")).to be_empty
+        expect(ad.holding_bags("dark orange")).to be_empty
+      end
+
+      it "returns multiple items when there are bags that can hold it" do
+        expect(ad.holding_bags("muted yellow")).to contain_exactly("light red", "dark orange")
+        expect(ad.holding_bags("bright white")).to contain_exactly("light red", "dark orange")
+      end
+
+      it "returns a recursive list of the bags that can hold it" do
+        expect(ad.holding_bags("shiny gold")).to contain_exactly(
+          "bright white",
+          "muted yellow",
+          "dark orange",
+          "light red",
+        )
       end
     end
 
     context "validation" do
-    end
-  end
-
-  describe Advent::BagReq do
-    let(:req) { Advent::BagReq.new(input.lines.first) }
-
-    describe "#new" do
-      it "parses the requirement" do
-        expect(req.req).to eq({
-          'light red' => Set.new(['bright white', 'muted yellow'])
-        })
-      end
     end
   end
 end
