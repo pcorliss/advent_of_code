@@ -4,9 +4,9 @@ module Advent
 
   class Bag
     ID_REGEX = /^(\w+ \w+) bags contain/
-    CONTAIN_REGEX = /\d+ (\w+ \w+) bag[s]{0,1}/
+    CONTAIN_REGEX = /(\d+) (\w+ \w+) bag[s]{0,1}/
 
-    attr_reader :rules
+    attr_reader :rules, :counts
 
     def initialize(input)
       input.lines.map do |line|
@@ -17,10 +17,25 @@ module Advent
 
     def add!(input)
       @rules ||= {}
+      @counts ||= {}
       if input =~ ID_REGEX
         key = $1
-        @rules[key] = Set.new(input.scan(CONTAIN_REGEX).flatten)
+        bag_names = input.scan(CONTAIN_REGEX).map(&:last)
+        @rules[key] = Set.new(bag_names)
+        @counts[key] = input.scan(CONTAIN_REGEX)
       end
+    end
+
+    def required_bags(bag)
+      @cached_bags ||= {}
+      return @cached_bags[bag] if @cached_bags[bag]
+      count = 0
+      @counts[bag].each do |cnt, b|
+        count += cnt.to_i
+        count += cnt.to_i * required_bags(b)
+      end
+
+      @cached_bags[bag] = count
     end
 
     def holding_bags(bag)

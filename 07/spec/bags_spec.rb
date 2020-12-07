@@ -18,6 +18,18 @@ describe Advent do
     EOS
   }
 
+  let(:input2) {
+    <<~EOS
+      shiny gold bags contain 2 dark red bags.
+      dark red bags contain 2 dark orange bags.
+      dark orange bags contain 2 dark yellow bags.
+      dark yellow bags contain 2 dark green bags.
+      dark green bags contain 2 dark blue bags.
+      dark blue bags contain 2 dark violet bags.
+      dark violet bags contain no other bags.
+    EOS
+  }
+
   describe Advent::Bag do
     let(:ad) { Advent::Bag.new(input) }
 
@@ -36,6 +48,22 @@ describe Advent do
         expect(ad.rules).to include({
           'dotted black' => Set.new,
         })
+      end
+    end
+
+    describe "#required_bags" do
+      let(:ad) { Advent::Bag.new(input2) }
+
+      it "returns a count of how many bags are required internally with no nesting" do
+        expect(ad.required_bags("dark violet")).to eq(0)
+      end
+
+      it "returns a count of how many bags are required with single nesting" do
+        expect(ad.required_bags("dark blue")).to eq(2)
+      end
+
+      it "returns a count of how many bags are required with full nesting" do
+        expect(ad.required_bags("shiny gold")).to eq(126)
       end
     end
 
@@ -61,6 +89,9 @@ describe Advent do
     end
 
     context "validation" do
+      it "returns the proper amount for required internal bags" do
+        expect(ad.required_bags("shiny gold")).to eq(32)
+      end
     end
   end
 end
