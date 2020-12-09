@@ -32,5 +32,26 @@ module Advent
 
       @nums[invalid_pos]
     end
+
+    def contigous_weakness(num)
+      @nums.length.times do |start_pos|
+        acc = 0
+        pos = start_pos
+        while acc < num do
+          acc += @nums[pos]
+          # puts "#{start_pos} #{pos} #{@nums[pos]} #{acc} #{num}"
+          pos += 1
+        end
+        if acc == num
+          return @nums[start_pos...pos]
+        end
+      end
+      []
+    end
+
+    def sum_first_last_contig(num) 
+      weak = contigous_weakness(num).sort
+      weak.first + weak.last
+    end
   end
 end

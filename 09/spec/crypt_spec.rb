@@ -72,6 +72,18 @@ describe Advent do
       end
     end
 
+    describe "#contigous_weakness" do
+      it "returns a list of numbers that sum to the given number" do
+        expect(ad.contigous_weakness(127)).to eq([15,25,47,40])
+      end
+    end
+
+    describe "#sum_first_last_contig" do
+      it "returns the sum of the first and last of the contigous weakness" do
+        expect(ad.sum_first_last_contig(127)).to eq(62)
+      end
+    end
+
     context "validation" do
     end
   end
