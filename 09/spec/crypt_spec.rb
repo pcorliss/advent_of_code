@@ -56,8 +56,21 @@ describe Advent do
       end
     end
 
-    describe "#valid?"
-    describe "#first_invalid_num"
+    describe "#valid?" do
+      it "returns true if a compliment exists in the preamble" do
+        expect(ad.valid?(5)).to be_truthy
+      end
+
+      it "returns false if the compliment doesn't exist" do
+        expect(ad.valid?(14)).to be_falsey
+      end
+    end
+
+    describe "#first_invalid_num" do
+      it "finds the first invalid num" do
+        expect(ad.first_invalid_num).to eq(127)
+      end
+    end
 
     context "validation" do
     end

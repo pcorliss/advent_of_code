@@ -18,5 +18,19 @@ module Advent
     def preamble(pos)
       Set.new(nums[(pos-@preamble_length)...pos])
     end
+
+    def valid?(pos)
+      p = preamble(pos)
+      c = compliment_set(pos)
+      !(c & p).empty?
+    end
+
+    def first_invalid_num
+      invalid_pos = (@preamble_length...@nums.length).find do |pos|
+        !valid?(pos)
+      end
+
+      @nums[invalid_pos]
+    end
   end
 end
