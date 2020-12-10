@@ -83,6 +83,17 @@ describe Advent do
       end
     end
 
+    describe "#arrangements" do
+      it "returns the possible count of chains" do
+        expect(ad.arrangements[19]).to eq(8)
+      end
+
+      it "returns the possible count of chains for larger sets" do
+        ad = Advent::Volt.new(input2)
+        expect(ad.arrangements[49]).to eq(19208)
+      end
+    end
+
     context "validation" do
     end
   end
