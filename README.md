@@ -5,6 +5,10 @@ My solutions to https://adventofcode.com/2020
 ## Templates
 
 ```
+./daily.sh <ChallengeName>
+```
+
+```
 cp -pr blank 06
 cd 06
 find . | grep rb | xargs sed -i 's/blank/<challenge>/g'
