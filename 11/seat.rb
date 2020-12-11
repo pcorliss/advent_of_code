@@ -12,23 +12,24 @@ module Advent
       @height = input.lines.count
     end
 
-    def edge?(pos)
+    def edge?(pos, x_dir, y_dir)
       x = pos % width
       y = pos / width
 
-      x >= width - 1 ||
-        y >= height - 1 ||
-        x <= 0 ||
-        y <= 0
+      x + x_dir < 0 ||
+      x + x_dir >= width ||
+      y + y_dir < 0 ||
+      y + y_dir >= height
     end
 
     def travel(pos, x_dir, y_dir)
+      return nil if edge?(pos, x_dir, y_dir)
       new_pos = pos
       new_pos += x_dir
       new_pos += y_dir * width
       # puts "#{pos} -> #{new_pos} : #{seats[new_pos]} ! #{edge?(new_pos)}"
       return seats[new_pos] if seats[new_pos] != LAVA
-      return nil if edge?(new_pos)
+      return nil if edge?(new_pos, x_dir, y_dir)
       travel(new_pos, x_dir, y_dir)
     end
 
@@ -48,11 +49,40 @@ module Advent
     end
 
     def tick_prime!
+      changes = 0
+      new_seats = []
+      seats.each_with_index do |s, idx|
+        new_seats[idx] = s
+        # puts "Start: #{s}" if idx == 0
+        # puts "Visible: #{visible_seats(idx)}" if idx == 0
+        if s == EMPTY && visible_seats(idx).count {|v| v == FILLED} == 0
+          new_seats[idx] = FILLED
+          changes += 1
+        end
+        if s == FILLED && visible_seats(idx).count {|v| v == FILLED} >= 5
+          new_seats[idx] = EMPTY
+          changes += 1
+        end
+        # puts "End: #{new_seats[idx]}" if idx == 0
+      end
 
+      @seats = new_seats
+      changes
     end
 
     def stabilize_prime!
-
+      changes = 1
+      i = 0
+      # pr
+      while changes > 0 do
+        changes = tick_prime!
+        # pr
+        i += 1
+        if i % 100 == 0
+          puts "Breaking, too many iterations"
+          break
+        end
+      end
     end
 
     def adjacent_seats(pos)

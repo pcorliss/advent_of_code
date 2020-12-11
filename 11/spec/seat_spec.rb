@@ -178,6 +178,22 @@ L.#.L..#..
     end
 
     context "validation" do
+      it "handles stabilization" do
+        expected = <<~EOS
+          #.L#.L#.L#
+          #LLLLLL.LL
+          L.L.L..#..
+          ##L#.#L.L#
+          L.L#.LL.L#
+          #.LLLL#.LL
+          ..#.L.....
+          LLL###LLL#
+          #.LLLLL#.L
+          #.L#LL#.L#
+        EOS
+        ad.stabilize_prime!
+        expect(ad.seats).to eq(Advent::Seat.new(expected).seats)
+      end
       it "reaches a stable state" do
         expect(ad.tick!).to eq(71)
         expect(ad.tick!).to eq(51)
@@ -249,10 +265,61 @@ L.#.L..#..
       it "returns a list of 8 visible seats" do
         expect(ad_vis.visible_seats(24)).to eq(%w(L # L # L # L #))
       end
+
+      it "handles corners" do
+        expect(ad_vis.visible_seats(0)).to eq(%w(# # L))
+      end
     end
 
     describe "#tick_prime!" do
-
+        let(:a) { <<~EOS
+      L.LL.LL.LL
+      LLLLLLL.LL
+      L.L.L..L..
+      LLLL.LL.LL
+      L.LL.LL.LL
+      L.LLLLL.LL
+      ..L.L.....
+      LLLLLLLLLL
+      L.LLLLLL.L
+      L.LLLLL.LL
+      EOS
+      }
+        let(:b) { <<~EOS
+      #.##.##.##
+      #######.##
+      #.#.#..#..
+      ####.##.##
+      #.##.##.##
+      #.#####.##
+      ..#.#.....
+      ##########
+      #.######.#
+      #.#####.##
+      EOS
+      }
+        let(:c) {
+          <<~EOS
+      #.LL.LL.L#
+      #LLLLLL.LL
+      L.L.L..L..
+      LLLL.LL.LL
+      L.LL.LL.LL
+      L.LLLLL.LL
+      ..L.L.....
+      LLLLLLLLL#
+      #.LLLLLL.L
+      #.LLLLL.L#
+      EOS
+      }
+      it "mutates state" do
+        ad = Advent::Seat.new(a)
+        expect(ad.tick_prime! > 0).to be_truthy
+        expect(ad.seats).to eq(Advent::Seat.new(b).seats)
+        expect(ad.tick_prime! > 0).to be_truthy
+        expect(ad.seats[0]).to eq('#')
+        expect(ad.seats).to eq(Advent::Seat.new(c).seats)
+      end
     end
   end
 end
