@@ -26,7 +26,8 @@ module Advent
       nodes = {}
       nodes[0] = 1
       @volts.each do |v|
-        nodes[v] = nodes[v - 3] || 0
+        nodes[v] ||= 0
+        nodes[v] += nodes[v - 3] || 0
         nodes[v] += nodes[v - 2] || 0
         nodes[v] += nodes[v - 1] || 0
       end
