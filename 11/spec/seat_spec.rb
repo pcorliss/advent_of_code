@@ -90,6 +90,7 @@ L.#.L..#..
 #.#L#L#.##
     EOS
   }
+
   describe Advent::Seat do
     let(:ad) { Advent::Seat.new(input) }
 
@@ -116,6 +117,26 @@ L.#.L..#..
 
       it "returns adjacent seats on a corner BR" do
         expect(ad.adjacent_seats(99)).to eq(%w(. L L))
+      end
+
+      it "returns adjacent seats on a corner TR" do
+        expect(ad.adjacent_seats(9)).to eq(%w(L L L))
+      end
+
+      it "returns adjacent seats on a corner BL" do
+        expect(ad.adjacent_seats(90)).to eq(%w(L . .))
+      end
+
+      context "unequal width and height" do
+        let(:input) {
+          <<~EOS
+            ...L.
+            ...LL
+          EOS
+        }
+        it "returns adjacent seats on a corner TR" do
+          expect(ad.adjacent_seats(4)).to eq(%w(L L L))
+        end
       end
     end
 
@@ -148,6 +169,14 @@ L.#.L..#..
       end
     end
 
+    describe "#stabilize!" do
+      it "goes directly to the final state" do
+        ad.stabilize!
+        expect(ad.seats).to eq( Advent::Seat.new(iter5).seats )
+        expect(ad.tick!).to eq(0)
+      end
+    end
+
     context "validation" do
       it "reaches a stable state" do
         expect(ad.tick!).to eq(71)
@@ -172,6 +201,30 @@ L.#.L..#..
         expect(ad.seats).to eq( Advent::Seat.new(iter4).seats )
         ad.tick!
         expect(ad.seats).to eq( Advent::Seat.new(iter5).seats )
+      end
+
+      # let(:validation) {
+      #   <<~EOS
+      #     L#.
+      #     LL.
+      #   EOS
+      # }
+      #
+      # it "should handle an edge case correctly" do
+      #   ad = Advent::Seat.new(validation)
+      #   ad.pr
+      #   ad.tick!
+      #   ad.pr
+      #   expect(ad.occupied_seats).to eq(0)
+      # end
+
+      it "should handle an edge case correctly" do
+          ad = Advent::Seat.new(File.read('./input_for_spec.txt'))
+          ad.tick!
+          ad.tick!
+          expect(ad.width).to eq(92)
+          expect(ad.height).to eq(91)
+          expect(ad.seats.first(92).join('')).to eq("#LLLLLLLLLLLLL.LLLLLLLLLLLLLLLLLLLLLL#.#LL#.#.LLLLLL#.#LLLLLL.LLLLLL.LL.LLLL.LLLLLLLLLLLLLL#")
       end
     end
   end
