@@ -203,21 +203,6 @@ L.#.L..#..
         expect(ad.seats).to eq( Advent::Seat.new(iter5).seats )
       end
 
-      # let(:validation) {
-      #   <<~EOS
-      #     L#.
-      #     LL.
-      #   EOS
-      # }
-      #
-      # it "should handle an edge case correctly" do
-      #   ad = Advent::Seat.new(validation)
-      #   ad.pr
-      #   ad.tick!
-      #   ad.pr
-      #   expect(ad.occupied_seats).to eq(0)
-      # end
-
       it "should handle an edge case correctly" do
           ad = Advent::Seat.new(File.read('./input_for_spec.txt'))
           ad.tick!
@@ -226,6 +211,48 @@ L.#.L..#..
           expect(ad.height).to eq(91)
           expect(ad.seats.first(92).join('')).to eq("#LLLLLLLLLLLLL.LLLLLLLLLLLLLLLLLLLLLL#.#LL#.#.LLLLLL#.#LLLLLL.LLLLLL.LL.LLLL.LLLLLLLLLLLLLL#")
       end
+    end
+  end
+
+  context "Part Two" do
+    describe "#visible_seats" do
+      let(:no_vis) {
+        <<~EOS
+          .##.##.
+          #.#.#.#
+          ##...##
+          ...L...
+          ##...##
+          #.#.#.#
+          .##.##.
+        EOS
+      }
+      let(:ad_no_vis) { Advent::Seat.new(no_vis) }
+
+      let(:vis) {
+        <<~EOS
+          .##.##.
+          #L###L#
+          ##...##
+          .#.L.L.
+          ##...##
+          ###L###
+          .##.##.
+        EOS
+      }
+      let(:ad_vis) { Advent::Seat.new(vis) }
+
+      it "returns a list of no visible seats" do
+        expect(ad_no_vis.visible_seats(24)).to be_empty
+      end
+
+      it "returns a list of 8 visible seats" do
+        expect(ad_vis.visible_seats(24)).to eq(%w(L # L # L # L #))
+      end
+    end
+
+    describe "#tick_prime!" do
+
     end
   end
 end

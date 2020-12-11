@@ -12,6 +12,49 @@ module Advent
       @height = input.lines.count
     end
 
+    def edge?(pos)
+      x = pos % width
+      y = pos / width
+
+      x >= width - 1 ||
+        y >= height - 1 ||
+        x <= 0 ||
+        y <= 0
+    end
+
+    def travel(pos, x_dir, y_dir)
+      new_pos = pos
+      new_pos += x_dir
+      new_pos += y_dir * width
+      # puts "#{pos} -> #{new_pos} : #{seats[new_pos]} ! #{edge?(new_pos)}"
+      return seats[new_pos] if seats[new_pos] != LAVA
+      return nil if edge?(new_pos)
+      travel(new_pos, x_dir, y_dir)
+    end
+
+    def visible_seats(pos)
+      acc = []
+      # puts "Start: #{pos} #{acc}"
+      acc << travel(pos, -1, -1)
+      acc << travel(pos,  0, -1)
+      acc << travel(pos,  1, -1)
+      acc << travel(pos, -1,  0)
+      acc << travel(pos,  1,  0)
+      acc << travel(pos, -1,  1)
+      acc << travel(pos,  0,  1)
+      acc << travel(pos,  1,  1)
+      # puts "End: #{acc}"
+      acc.compact
+    end
+
+    def tick_prime!
+
+    end
+
+    def stabilize_prime!
+
+    end
+
     def adjacent_seats(pos)
       x = pos % width
       y = pos / width
