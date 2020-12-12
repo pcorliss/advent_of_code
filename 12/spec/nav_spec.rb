@@ -57,4 +57,46 @@ F11
     context "validation" do
     end
   end
+
+  describe Advent::Nav2 do
+    let(:ad) { Advent::Nav2.new(input) }
+
+    describe "#new" do
+    end
+
+    describe "#move!" do
+      it "moves forward" do
+        expect(ad.pos).to eq([0,0])
+        ad.move!("F10")
+        expect(ad.pos).to eq([100,10])
+      end
+
+      it "moves waypoint cardinal" do
+        expect(ad.pos).to eq([0,0])
+        expect(ad.way).to eq([10,1])
+        ad.move!("N10")
+        expect(ad.pos).to eq([0,0])
+        expect(ad.way).to eq([10,11])
+      end
+
+      it "turns" do
+        ad.move!("N3")
+        expect(ad.way).to eq([10,4])
+        ad.move!("R90")
+        expect(ad.way).to eq([4,-10])
+        ad.move!("L90")
+        expect(ad.way).to eq([10,4])
+      end
+    end
+
+    describe "#manhattan" do
+      it "returns the manhattan distance" do
+        ad.exec!
+        expect(ad.manhattan).to eq(286)
+      end
+    end
+
+    context "validation" do
+    end
+  end
 end
