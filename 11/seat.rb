@@ -6,10 +6,12 @@ module Advent
 
     attr_reader :seats, :width, :height
 
-    def initialize(input)
+    def initialize(input, caching = false)
       @seats = input.lines.map {|l| l.chomp.chars }.flatten
       @width = input.lines.first.chars.count - 1
       @height = input.lines.count
+      @caching = caching
+      @positions = []
     end
 
     def edge?(pos, x_dir, y_dir)
@@ -28,24 +30,31 @@ module Advent
       new_pos += x_dir
       new_pos += y_dir * width
       # puts "#{pos} -> #{new_pos} : #{seats[new_pos]} ! #{edge?(new_pos)}"
-      return seats[new_pos] if seats[new_pos] != LAVA
-      return nil if edge?(new_pos, x_dir, y_dir)
+      return new_pos if seats[new_pos] != LAVA
       travel(new_pos, x_dir, y_dir)
     end
 
+    def positions(pos)
+      p = []
+      p << travel(pos, -1, -1)
+      p << travel(pos,  0, -1)
+      p << travel(pos,  1, -1)
+      p << travel(pos, -1,  0)
+      p << travel(pos,  1,  0)
+      p << travel(pos, -1,  1)
+      p << travel(pos,  0,  1)
+      p << travel(pos,  1,  1)
+      p
+    end
+
     def visible_seats(pos)
-      acc = []
-      # puts "Start: #{pos} #{acc}"
-      acc << travel(pos, -1, -1)
-      acc << travel(pos,  0, -1)
-      acc << travel(pos,  1, -1)
-      acc << travel(pos, -1,  0)
-      acc << travel(pos,  1,  0)
-      acc << travel(pos, -1,  1)
-      acc << travel(pos,  0,  1)
-      acc << travel(pos,  1,  1)
-      # puts "End: #{acc}"
-      acc.compact
+      if @caching
+        @positions[pos] ||= positions(pos)
+      else
+        positions(pos)
+      end.compact.map do |p|
+        seats[p]
+      end
     end
 
     def tick_prime!
@@ -55,6 +64,7 @@ module Advent
         new_seats[idx] = s
         # puts "Start: #{s}" if idx == 0
         # puts "Visible: #{visible_seats(idx)}" if idx == 0
+        next if s == LAVA
         if s == EMPTY && visible_seats(idx).count {|v| v == FILLED} == 0
           new_seats[idx] = FILLED
           changes += 1
@@ -71,6 +81,7 @@ module Advent
     end
 
     def stabilize_prime!
+      # puts "STR Positions: #{@positions}"
       changes = 1
       i = 0
       # pr
@@ -83,6 +94,7 @@ module Advent
           break
         end
       end
+      # puts "END Positions: #{@positions.count}"
     end
 
     def adjacent_seats(pos)

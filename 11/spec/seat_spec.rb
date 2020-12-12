@@ -320,6 +320,15 @@ L.#.L..#..
         expect(ad.seats[0]).to eq('#')
         expect(ad.seats).to eq(Advent::Seat.new(c).seats)
       end
+
+      it "works with caching" do
+        ad = Advent::Seat.new(a, true)
+        expect(ad.tick_prime! > 0).to be_truthy
+        expect(ad.seats).to eq(Advent::Seat.new(b).seats)
+        expect(ad.tick_prime! > 0).to be_truthy
+        expect(ad.seats[0]).to eq('#')
+        expect(ad.seats).to eq(Advent::Seat.new(c).seats)
+      end
     end
   end
 end
