@@ -10,13 +10,6 @@ module Advent
       @way = [10,1]
     end
 
-    CARD = {
-      0 => 'N',
-      90 => 'E',
-      180 => 'S',
-      270 => 'W',
-    }
-
     def move!(inst)
       if inst =~ /^(\w)(\d+)$/
         i = $1
@@ -36,14 +29,9 @@ module Advent
             @way[0] = @way[1]
             @way[1] = -n
           end
-          # 10,4
-          # 4,-10
-          # -10,-4
-          # -4,10
         when 'L'
           move!("R#{-n % 360}")
         when 'F'
-          # move!(CARD[@direction] + n.to_s)
           @pos[0] += @way[0] * n
           @pos[1] += @way[1] * n
         end
@@ -60,6 +48,7 @@ module Advent
       pos[0].abs + pos[1].abs
     end
   end
+
   class Nav
     attr_reader :pos, :direction, :moves
     def initialize(input)
