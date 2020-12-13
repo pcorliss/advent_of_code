@@ -7,13 +7,14 @@ module Advent
 
     def initialize(input)
       @start = input.lines.first.chomp.to_i
-      @bus = input.lines[1].chomp.split(",").map do |b|
+      @bus_with_nil = input.lines[1].chomp.split(",").map do |b|
         if b == 'x'
           nil
         else
           b.to_i
         end
-      end.compact
+      end
+      @bus = @bus_with_nil.compact
     end
 
     def time_until_arrival(b)
@@ -29,6 +30,28 @@ module Advent
         end
       end
       acc
+    end
+
+    def contest_match?(t)
+      @bus_with_nil.each_with_index.all? do |b, idx|
+        t_prime = t + idx
+        if b.nil? || t_prime % b == 0
+          true
+        else
+          false
+        end
+      end
+    end
+
+    def contest
+      mult = @bus.first
+      i = 0
+      while true do
+        t = mult * i
+        return t if contest_match?(t)
+        i += 1
+        raise "Break!" if t > 10000000000
+      end
     end
   end
 end

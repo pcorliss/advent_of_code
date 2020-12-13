@@ -31,6 +31,19 @@ describe Advent do
     end
 
     context "validation" do
+      {
+        "17,x,13,19" => 3417,
+        "67,7,59,61" => 754018,
+        "67,x,7,59,61" => 779210,
+        "7,13,x,x,59,x,31,19" => 1068781,
+        "67,7,x,59,61" => 1261476,
+        "1789,37,47,1889" => 1202161486,
+      }.each do |inp, expected|
+        it "validates that #{inp} returns #{expected}" do
+          ad = Advent::Bus.new("0\n#{inp}")
+          expect(ad.contest).to eq(expected)
+        end
+      end
     end
   end
 end
