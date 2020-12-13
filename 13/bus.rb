@@ -15,6 +15,10 @@ module Advent
         end
       end
       @bus = @bus_with_nil.compact
+      @bus_with_offset = {}
+      @bus_with_nil.each_with_index do |b, idx|
+        @bus_with_offset[b] = idx unless b.nil?
+      end
     end
 
     def time_until_arrival(b)
@@ -32,10 +36,10 @@ module Advent
       acc
     end
 
+    # Use a smaller set with just busses and offsets, 5x speedup
     def contest_match?(t)
-      @bus_with_nil.each_with_index.all? do |b, idx|
-        t_prime = t + idx
-        if b.nil? || t_prime % b == 0
+      @bus_with_offset.all? do |b, idx|
+        if (t + idx) % b == 0
           true
         else
           false
@@ -43,14 +47,18 @@ module Advent
       end
     end
 
+    # Use the largest number instead of the first number. Should speed up by a factor of 55 based on input
+    # Chinese Remainder Theorem is what folks online are saying may be necessary.
+    # Should be able to find solutons using two largest numbers, which will then repeat.
     def contest
-      mult = @bus.first
+      mult = @bus.max
+      offset = @bus_with_nil.index(mult)
       i = 0
       while true do
-        t = mult * i
+        t = mult * i - offset
         return t if contest_match?(t)
         i += 1
-        raise "Break!" if t > 10000000000
+        puts "T: #{t} I: #{i}" if i % 1_000_000 == 0
       end
     end
   end
