@@ -51,5 +51,58 @@ module Advent
         invalid_nums(t)
       end.flatten.inject(:+)
     end
+
+    def valid_tickets
+      @tickets.select do |t|
+        invalid_nums(t).empty?
+      end
+    end
+
+    def field_mappings
+      valid = valid_tickets
+      # puts "Valid: #{valid}"
+      mappings = []
+      possible_mappings = {}
+      valid.first.length.times do |idx|
+        # puts "\tIdx: #{idx}"
+        nums = valid.map { |v| v[idx] }
+        # puts "\tNums: #{nums}"
+
+        # Rework this to determine possible fields for each index
+        # Then select the ones that only have 1 possible, then 2 possible, etc...
+        @fields.each do |f, rs|
+          # puts "\t\tField: #{f}"
+          match = nums.all? do |n|
+            rs.any? do |r|
+              r.include? n
+            end
+          end
+          # puts "\t\tMatch: #{match}"
+
+          if match
+            possible_mappings[f] ||= []
+            possible_mappings[f] << idx
+          end
+        end
+      end
+      # puts "Possible: #{possible_mappings}"
+      possible_mappings.sort_by { |f, v| v.length }.each do |f, v|
+        idx = v.find do |val|
+          mappings[val].nil?
+        end
+        mappings[idx] = f
+      end
+      mappings
+    end
+
+    def departure_info
+      departure_fields = []
+      field_mappings.each_with_index do |f, idx|
+        if f.start_with? "departure"
+          departure_fields << @ticket[idx]
+        end
+      end
+      departure_fields
+    end
   end
 end

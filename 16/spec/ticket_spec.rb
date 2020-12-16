@@ -68,6 +68,34 @@ describe Advent do
       end
     end
 
+    describe "#valid_tickets" do
+      it "returns only valid tikets" do
+        expect(ad.valid_tickets).to contain_exactly([7,3,47])
+      end
+    end
+
+    describe "#field_mappings" do
+      let(:input) {
+        <<~EOS
+          class: 0-1 or 4-19
+          row: 0-5 or 8-19
+          seat: 0-13 or 16-19
+
+          your ticket:
+          11,13,12
+
+          nearby tickets:
+          3,18,9
+          15,5,1
+          5,9,14
+        EOS
+      }
+
+      it "returns the field mappings" do
+        expect(ad.field_mappings).to eq(["row", "seat", "class"])
+      end
+    end
+
     context "validation" do
     end
   end
