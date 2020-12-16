@@ -75,6 +75,20 @@ describe Advent do
           expect(ad.goto_turn!(2020)).to eq(expected)
         end
       end
+      {
+        "0,3,6" => 175594,
+        "1,3,2" => 2578,
+        "2,1,3" => 3544142,
+        "1,2,3" => 261214,
+        "2,3,1" => 6895259,
+        "3,2,1" => 18,
+        "3,1,2" => 362,
+      }.each do |input, expected|
+        it "expects #{expected} when #{input} input is received for the 3*10^6th iteration" do
+          ad = Advent::Memory.new(input)
+          expect(ad.goto_turn!(30000000)).to eq(expected)
+        end
+      end
     end
   end
 end
