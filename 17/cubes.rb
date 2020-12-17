@@ -6,15 +6,17 @@ module Advent
     X = 0
     Y = 1
     Z = 2
+    W = 3
     ACTIVE = '#'
     INACTIVE = '.'
     CYCLES = 6
 
     attr_reader :grid, :cycle
 
-    def initialize(input)
+    def initialize(input, dimensions = 3)
       @grid = Set.new
       @cycle = 0
+      @dimensions = dimensions
 
       y = 0
       z = 0
@@ -23,7 +25,9 @@ module Advent
         l = line.chomp
         l.each_char do |char|
           if char == ACTIVE
-            @grid.add [x, y, z]
+            cube = [x, y, z]
+            cube << 0 if dimensions > 3
+            @grid.add cube
           end
           x += 1
         end
@@ -36,7 +40,13 @@ module Advent
       (-1..1).each do |x|
         (-1..1).each do |y|
           (-1..1).each do |z|
-            coords << [coord[X] + x, coord[Y] + y, coord[Z] + z] unless x == 0 && y == 0 && z == 0
+            if @dimensions > 3
+              (-1..1).each do |w|
+                coords << [coord[X] + x, coord[Y] + y, coord[Z] + z, coord[W] + w] unless x == 0 && y == 0 && z == 0 && w == 0
+              end
+            else
+              coords << [coord[X] + x, coord[Y] + y, coord[Z] + z] unless x == 0 && y == 0 && z == 0
+            end
           end
         end
       end

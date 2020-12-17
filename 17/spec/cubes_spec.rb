@@ -29,11 +29,27 @@ describe Advent do
       it "sets cycle to 0" do
         expect(ad.cycle).to eq(0)
       end
+
+      it "inits a 4D grid based on input" do
+        ad = Advent::Cubes.new(input, 4)
+        expect(ad.grid).to eq(Set.new([
+          [1,0,0,0],
+          [2,1,0,0],
+          [0,2,0,0],
+          [1,2,0,0],
+          [2,2,0,0],
+        ]))
+      end
     end
 
     describe "#neighbor_coords" do
       it "returns 26 coords" do
         expect(ad.neighbor_coords([0,0,0]).count).to eq(26)
+      end
+
+      it "returns 80 coords in a 4D space" do
+        ad = Advent::Cubes.new(input, 4)
+        expect(ad.neighbor_coords([0,0,0,0]).count).to eq(80)
       end
     end
 
@@ -77,6 +93,12 @@ describe Advent do
       it "sets 112 active cubes after 6 cycles according to part 1 problem" do
         6.times { ad.cycle! }
         expect(ad.grid.count).to eq(112)
+      end
+
+      it "sets 848 active cubes after 6 cycles according to part 2 problem when using a 4D grid" do
+        ad = Advent::Cubes.new(input, 4)
+        6.times { ad.cycle! }
+        expect(ad.grid.count).to eq(848)
       end
     end
   end
