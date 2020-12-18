@@ -13,36 +13,15 @@ module Advent
     def parse(expr)
       acc = []
       arr_stack = [acc]
-      prec_oper = false
       expr.each_char do |char|
         case char
         when /\d/
           acc << char.to_i
-          if prec_oper
-            prec_oper = false
-            arr = arr_stack.pop
-            acc = arr_stack.last
-            acc << arr
-          end
-        # when @precedence
-        #   prec_oper = true
-        #   first_elem = acc.pop
-        #   arr_stack << []
-        #   acc = arr_stack.last
-        #   acc << first_elem
-        #   acc << char
         when /[\+\*]/
           acc << char
         when '('
           arr_stack << []
           acc = arr_stack.last
-          if prec_oper
-            prec_oper = false
-
-            # arr = arr_stack.pop
-            # acc = arr_stack.last
-            # acc << arr
-          end
         when ')'
           arr = arr_stack.pop
           acc = arr_stack.last
