@@ -6,3 +6,5 @@ input = File.read('./input.txt')
 
 ad = Advent::Homework.new(input)
 puts "Sum: #{ad.sum}"
+ad = Advent::Homework.new(input, '+')
+puts "Sum: #{ad.sum}"

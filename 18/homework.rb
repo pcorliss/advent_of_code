@@ -5,22 +5,44 @@ module Advent
   class Homework
     attr_reader :expressions
 
-    def initialize(input)
+    def initialize(input, precedence = nil)
       @expressions = input.each_line.map(&:chomp)
+      @precedence = precedence
     end
 
     def parse(expr)
       acc = []
       arr_stack = [acc]
+      prec_oper = false
       expr.each_char do |char|
         case char
         when /\d/
           acc << char.to_i
+          if prec_oper
+            prec_oper = false
+            arr = arr_stack.pop
+            acc = arr_stack.last
+            acc << arr
+          end
+        # when @precedence
+        #   prec_oper = true
+        #   first_elem = acc.pop
+        #   arr_stack << []
+        #   acc = arr_stack.last
+        #   acc << first_elem
+        #   acc << char
         when /[\+\*]/
           acc << char
         when '('
           arr_stack << []
           acc = arr_stack.last
+          if prec_oper
+            prec_oper = false
+
+            # arr = arr_stack.pop
+            # acc = arr_stack.last
+            # acc << arr
+          end
         when ')'
           arr = arr_stack.pop
           acc = arr_stack.last
@@ -34,6 +56,29 @@ module Advent
       acc = 0
       operator = nil
       expr = parse(expr) if expr.is_a?(String)
+      if @precedence
+        new_expr = []
+        idx = 0
+        while idx < expr.length do
+          e = expr[idx]
+          if e == @precedence
+            first_term = new_expr.pop
+            second_term = expr[idx + 1]
+            first_term = evaluate(first_term) if first_term.is_a? Array
+            second_term = evaluate(second_term) if second_term.is_a? Array
+            new_expr << first_term + second_term if e == '+'
+            new_expr << first_term * second_term if e == '*'
+            idx += 1
+          else
+            new_expr << e
+          end
+          idx += 1
+        end
+        expr = new_expr
+      end
+
+      acc = 0
+      operator = nil
       expr.each do |e|
         if e.is_a? String
           operator = e
