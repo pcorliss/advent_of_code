@@ -1,4 +1,5 @@
 require 'set'
+require 'benchmark'
 
 module Advent
 
@@ -166,10 +167,13 @@ module Advent
 
         @rule_parser[1000 + i] = [42]
         @rule_parser[2000 + i] = [42,31]
-        m = @inputs.count do |input|
-          match?(rule_parser.first, input)
+        m = nil
+        t = Benchmark.measure do
+          m = @inputs.count do |input|
+            match?(rule_parser.first, input)
+          end
         end
-        puts "Matched: #{m}"
+        puts "Matched: #{m} in #{t}"
         @rule_parser[1000 + i] = [42, "|", 42, 1001 + i]
         @rule_parser[2000 + i] = [42, 31, "|", 42, 2001 + i, 31]
         m
