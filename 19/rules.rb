@@ -41,7 +41,75 @@ module Advent
       end
     end
 
+    def parse_rule_to_regex(rule)
+      #puts "Parsing: #{rule}"
+      joined = rule.split(" ").map do |r|
+        #puts "\tChecking on #{r.inspect}"
+        if r.match(/\d+/)
+          #puts "\tRecursing #{rule_parser[r.to_i]}"
+          parse_rule_to_regex(rule_parser[r.to_i].join(" "))
+        else
+          r
+        end
+      end.join("")
+      joined = "(#{joined})" if joined.include? "|"
+      joined
+    end
+
+    def rules_regex
+      return @rules_regex if @rules_regex
+      @rules_regex = parse_rule_to_regex("0")
+      @rules_regex
+    end
+
+    def gsub_rules!
+      @rules.map! do |r|
+        # elements = r.split(" ").map do |e|
+        #   next if e == "|"
+        #   next unless e.match(/\d+/)
+        #   sub = @rules[e.to_i]
+        #   if sub.length == 1
+        #     sub.to_s
+        #   elsif sub
+        #   else
+        #     "(#{sub})"
+        #   end
+        # end
+      end
+    end
+
+    def simplify_rules!
+      #puts "Rules: #{rule_parser}"
+      rule_parser.map! do |r|
+        # puts "\t#{r}"
+        r.map do |re|
+          if re.is_a? String
+            re
+          else
+            # puts "\t\t#{re} -- #{rule_parser[re]}"
+            lookup = rule_parser[re]
+            lookup = lookup.first if lookup.length == 1
+            lookup
+          end
+        end
+      end
+    end
+
     def match?(rules, chars)
+      # reg = ''
+      #
+      # !!chars.match(/#{reg}/)
+      # puts rule_parser.inspect
+      # naive_match?(rules,chars)
+      # !!rules_regex.match(chars)
+      reg = parse_rule_to_regex(rules.join(" "))
+      # puts "Expr: #{reg}"
+      m = chars.match(/^#{reg}$/)
+      # puts "Match: #{m.inspect}"
+      !!m
+    end
+
+    def naive_match?(rules, chars)
       # can add if empty check here for whole string check
       # sub_match? eats the chars so we can do this although it's bad
       chars = chars.chars if chars.is_a? String
