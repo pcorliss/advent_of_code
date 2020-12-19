@@ -7,6 +7,7 @@ module Advent
     def initialize(input)
       @rules = []
       @inputs = []
+      @reg = {}
       input.each_line do |l|
         l = l.chomp
         if l =~ /^\d/
@@ -42,6 +43,7 @@ module Advent
     end
 
     def parse_rule_to_regex(rule)
+      return @reg[rule] if @reg[rule]
       #puts "Parsing: #{rule}"
       joined = rule.split(" ").map do |r|
         #puts "\tChecking on #{r.inspect}"
@@ -53,7 +55,7 @@ module Advent
         end
       end.join("")
       joined = "(#{joined})" if joined.include? "|"
-      joined
+      @reg[rule] = joined
     end
 
     def rules_regex
@@ -151,6 +153,26 @@ module Advent
     def match_count
       @inputs.count do |input|
         match?(rule_parser.first, input)
+      end
+    end
+
+    def mutating_rules_match_count
+      @rule_parser[8] = [1000]
+      @rule_parser[11] = [2000]
+      10.times.map do |i|
+        @reg = {}
+        # 8: 42 | 42 8
+        # 11: 42 31 | 42 11 31
+
+        @rule_parser[1000 + i] = [42]
+        @rule_parser[2000 + i] = [42,31]
+        m = @inputs.count do |input|
+          match?(rule_parser.first, input)
+        end
+        puts "Matched: #{m}"
+        @rule_parser[1000 + i] = [42, "|", 42, 1001 + i]
+        @rule_parser[2000 + i] = [42, 31, "|", 42, 2001 + i, 31]
+        m
       end
     end
   end

@@ -11,3 +11,4 @@ RubyVM::InstructionSequence.compile_option = {
 
 ad = Advent::Rules.new(input)
 puts "Count: #{ad.match_count}"
+puts "Mutating Count: #{ad.mutating_rules_match_count}"

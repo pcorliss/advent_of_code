@@ -148,7 +148,7 @@ describe Advent do
 
       it "matches nested conditionals" do
         expect(ad.match?([4, 1, 5], "ababbb")).to be_truthy
-        # expect(ad.match?([4, 1, 5], "aaabbb")).to be_falsey
+        expect(ad.match?([4, 1, 5], "aaabbb")).to be_falsey
       end
 
       it "matches the whole string" do
