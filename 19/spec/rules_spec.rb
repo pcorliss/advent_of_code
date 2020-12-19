@@ -63,13 +63,41 @@ describe Advent do
         expect(ad.match?([4,5], "ab")).to be_truthy
         expect(ad.match?([4,5], "ba")).to be_falsey
       end
-      it "matches conditionals"
-      it "matches nested conditionals"
-      it "matches the whole string"
+
+      it "matches conditionals" do
+        expect(ad.match?([4, 5,'|', 5, 4], "ab")).to be_truthy
+        expect(ad.match?([4, 5,'|', 5, 4], "ba")).to be_truthy
+        expect(ad.match?([4, 5,'|', 5, 4], "ac")).to be_falsey
+      end
+
+      it "matches nested conditionals" do
+        expect(ad.match?([4, 1, 5], "ababbb")).to be_truthy
+        expect(ad.match?([4, 1, 5], "aaabbb")).to be_falsey
+      end
+
+      it "matches the whole string" do
+        expect(ad.match?([4], "aa")).to be_falsey
+        expect(ad.match?([4, 1, 5], "aaaabbb")).to be_falsey
+      end
     end
 
 
     context "validation" do
+      {
+        "ababbb" => true,
+        "bababa" => false,
+        "abbbab" => true,
+        "aaabbb" => false,
+        "aaaabbb" => false,
+      }.each do |chars, expected|
+        it "matches #{chars} as #{expected}" do
+          expect(ad.match?([4,1,5], chars)).to eq(expected)
+        end
+      end
+
+      it "correctly counts the number of matches" do
+        expect(ad.match_count).to eq(2)
+      end
     end
   end
 end
