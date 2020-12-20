@@ -171,7 +171,37 @@ Tile 3079:
         ])
       end
     end
+
+    describe "#get" do
+      it "gets an individual char without borders" do
+        expect(ad.get(0,0)).to eq('.')
+        expect(ad.get(1,0)).to eq('#')
+        expect(ad.get(1,1)).to eq('#')
+        expect(ad.get(0,1)).to eq('#')
+      end
+
+      it "handles tiles at the other end of the board" do
+        expect(ad.get(23,23)).to eq('#')
+        expect(ad.get(22,23)).to eq('.')
+        expect(ad.get(22,22)).to eq('#')
+        expect(ad.get(23,22)).to eq('#')
+      end
+    end
+
+    describe "#monster_coords" do
+      it "generates all possible monster coords" do
+        expect(ad.monster_coords.count).to eq(8)
+      end
+    end
+
     context "validation" do
+      it "counts the monsters" do
+        expect(ad.count_monsters).to eq(2)
+      end
+
+      it "counts non monster waves" do
+        expect(ad.waves).to eq(273)
+      end
     end
   end
 

@@ -140,10 +140,109 @@ module Advent
         matching_edges == 2
       end
     end
+
+    def get(x,y)
+      orient! if @grid.empty?
+      tile_width = @grid.first.width
+      tile_x = x / tile_width
+      tile_y = y / tile_width
+      subtile_x = x % tile_width + 1
+      subtile_y = y % tile_width + 1
+      tile = @grid[tile_x + tile_y * @width]
+      if tile.nil?
+        #puts "Overbounds: #{x} #{y}"
+        return ''
+      end
+      tile.grid[subtile_y][subtile_x]
+    end
+
+    MONSTER = <<~EOS
+..................#.
+#....##....##....###
+.#..#..#..#..#..#...
+    EOS
+
+    def monsters
+      monster_coords
+    end
+
+    def monster_coords
+      return @monsters if @monsters
+      @monsters = [
+        [], [], [], [],
+        [], [], [], [],
+      ]
+
+      m = MONSTER
+      8.times do |idx|
+        # rotation
+        m = m.lines.map {|l| l.chomp.chars}.transpose.map(&:reverse).map(&:join).join("\n")
+        if idx == 4
+          # flip
+          m = m.lines.map {|l| l.chomp.reverse}.join("\n")
+        end
+        m.lines.each_with_index do |line, row|
+          line.chomp.chars.each_with_index do |char, col|
+            if char == "#"
+              @monsters[idx] << [col, row]
+            end
+          end
+        end
+      end
+
+      @monsters
+    end
+
+    def count_monsters
+      orient! if @grid.empty?
+      match_count = 0
+
+      tile_width = @grid.first.width
+      boundary_x = @width * tile_width
+      boundary_y = boundary_x # May want to shorten this so we don't read off the edge
+      monsters.each do |m|
+        (0..boundary_x-1).each do |x|
+          (0..boundary_y-1).each do |y|
+            match = true
+            # This could be an all
+            m.each do |coord|
+              if get( coord[0] + x, coord[1] + y,) != '#'
+                match = false
+                break
+              end
+            end
+            match_count += 1 if match
+          end
+        end
+        puts "Monster Count: #{match_count}"
+      end
+      match_count
+    end
+
+    def waves
+      orient! if @grid.empty?
+      monster_waves = MONSTER.chars.count do |c|
+        c == '#'
+      end
+
+      # puts "Monster waves: #{monster_waves}"
+      waves = 0
+
+      tile_width = @grid.first.width
+      boundary_x = @width * tile_width
+      boundary_y = boundary_x # May want to shorten this so we don't read off the edge
+      (0..boundary_x-1).each do |x|
+        (0..boundary_y-1).each do |y|
+          waves += 1 if get(x, y) == '#'
+        end
+      end
+      # puts "Waves: #{waves}"
+      waves - monster_waves * count_monsters
+    end
   end
 
   class Tile
-    attr_reader :id, :grid
+    attr_reader :id, :grid, :width
 
     def initialize(input)
       @grid = []
@@ -155,6 +254,7 @@ module Advent
           @grid << line
         end
       end
+      @width = grid.first.length - 2
     end
 
     def edges
