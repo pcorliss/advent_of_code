@@ -8,3 +8,4 @@ ad = Advent::Jigsaw.new(input)
 ids = ad.corners.map(&:id)
 puts "Ids: #{ids}"
 puts "Mult: #{ids.inject(:*)}"
+puts "Grid: #{ad.orient!.map(&:id)}"
