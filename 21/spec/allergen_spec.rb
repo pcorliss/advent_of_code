@@ -69,6 +69,14 @@ describe Advent do
         end
         expect(count).to eq(5)
       end
+
+      it "lists the dangerous ingredients alphabetically" do
+        ad.safe_foods
+        dangerous = ad.known_allergens.keys.sort.map do |allergen|
+          ad.known_allergens[allergen]
+        end.join(",")
+        expect(dangerous).to eq("mxmxvkd,sqjhc,fvjkl")
+      end
     end
   end
 end

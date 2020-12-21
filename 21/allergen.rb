@@ -45,10 +45,10 @@ module Advent
           find_potential_allergen(allergen)
           # puts "f: #{f}"
         end
-        # puts "Iterating: #{i}"
+        puts "Iterating: #{i}"
         i += 1
-        # puts "Known: #{@known_allergens.keys}"
-        # puts "Unknown: #{@allergen_map.keys - @known_allergens.keys}"
+        puts "Known: #{@known_allergens.keys}"
+        puts "Unknown: #{@allergen_map.keys - @known_allergens.keys}"
         if i > 100
           raise "Breaking after 100 loops"
         end
