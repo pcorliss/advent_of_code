@@ -14,3 +14,5 @@ puts "Recursive Score: #{ad.score}"
 
 # Recursive Score: 32052
 # That's not the right answer; your answer is too low.
+# Recursive Score: 7012
+# That's not the right answer; your answer is too low.

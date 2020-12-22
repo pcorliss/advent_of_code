@@ -74,6 +74,11 @@ Player 2:
       xit "orders the resulting cards correctly (sometimes the winning card is lower)"
       xit "doesn't play a sub-game if one player doesn't have enough cards"
 
+      xit "avoids off by one errors on deck copies" do
+        ad = Advent::Crab.new("", [1,8,3], [4,10,9,7,5])
+        ad.recursive_round!
+      end
+
       it "makes player 1 the winner if there was a previous round in this game that had exactly the same cards in the same order" do
         input = <<~EOS
         Player 1:
@@ -88,7 +93,10 @@ Player 2:
         ad = Advent::Crab.new(input)
         expect(ad.decks.first.count).to eq(2)
         ad.recursive_combat!
-        expect(ad.score).to eq(273)
+        # Doesn't terminate on an empty deck
+        # puts ad.decks.inspect
+        expect(ad.decks.first.count).to eq(2)
+        expect(ad.decks.last.count).to eq(3)
       end
     end
 
@@ -109,6 +117,14 @@ Player 2:
       it "calculates teh correct score for recursive combat" do
         ad.recursive_combat!
         expect(ad.score).to eq(291)
+      end
+
+      it "isn't experiencing memory issues" do
+        100.times do 
+          ad = Advent::Crab.new(input)
+          ad.recursive_combat!
+          expect(ad.score).to eq(291)
+        end
       end
     end
 
