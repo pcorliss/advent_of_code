@@ -10,6 +10,99 @@ describe Advent do
     EOS
   }
 
+  describe Advent::LinkedNumList do
+    let(:ad) { Advent::Cups.new(input, 9, true) }
+    let(:ll) { ad.cups_prime }
+
+    describe "#new" do
+      it "inits a new linked list" do
+        expect(ll.to_a).to eq([3,8,9,1,2,5,4,6,7])
+      end
+
+      it "fills up to a num" do
+        ad = Advent::Cups.new(input, 12)
+        ll = ad.cups_prime
+        expect(ll.to_a).to eq([3,8,9,1,2,5,4,6,7,10,11,12])
+      end
+
+      it "has pointers to each node" do
+        nums = ll.nums.map { |node| node.num if node }
+        expect(nums).to eq([nil, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+      end
+    end
+
+    describe "#advance!" do
+      it "walks forwards" do
+        ll.advance!
+        expect(ll.to_a).to eq([8,9,1,2,5,4,6,7,3])
+      end
+    end
+
+    describe "#move!" do
+      it "increments the current cup" do
+        expect(ll.pos.num).to eq(3)
+        ll.move!
+        expect(ll.pos.num).to eq(2)
+      end
+
+      it "moves three cups to a new position" do
+        expect(ll.to_a).to eq([3,8,9,1,2,5,4,6,7])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,8,9,1,5,4,6,7])
+      end
+
+      it "keeps subtracting until it finds a destination of a cub just picked up" do
+        expect(ll.to_a(3)).to eq([3,8,9,1,2,5,4,6,7])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,8,9,1,5,4,6,7])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,5,4,6,7,8,9,1])
+      end
+    end
+    context "validation" do
+      it "results in valid sequences after each move" do
+        expect(ll.to_a(3)).to eq([3,8,9,1,2,5,4,6,7])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,8,9,1,5,4,6,7])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,5,4,6,7,8,9,1])
+        ll.move!
+        expect(ll.to_a(7)).to eq([7,2,5,8,9,1,3,4,6])
+        ll.move!
+        expect(ll.to_a(3)).to eq([3,2,5,8,4,6,7,9,1])
+        ll.move!
+        expect(ll.to_a(9)).to eq([9,2,5,8,4,1,3,6,7])
+        ll.move!
+        expect(ll.to_a(7)).to eq([7,2,5,8,4,1,9,3,6])
+        ll.move!
+        expect(ll.to_a(8)).to eq([8,3,6,7,4,1,9,2,5])
+        ll.move!
+        expect(ll.to_a(7)).to eq([7,4,1,5,8,3,9,2,6])
+        ll.move!
+        expect(ll.to_a(5)).to eq([5,7,4,1,8,3,9,2,6])
+        ll.move!
+        expect(ll.to_a(5)).to eq([5,8,3,7,4,1,9,2,6])
+        ll.move!
+      end
+
+      it "delivers the correct ordering after 100 moves" do
+        100.times { ll.move! }
+        expect(ll.to_a(1)).to eq([1,6,7,3,8,4,5,2,9])
+      end
+
+      it "produces the correct value when filling the array with 1 million values and running ten million moves" do
+        ad = Advent::Cups.new(input, 1_000_000)
+        ll = ad.cups_prime
+        # 10_000_000.times do |i|
+        10_000_000.times do |i|
+          ll.move!
+        end
+        cups = ll.to_a(1).first(3).last(2)
+        expect(cups).to eq([934001, 159792])
+      end
+    end
+  end
+
   describe Advent::Cups do
     let(:ad) { Advent::Cups.new(input, 9, true) }
 
