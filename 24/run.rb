@@ -13,3 +13,6 @@ puts "Flips: #{tiles.sum}"
 puts "White Tiles: #{white_tiles}"
 puts "Black Tiles: #{black_tiles}"
 
+100.times do |i|
+  puts "Day #{i + 1}: #{ad.day!}"
+end

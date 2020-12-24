@@ -4,7 +4,7 @@ module Advent
 
   class Hexagon
 
-    attr_reader :instructions, :grid
+    attr_reader :instructions, :grid, :day
     attr_accessor :debug
 
     def initialize(input)
@@ -69,6 +69,61 @@ module Advent
       @instructions.each do |inst|
         flip!(inst)
       end
+    end
+
+    def adjacent(x, y)
+      acc = []
+      directions = DIRECTIONS
+      directions = SHIFTED_DIRECTIONS if y % 2 == 1
+      directions.each do |dir, shift|
+        acc << [x + shift[0], y + shift[1]]
+      end
+      acc
+    end
+
+    def day!
+      @day ||= 0
+      @day += 1
+
+      neighbors_count = {}
+      @grid.each do |coord, val|
+        next unless val % 2 == 1
+        adjacent(*coord).each do |ncoord|
+          neighbors_count[ncoord] ||= 0
+          neighbors_count[ncoord] += 1
+        end
+      end
+      
+      new_grid = @grid.clone
+
+      @grid.each do |coord, val|
+        if val % 2 == 1 && neighbors_count[coord].nil?
+          new_grid[coord] += 1
+
+        end
+      end
+
+      neighbors_count.each do |coord, adj_count|
+        # black tiles
+        if @grid[coord] && @grid[coord] % 2 == 1
+          if adj_count > 2
+            new_grid[coord] += 1
+          end
+        # white tiles
+        else
+          if adj_count == 2
+            new_grid[coord] ||= 0
+            new_grid[coord] += 1
+          end
+        end
+      end
+
+      # flipped = new_grid.values.sum - @grid.values.sum
+
+      @grid = new_grid
+
+      # Return num of black tiles
+      @grid.values.count {|t| t % 2 == 1}
     end
   end
 end
