@@ -28,6 +28,12 @@ describe Advent do
         ad.parse!(["U2","R2","D2","L2"], 1)
         expect(ad.grid.cells.count).to eq(8)
       end
+
+      it "draws on the trace grid" do
+        ad.parse!(["U2","R2","D2","L2"], 1)
+        expect(ad.trace.cells.count).to eq(8)
+        expect(ad.trace.cells.values).to eq((1..8).to_a)
+      end
     end
 
     describe "#intersections" do
@@ -57,6 +63,24 @@ describe Advent do
         ad = Advent::Wires.new(input)
         expect(ad.distance_intersection).to eq(135)
       end
+
+      it "finds the shortest trace intersection" do
+        input = <<~EOS
+          R75,D30,R83,U83,L12,D49,R71,U7,L72
+          U62,R66,U55,R34,D71,R55,D58,R83
+        EOS
+        ad = Advent::Wires.new(input)
+        expect(ad.shortest_intersection).to eq(610)
+      end
+
+      it "finds the closeset intersection using alternate inputs" do
+        input = <<~EOS
+          R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51
+          U98,R91,D20,R16,D67,R40,U7,R15,U6,R7
+        EOS
+        ad = Advent::Wires.new(input)
+        expect(ad.shortest_intersection).to eq(410)
+      end
     end
   end
 end
@@ -85,6 +109,15 @@ describe Grid do
       grid.draw!([0,-1], 4, 2, :+)
       # Doesn't set origin point so different values will appear
       expect(grid.cells.values).to include(3, 1, 2)
+    end
+  end
+
+  describe "#trace!" do
+    it "takes a direction, distance and value and marks cells along the route with increasing values" do
+      grid.trace!([0,1], 3, 3)
+      expect(grid.pos).to eq([0,3])
+      expect(grid.cells.count).to eq(3)
+      expect(grid.cells.values).to eq([4,5,6])
     end
   end
 end

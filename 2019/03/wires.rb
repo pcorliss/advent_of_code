@@ -3,7 +3,7 @@ require 'set'
 module Advent
 
   class Wires
-    attr_reader :grid, :instructions
+    attr_reader :grid, :instructions, :trace
     attr_accessor :debug
 
     DIRECTION = {
@@ -15,18 +15,23 @@ module Advent
 
     def initialize(input)
       @grid = Grid.new
+      @trace = Grid.new
       @instructions = input.each_line.map { |l| l.chomp.split(",") }
       @debug = false
     end
 
     def parse!(instructions, val)
       @grid.pos = [0,0]
+      @trace.pos = [0,0]
+      t = 0
       instructions.each do |inst|
         if inst =~ /(\w)(\d+)/
           direction = DIRECTION[$1]
           distance = $2.to_i
           @grid.draw!(direction, distance, val, :|)
-          puts "#{inst} - Dir: #{direction}, Distance: #{distance}, #{@grid.cells}" if @debug
+          t = @trace.trace!(direction, distance, t)
+          puts "#{inst} - #{t} #{@trace.cells}" if @debug
+          # puts "#{inst} - Dir: #{direction}, Distance: #{distance}, #{@trace.cells}, #{@grid.cells}" if @debug
         end
       end
     end
@@ -45,6 +50,12 @@ module Advent
       puts "Intersections: #{intersections}" if @debug
       intersections.map do |int|
         int[0].abs + int[1].abs
+      end.min
+    end
+
+    def shortest_intersection
+      intersections.map do |int|
+        @trace.cells[int]
       end.min
     end
   end
@@ -76,5 +87,18 @@ class Grid
       end
       @pos = new_pos
     end
+  end
+
+  def trace!(direction, distance, val)
+    x, y = direction
+    counter = val
+    distance.times do |i|
+      counter = val + i + 1
+      new_pos = [@pos[X] + x, @pos[Y] + y]
+      @cells[new_pos] ||= 0
+      @cells[new_pos] += counter
+      @pos = new_pos
+    end
+    counter
   end
 end
