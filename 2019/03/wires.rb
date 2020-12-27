@@ -3,13 +3,55 @@ require 'set'
 module Advent
 
   class Wires
+    attr_reader :grid, :instructions
+    attr_accessor :debug
+
+    DIRECTION = {
+      'R' => [1,0],
+      'U' => [0,1],
+      'L' => [-1,0],
+      'D' => [0,-1],
+    }
+
     def initialize(input)
+      @grid = Grid.new
+      @instructions = input.each_line.map { |l| l.chomp.split(",") }
+      @debug = false
+    end
+
+    def parse!(instructions, val)
+      @grid.pos = [0,0]
+      instructions.each do |inst|
+        if inst =~ /(\w)(\d+)/
+          direction = DIRECTION[$1]
+          distance = $2.to_i
+          @grid.draw!(direction, distance, val, :|)
+          puts "#{inst} - Dir: #{direction}, Distance: #{distance}, #{@grid.cells}" if @debug
+        end
+      end
+    end
+
+    def intersections
+      return @intersections if @intersections
+      @instructions.each_with_index do |inst, i|
+        parse!(inst, 2 ** i)
+      end
+      @intersections = @grid.cells.select do |cell, val|
+        val == 3
+      end.keys
+    end
+
+    def distance_intersection
+      puts "Intersections: #{intersections}" if @debug
+      intersections.map do |int|
+        int[0].abs + int[1].abs
+      end.min
     end
   end
 end
 
 class Grid
-  attr_reader :cells, :pos
+  attr_accessor :cells, :pos
 
   X = 0
   Y = 1
@@ -34,6 +76,5 @@ class Grid
       end
       @pos = new_pos
     end
-
   end
 end
