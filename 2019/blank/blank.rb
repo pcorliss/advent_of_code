@@ -8,5 +8,9 @@ module Advent
     def initialize(input)
       @debug = false
     end
+
+    def debug!
+      @debug = true
+    end
   end
 end
