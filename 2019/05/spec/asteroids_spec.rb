@@ -35,15 +35,13 @@ describe Advent do
     end
 
     describe "#run!" do
-      before do
-        ad.run!
-      end
-
       it "executes an addition instruction" do
+        ad.run!
         expect(ad.instructions[3]).to eq(70)
       end
 
       it "executes a multiplication instruction" do
+        ad.run!
         expect(ad.instructions[0]).to eq(3500)
       end
 
@@ -77,9 +75,115 @@ describe Advent do
         }.each do |input, expected|
           it "takes an input of #{input} and results in #{expected}" do
             ad = Advent::IntCode.new(input)
-            ad.debug!
             ad.run!
             expect(ad.instructions).to eq(expected)
+          end
+        end
+      end
+
+      context "inputs" do
+        it "sets the input" do
+          input = "3,3,99,0"
+          ad = Advent::IntCode.new(input)
+          expect(ad.instructions.last).to eq(0)
+          ad.program_input = 7
+          ad.run!
+          expect(ad.instructions.last).to eq(7)
+        end
+      end
+
+      context "outputs" do
+        it "returns the output" do
+          input = "4,3,99,0"
+          ad = Advent::IntCode.new(input)
+          ad.run!
+          expect(ad.output).to eq(0)
+        end
+      end
+
+      # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+      context "jump if true" do
+        let(:input) { "3,3,1105,-1,9,1101,0,0,12,4,12,99,1" }
+        it "jumps if true" do
+          ad = Advent::IntCode.new(input)
+          ad.program_input = 1
+          ad.run!
+          expect(ad.output).to eq(1)
+        end
+
+        it "does nothing if false" do
+          ad = Advent::IntCode.new(input)
+          ad.program_input = 0
+          ad.run!
+          expect(ad.output).to eq(0)
+        end
+      end
+
+      #     Opcode 6 is jump-if-false: if the first parameter is zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
+      context "jump if false" do
+        let(:input) { "3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9" }
+        it "jumps if false" do
+          ad = Advent::IntCode.new(input)
+          ad.program_input = 1
+          ad.run!
+          expect(ad.output).to eq(1)
+        end
+
+        it "does nothing if true" do
+          ad = Advent::IntCode.new(input)
+          ad.program_input = 0
+          ad.run!
+          expect(ad.output).to eq(0)
+        end
+      end
+
+      #     Opcode 7 is less than: if the first parameter is less than the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+      context "less_than" do
+        [
+          "3,9,7,9,10,9,4,9,99,-1,8", # - Using position mode, consider whether the input is less than 8; output 1 (if it is) or 0 (if it is not).
+          "3,3,1107,-1,8,3,4,3,99", # - Using immediate mode, consider whether the input is less than 8; output 1 (if it is) or 0 (if it is not).
+        ].each do |input|
+          it "sets the output to 1 if the input is less than 8" do
+            ad = Advent::IntCode.new(input)
+            ad.program_input = 7
+            ad.run!
+            expect(ad.output).to eq(1)
+          end
+
+          it "sets the output to 0 if the input is equal to 8" do
+            ad = Advent::IntCode.new(input)
+            ad.program_input = 8
+            ad.run!
+            expect(ad.output).to eq(0)
+          end
+
+          it "sets the output to 0 if the input is greater than 8" do
+            ad = Advent::IntCode.new(input)
+            ad.program_input = 9
+            ad.run!
+            expect(ad.output).to eq(0)
+          end
+        end
+      end
+
+      #     Opcode 8 is equals: if the first parameter is equal to the second parameter, it stores 1 in the position given by the third parameter. Otherwise, it stores 0.
+      context "equals" do
+        [
+          "3,9,8,9,10,9,4,9,99,-1,8", # - Using position mode, consider whether the input is equal to 8; output 1 (if it is) or 0 (if it is not).
+          "3,3,1108,-1,8,3,4,3,99", # - Using immediate mode, consider whether the input is equal to 8; output 1 (if it is) or 0 (if it is not).
+        ].each do |input|
+          it "sets the output to 1 if the input is equivalent to 8" do
+            ad = Advent::IntCode.new(input)
+            ad.program_input = 8
+            ad.run!
+            expect(ad.output).to eq(1)
+          end
+
+          it "sets the output to 0 if the input is not equivalent to 8" do
+            ad = Advent::IntCode.new(input)
+            ad.program_input = 7
+            ad.run!
+            expect(ad.output).to eq(0)
           end
         end
       end
@@ -96,6 +200,28 @@ describe Advent do
           ad = Advent::IntCode.new(input)
           ad.run!
           expect(ad.instructions).to eq(expected)
+        end
+      end
+
+      context "jumps and comparisons" do
+        let(:input) { "3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99" }
+
+        it "will output 999 if the input value is below 8" do
+          ad.program_input = 7
+          ad.run!
+          expect(ad.output).to eq(999)
+        end
+
+        it "will output 1000 if the input value is equal to 8" do
+          ad.program_input = 8
+          ad.run!
+          expect(ad.output).to eq(1000)
+        end
+
+        it "will output 1001 if the input value is greater than 8" do
+          ad.program_input = 9
+          ad.run!
+          expect(ad.output).to eq(1001)
         end
       end
     end
