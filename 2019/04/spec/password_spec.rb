@@ -52,6 +52,28 @@ describe Advent do
       end
     end
 
+    describe "#valid_numbers_prime" do
+      # 112233 meets these criteria because the digits never decrease and all repeated digits are exactly two digits long.
+      it "the two adjacent matching digits are not part of a larger group of matching digits." do
+        inp = "112233-112233"
+        ad = Advent::Password.new(inp)
+        expect(ad.valid_numbers_prime).to include(112233)
+      end
+
+      it "doesn't include numbers with repeated groups" do
+        inp = "123444-123444"
+        ad = Advent::Password.new(inp)
+        expect(ad.valid_numbers_prime).to be_empty
+      end
+
+      #   111122 meets the criteria (even though 1 is repeated more than twice, it still contains a double 22).
+      it "includes numbers with repeats as long as there is still a double" do
+        inp = "111122-111122"
+        ad = Advent::Password.new(inp)
+        expect(ad.valid_numbers_prime).to include(111122)
+      end
+    end
+
     # It is a six-digit number.
     # The value is within the range given in your puzzle input.
     # Two adjacent digits are the same (like 22 in 122345).

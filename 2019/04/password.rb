@@ -33,9 +33,23 @@ module Advent
       s
     end
 
-    # It is a six-digit number.
-    # The value is within the range given in your puzzle input.
-    # Two adjacent digits are the same (like 22 in 122345).
-    # Going from left to right, the digits never decrease; they only ever increase or stay the same (like 111123 or 135679).
+    def valid_numbers_prime
+      s = valid_numbers
+      s.each do |i|
+        puts "Num: #{i}" if @debug
+        last_digit = 10
+        repeats = {}
+        i.digits.each do |j|
+          if last_digit == j
+            repeats[j] ||= 0
+            repeats[j] += 1
+          end
+          last_digit = j
+        end
+        puts "Repeats: #{repeats.inspect}" if @debug
+        s.delete i unless repeats.values.include? 1
+      end
+      s
+    end
   end
 end
