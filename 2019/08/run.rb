@@ -14,3 +14,4 @@ twos = layer.cells.values.count { |v| v == 2}
 
 puts "Mult: #{ones * twos}"
 
+puts "Rendered: \n#{ad.compose_layers.render.tr('01',' █')}"

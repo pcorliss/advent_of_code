@@ -18,17 +18,32 @@ module Advent
     def debug!
       @debug = true
     end
+
+    def compose_layers
+      g = Grid.new
+      g.width = @layers.first.width
+
+      @layers.first.cells.each do |cell, x|
+        l = @layers.find do |layer|
+          layer.cells[cell] != 2
+        end
+        g.cells[cell] = l.cells[cell]
+      end
+
+      g
+    end
   end
 end
 
 class Grid
-  attr_reader :width
+  attr_accessor :width
   attr_accessor :cells, :pos
 
   X = 0
   Y = 1
 
   def initialize(init = nil, width = nil)
+    @debug = false
     @cells = {}
     @pos = [0,0]
     if init && width
@@ -39,6 +54,29 @@ class Grid
         @cells[[x, y]] = val
       end
     end
+  end
+
+  def debug!
+    @debug = true
+  end
+
+  def render
+    min_y, max_y = @cells.keys.map(&:last).minmax
+    min_x, max_x = @cells.keys.map(&:first).minmax
+
+    puts "Grid: #{@cells}" if @debug
+    puts "Cells: #{@cells.keys}" if @debug
+    puts "[#{min_x},#{min_y}] -> [#{max_x},#{max_y}]" if @debug
+    acc = ""
+    (min_y..max_y).each do |y|
+      (min_x..max_x).each do |x|
+        cell = @cells[[x,y]] || ' '
+        acc << cell.to_s
+      end
+      acc << "\n"
+    end
+    acc.chomp!
+    acc
   end
 
   def draw!(direction, distance, val = true, operator = nil)
