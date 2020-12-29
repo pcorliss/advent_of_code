@@ -37,8 +37,54 @@ module Advent
     end
   end
 
+  class LoopedAmp
+    attr_accessor :debug, :program
+
+    def initialize(input)
+      @debug = false
+      @program = input
+    end
+
+    def debug!
+      @debug = true
+    end
+
+    def thruster_signal(phase_setting)
+      output = 0
+      computers = phase_setting.map do |setting|
+        c = IntCode.new(@program)
+        c.inputs << setting
+        c
+      end
+      continue = true
+      i = 0
+      while continue do
+        phase_setting.each_with_index do |setting, idx|
+          computer = computers[idx]
+          computer.inputs << output
+          computer.run!
+          output = computer.output
+        end
+        break if computers.all?(&:halted?)
+        i += 1
+        raise "Too many iterations" if i > 100
+      end
+      output
+    end
+
+    def max_thruster_signal
+      thruster_signal(ideal_phase_setting)
+    end
+
+    def ideal_phase_setting
+      (5..9).to_a.permutation.max_by do |setting|
+        thruster_signal(setting)
+      end
+    end
+  end
+
   class IntCode
-    attr_reader :instructions, :inputs
+    attr_reader :instructions, :inputs, :pos
     attr_accessor :debug
 
     def initialize(input)
@@ -46,6 +92,7 @@ module Advent
       @pos = 0
       @debug = false
       @inputs = []
+      @paused = true
     end
 
     def program_input
@@ -107,6 +154,7 @@ module Advent
 
     def run!
       i = 0
+      @paused = false
       while @pos < @instructions.length do
         opcode = @instructions[@pos] % 100
         instruction = INST[opcode]
@@ -114,18 +162,29 @@ module Advent
           @pos += 1
           next
         end
-        break if instruction[:halt]
+        return if instruction[:halt]
 
         params = instruction[:arguments].times.map do |i|
           (@instructions[@pos] / 10 ** (i + 2)) % (10 ** (i + 1)) == 1
         end
 
         puts "#{instruction[:method].inspect} - #{@pos} - #{params} - #{@instructions[@pos..(@pos+instruction[:arguments])]}" if @debug
+        break if instruction[:method] == :inp && @inputs.count == 0
         self.__send__(instruction[:method], @pos, *params)
         @pos += instruction[:arguments] + 1
         i += 1
         raise "Too many iterations!!" if i > 1000
       end
+      @paused = true
+    end
+
+    def paused?
+      !!@paused
+    end
+
+    def halted?
+      # Not technically correct while running but sufficient for now
+      !paused?
     end
 
     def equals(pos, a_param, b_param, target_param)
