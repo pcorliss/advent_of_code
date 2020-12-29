@@ -49,9 +49,23 @@ puts b
 
 # exit
 
-ad = Advent::Cups.new(input, 1_000_000, false)
-ll = ad.cups_prime
-10_000_000.times { ll.move! }
-cups = ll.to_a(1).first(3).last(2)
+b = Benchmark.measure do
+  ad = Advent::Cups.new(input, 1_000_000, false)
+  ll = ad.cups_prime
+end
+
+puts "Init: #{b}"
+
+b = Benchmark.measure do
+  10_000_000.times { ll.move! }
+end
+puts "10M Moves: #{b}"
+
+cups = nil
+b = Benchmark.measure do
+  cups = ll.to_a(1).first(3).last(2)
+end
+puts "Slice: #{b}"
+
 puts "#{cups}"
 puts "#{cups.inject(:*)}"
