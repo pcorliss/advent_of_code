@@ -3,14 +3,37 @@ require 'set'
 module Advent
 
   class Amp
-    attr_accessor :debug
+    attr_accessor :debug, :program, :computer
 
     def initialize(input)
       @debug = false
+      @program = input
     end
 
     def debug!
       @debug = true
+    end
+
+    def thruster_signal(phase_setting)
+      output = 0
+      phase_setting.each do |setting|
+        computer = IntCode.new(@program)
+        computer.inputs << setting
+        computer.inputs << output
+        computer.run!
+        output = computer.output
+      end
+      output
+    end
+
+    def max_thruster_signal
+      thruster_signal(ideal_phase_setting)
+    end
+
+    def ideal_phase_setting
+      5.times.to_a.permutation.max_by do |setting|
+        thruster_signal(setting)
+      end
     end
   end
 

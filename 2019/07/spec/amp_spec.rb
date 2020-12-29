@@ -6,6 +6,7 @@ describe Advent do
 
   let(:input) {
     <<~EOS
+    3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0
     EOS
   }
 
@@ -13,9 +14,54 @@ describe Advent do
     let(:ad) { Advent::Amp.new(input) }
 
     describe "#new" do
+      it "loads the a sample program" do
+        expect(ad.program).to eq(input)
+      end
     end
 
+    describe "#thruster signal" do
+      it "calibrates a given phase setting and runs it against a computer" do
+        expect(ad.thruster_signal([4,3,2,1,0])).to eq(43210)
+      end
+    end
+
+
+
     context "validation" do
+      {
+        "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0" => {thrust: 43210, setting: [4,3,2,1,0]},
+        "3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0" => {thrust: 54321, setting: [0,1,2,3,4]},
+        "3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0" => {thrust: 65210, setting: [1,0,4,3,2]},
+      }.each do |program, expected|
+        it "calculates the correct thrust signal" do
+          ad = Advent::Amp.new(program)
+          phase_setting = expected[:setting]
+          thrust = expected[:thrust]
+          expect(ad.thruster_signal(phase_setting)).to eq(thrust)
+        end
+      end
+
+      {
+        "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0" => 43210,
+        "3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0" => 54321,
+        "3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0" => 65210,
+      }.each do |program, max_thruster|
+        it "finds the max thruster signal for the given program" do
+          ad = Advent::Amp.new(program)
+          expect(ad.max_thruster_signal).to eq(max_thruster)
+        end
+      end
+
+      {
+        "3,15,3,16,1002,16,10,16,1,16,15,15,4,15,99,0,0" => [4,3,2,1,0],
+        "3,23,3,24,1002,24,10,24,1002,23,-1,23,101,5,23,23,1,24,23,23,4,23,99,0,0" => [0,1,2,3,4],
+        "3,31,3,32,1002,32,10,32,1001,31,-2,31,1007,31,0,33,1002,33,7,33,1,33,31,31,1,32,31,31,4,31,99,0,0,0" => [1,0,4,3,2]
+      }.each do |program, ideal_phase_setting|
+        it "finds the ideal phase setting for the given program" do
+          ad = Advent::Amp.new(program)
+          expect(ad.ideal_phase_setting).to eq(ideal_phase_setting)
+        end
+      end
     end
   end
 
@@ -97,10 +143,10 @@ describe Advent do
           expect(ad.instructions[-1]).to eq(0)
           expect(ad.instructions[-2]).to eq(0)
           ad.inputs << 7
-          ad.inputs << 8
+          ad.inputs << 9
           ad.run!
           expect(ad.instructions[-2]).to eq(7)
-          expect(ad.instructions[-1]).to eq(8)
+          expect(ad.instructions[-1]).to eq(9)
         end
       end
 
