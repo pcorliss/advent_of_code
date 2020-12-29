@@ -56,19 +56,18 @@ module Advent
         c.inputs << setting
         c
       end
-      continue = true
       i = 0
-      while continue do
+      until computers.all?(&:halted?) do
         phase_setting.each_with_index do |setting, idx|
           computer = computers[idx]
           computer.inputs << output
           computer.run!
           output = computer.output
         end
-        break if computers.all?(&:halted?)
         i += 1
         raise "Too many iterations" if i > 100
       end
+      puts "Iterations: #{i} #{phase_setting}" if @debug
       output
     end
 
