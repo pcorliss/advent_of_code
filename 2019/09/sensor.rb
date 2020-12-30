@@ -21,6 +21,7 @@ module Advent
     def initialize(input)
       @instructions = input.split(",").map(&:to_i)
       @pos = 0
+      @relative_base = 0
       @debug = false
     end
 
@@ -67,6 +68,11 @@ module Advent
         arguments: 3,
         method: :equals,
       },
+      # Opcode 9 adjusts the relative base by the value of its only parameter. The relative base increases (or decreases, if the value is negative) by the value of the parameter.
+      9 => {
+        arguments: 1,
+        method: :relative,
+      },
       99 => {
         arguments: 0,
         halt: true,
@@ -85,13 +91,15 @@ module Advent
         break if instruction[:halt]
 
         pos_params = instruction[:arguments].times.map do |i|
-          mode = (@instructions[@pos] / 10 ** (i + 2)) % (10 ** (i + 1))
+          mode = (@instructions[@pos] / 10 ** (i + 2)) % 10
           case mode
-          when 2
-            nil
-          when 1
+          when 2 # relative mode
+            puts "Mode: #{mode} #{@pos} + #{i} + 1 + #{@relative_base} -- #{@instructions[@pos + i + 1 + @relative_base]}" if @debug
+            @instructions[@pos + i + 1] + @relative_base
+          when 1 # immediate mode
             @pos + i + 1
-          else
+          else # position mode
+            puts "Mode: #{mode} #{@pos} + #{i} + 1 #{@instructions[@pos + i + 1]}" if @debug
             @instructions[@pos + i + 1]
           end
         end
@@ -161,6 +169,11 @@ module Advent
 
     def out(pos, x)
       @output_target = x
+    end
+
+    def relative(pos, x)
+      puts "Relative Base Adjusted: #{@instructions[x]}" if @debug
+      @relative_base = @instructions[x]
     end
 
     def output
