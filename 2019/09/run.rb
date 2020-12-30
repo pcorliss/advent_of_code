@@ -4,4 +4,7 @@ require_relative 'sensor'
 
 input = File.read('./input.txt')
 
-ad = Advent::Sensor.new(input)
+ad = Advent::IntCode.new(input)
+ad.program_input = 1
+ad.run!
+puts "Out: #{ad.full_output}"
