@@ -89,6 +89,13 @@ describe Advent do
             expect(ad.instructions).to eq(expected)
           end
         end
+
+        it "increases the relative base each time it's called" do
+          input = "109,1,109,3,4,11,21101,1,2,7,99,0"
+          ad = Advent::IntCode.new(input)
+          ad.run!
+          expect(ad.output).to eq(3)
+        end
       end
 
       context "inputs" do
@@ -109,6 +116,8 @@ describe Advent do
           ad.run!
           expect(ad.output).to eq(0)
         end
+
+        # it "handles multiple outputs"
       end
 
       # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
@@ -239,8 +248,9 @@ describe Advent do
         it "takes no input and produces a copy of itself" do
           input = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
           ad = Advent::IntCode.new(input)
+          # ad.debug!
           ad.run!
-          expect(ad.output).to eq(109)
+          expect(ad.full_output.map(&:to_s).join(",")).to eq(input)
         end
 
         it "should output a 16-digit number." do

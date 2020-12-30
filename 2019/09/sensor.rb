@@ -168,16 +168,25 @@ module Advent
     end
 
     def out(pos, x)
-      @output_target = x
+      @output_targets ||= []
+      @output_targets << x
+      puts "Output: #{@instructions[x]}" if @debug
     end
 
     def relative(pos, x)
-      puts "Relative Base Adjusted: #{@instructions[x]}" if @debug
-      @relative_base = @instructions[x] || 0
+      puts "Relative Base Adjusted: #{@relative_base} + #{@instructions[x]}" if @debug
+      @relative_base += @instructions[x] || 0
     end
 
     def output
-      @instructions[@output_target] || 0
+      @instructions[@output_targets.shift] || 0
+    end
+
+    # Unclear if we should be saving the output on assignment or if output is gauranteed not to be overwritten
+    def full_output
+      @output_targets.map do |t|
+        @instructions[t] || 0
+      end
     end
   end
 end
