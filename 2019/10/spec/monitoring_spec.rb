@@ -113,8 +113,26 @@ EOS
 
         it "counts the right number of visible asteroids" do
           ad = Advent::Monitoring.new(inputs[vals[:input]])
-          # binding.pry
           expect(ad.visible_from(vals[:best])).to eq(vals[:count])
+        end
+      end
+
+      {
+        1 => [11,12],
+        2 => [12,1],
+        3 => [12,2],
+        10 => [12,8],
+        20 => [16,0],
+        50 => [16,9],
+        100 => [10,16],
+        199 => [9,6],
+        200 => [8,2],
+        201 => [10,9],
+        299 => [11,1],
+      }.each do |num, pos|
+        it "finds the #{num} asteroid to be vaporized at #{pos}" do
+          ad = Advent::Monitoring.new(inputs[:input_d])
+          expect(ad.asteroid_vaporized(num)).to eq(pos)
         end
       end
     end

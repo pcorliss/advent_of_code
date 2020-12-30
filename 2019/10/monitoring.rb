@@ -32,6 +32,36 @@ module Advent
       directions = @asteroids.cell_direction
       directions[location].count
     end
+
+    def asteroid_vaporized(num)
+      @best ||= best_location
+      @directions ||= @asteroids.cell_direction[@best]
+      # Ensures we rotate the correct direction given atan output
+      sorted = @directions.sort_by do |k,v|
+        if k <= 0.0
+          -(k + 2 * Math::PI)
+        else
+          -k
+        end
+      end
+      sorted.map! {|direction, asteroids| asteroids.sort_by { |x, y| (@best[Grid::X] - x).abs + (@best[Grid::Y] - y).abs } }
+      vaporized = []
+      until vaporized.count >= num do
+        begin_count = vaporized.count
+        sorted.each do |asteroids|
+          unless asteroids.empty?
+            vaporized << asteroids.shift
+          end
+        end
+
+        if begin_count == vaporized.count
+          binding.pry
+        end
+        raise "Infinite Loop!!!" if begin_count == vaporized.count
+      end
+      # binding.pry
+      vaporized[num - 1]
+    end
   end
 end
 
