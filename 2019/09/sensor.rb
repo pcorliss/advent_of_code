@@ -95,12 +95,12 @@ module Advent
           case mode
           when 2 # relative mode
             puts "Mode: #{mode} #{@pos} + #{i} + 1 + #{@relative_base} -- #{@instructions[@pos + i + 1 + @relative_base]}" if @debug
-            @instructions[@pos + i + 1] + @relative_base
+            (@instructions[@pos + i + 1] || 0) + @relative_base
           when 1 # immediate mode
             @pos + i + 1
           else # position mode
             puts "Mode: #{mode} #{@pos} + #{i} + 1 #{@instructions[@pos + i + 1]}" if @debug
-            @instructions[@pos + i + 1]
+            @instructions[@pos + i + 1] || 0
           end
         end
 
@@ -113,16 +113,16 @@ module Advent
     end
 
     def equals(pos, x, y, z)
-      a = @instructions[x]
-      b = @instructions[y]
+      a = @instructions[x] || 0
+      b = @instructions[y] || 0
       result = 0
       result = 1 if a == b
       @instructions[z] = result
     end
 
     def less_than(pos, x, y, z)
-      a = @instructions[x]
-      b = @instructions[y]
+      a = @instructions[x] || 0
+      b = @instructions[y] || 0
       result = 0
       result = 1 if a < b
       @instructions[z] = result
@@ -130,34 +130,34 @@ module Advent
 
     # We can likely save some keystrokes here and swap the conditional around or something
     def jmp_if_false(pos, x, y)
-      conditional = @instructions[x]
+      conditional = @instructions[x] || 0
       puts "Conditional: #{conditional}" if @debug
       if conditional == 0
         # We need to update the position a little bit more nicely
-        @pos = @instructions[y] - 3
+        @pos = (@instructions[y] || 0) - 3
       end
       puts "Pos: #{@pos}" if @debug
     end
 
     def jmp_if_true(pos, x, y)
-      conditional = @instructions[x]
+      conditional = @instructions[x] || 0
       puts "Conditional: #{conditional}" if @debug
       if conditional != 0
-        @pos = @instructions[y] - 3
+        @pos = (@instructions[y] || 0) - 3
       end
       puts "Pos: #{@pos}" if @debug
     end
 
 
     def add(pos, x, y, z)
-      a = @instructions[x]
-      b = @instructions[y]
+      a = @instructions[x] || 0
+      b = @instructions[y] || 0
       @instructions[z] = a + b
     end
 
     def mult(pos, x, y, z)
-      a = @instructions[x]
-      b = @instructions[y]
+      a = @instructions[x] || 0
+      b = @instructions[y] || 0
       @instructions[z] = a * b
     end
 
@@ -173,11 +173,11 @@ module Advent
 
     def relative(pos, x)
       puts "Relative Base Adjusted: #{@instructions[x]}" if @debug
-      @relative_base = @instructions[x]
+      @relative_base = @instructions[x] || 0
     end
 
     def output
-      @instructions[@output_target]
+      @instructions[@output_target] || 0
     end
   end
 end
