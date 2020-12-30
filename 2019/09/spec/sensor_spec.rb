@@ -107,6 +107,46 @@ describe Advent do
           ad.run!
           expect(ad.instructions.last).to eq(7)
         end
+
+        it "takes multiple inputs" do
+          input = "3,5,3,6,99,0,0"
+          ad = Advent::IntCode.new(input)
+          expect(ad.instructions[-1]).to eq(0)
+          expect(ad.instructions[-2]).to eq(0)
+          ad.inputs << 7
+          ad.inputs << 9
+          ad.run!
+          expect(ad.instructions[-2]).to eq(7)
+          expect(ad.instructions[-1]).to eq(9)
+        end
+
+        it "pauses if waiting on input" do
+          input = "3,5,3,5,99,0"
+          ad = Advent::IntCode.new(input)
+          ad.inputs << 7
+          ad.run!
+          expect(ad.instructions.last).to eq(7)
+          expect(ad.pos).to eq(2)
+          expect(ad.inputs).to be_empty
+          ad.inputs << 9
+          ad.run!
+          expect(ad.instructions.last).to eq(9)
+        end
+      end
+
+      describe "#paused?" do
+        it "distringuishes between paused and halted" do
+          input = "3,5,3,5,99,0"
+          ad = Advent::IntCode.new(input)
+          ad.inputs << 7
+          ad.run!
+          expect(ad.paused?).to be_truthy
+          expect(ad.halted?).to be_falsey
+          ad.inputs << 9
+          ad.run!
+          expect(ad.halted?).to be_truthy
+          expect(ad.paused?).to be_falsey
+        end
       end
 
       context "outputs" do
@@ -244,28 +284,26 @@ describe Advent do
         end
       end
 
-      context "validation" do
-        it "takes no input and produces a copy of itself" do
-          input = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
-          ad = Advent::IntCode.new(input)
-          # ad.debug!
-          ad.run!
-          expect(ad.full_output.map(&:to_s).join(",")).to eq(input)
-        end
+      it "takes no input and produces a copy of itself" do
+        input = "109,1,204,-1,1001,100,1,100,1008,100,16,101,1006,101,0,99"
+        ad = Advent::IntCode.new(input)
+        # ad.debug!
+        ad.run!
+        expect(ad.full_output.map(&:to_s).join(",")).to eq(input)
+      end
 
-        it "should output a 16-digit number." do
-          input = "1102,34915192,34915192,7,4,7,99,0"
-          ad = Advent::IntCode.new(input)
-          ad.run!
-          expect(ad.output.to_s.length).to eq(16)
-        end
+      it "should output a 16-digit number." do
+        input = "1102,34915192,34915192,7,4,7,99,0"
+        ad = Advent::IntCode.new(input)
+        ad.run!
+        expect(ad.output.to_s.length).to eq(16)
+      end
 
-        it "should output the large number in the middle." do
-          input = "104,1125899906842624,99"
-          ad = Advent::IntCode.new(input)
-          ad.run!
-          expect(ad.output).to eq(1125899906842624)
-        end
+      it "should output the large number in the middle." do
+        input = "104,1125899906842624,99"
+        ad = Advent::IntCode.new(input)
+        ad.run!
+        expect(ad.output).to eq(1125899906842624)
       end
     end
   end

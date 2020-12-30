@@ -15,14 +15,24 @@ module Advent
   end
 
   class IntCode
-    attr_reader :instructions
-    attr_accessor :debug, :program_input
+    attr_reader :instructions, :inputs, :pos
+    attr_accessor :debug
 
     def initialize(input)
       @instructions = input.split(",").map(&:to_i)
       @pos = 0
       @relative_base = 0
       @debug = false
+      @inputs = []
+      @paused = true
+    end
+
+    def program_input
+      @inputs.shift
+    end
+
+    def program_input=(inp)
+      @inputs << inp
     end
 
     def debug!
@@ -81,6 +91,7 @@ module Advent
 
     def run!
       i = 0
+      @paused = false
       while @pos < @instructions.length do
         opcode = @instructions[@pos] % 100
         instruction = INST[opcode]
@@ -88,7 +99,7 @@ module Advent
           @pos += 1
           next
         end
-        break if instruction[:halt]
+        return if instruction[:halt]
 
         pos_params = instruction[:arguments].times.map do |i|
           mode = (@instructions[@pos] / 10 ** (i + 2)) % 10
@@ -105,11 +116,22 @@ module Advent
         end
 
         puts "#{instruction[:method].inspect} - #{@pos} - #{pos_params} - #{@instructions[@pos..(@pos+instruction[:arguments])]}" if @debug
+        break if instruction[:method] == :inp && @inputs.count == 0
         self.__send__(instruction[:method], @pos, *pos_params)
         @pos += instruction[:arguments] + 1
         i += 1
         raise "Too many iterations!!" if i > 1000000
       end
+      @paused = true
+    end
+
+    def paused?
+      !!@paused
+    end
+
+    def halted?
+      # Not technically correct while running but sufficient for now
+      !paused?
     end
 
     def equals(pos, x, y, z)
@@ -161,10 +183,9 @@ module Advent
       @instructions[z] = a * b
     end
 
-    # Will I ever need to deal with immediate mode?
     def inp(pos, x)
       @input_target = x
-      @instructions[x] = @program_input
+      @instructions[x] = program_input
     end
 
     def out(pos, x)

@@ -188,7 +188,6 @@ describe Advent do
           ad.run!
           expect(ad.instructions.last).to eq(9)
         end
-
       end
 
       describe "#paused?" do
