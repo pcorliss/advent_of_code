@@ -108,7 +108,7 @@ module Advent
         self.__send__(instruction[:method], @pos, *pos_params)
         @pos += instruction[:arguments] + 1
         i += 1
-        raise "Too many iterations!!" if i > 1000
+        raise "Too many iterations!!" if i > 1000000
       end
     end
 
