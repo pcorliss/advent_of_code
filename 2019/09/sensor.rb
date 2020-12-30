@@ -84,96 +84,83 @@ module Advent
         end
         break if instruction[:halt]
 
-        params = instruction[:arguments].times.map do |i|
-          (@instructions[@pos] / 10 ** (i + 2)) % (10 ** (i + 1)) == 1
+        pos_params = instruction[:arguments].times.map do |i|
+          mode = (@instructions[@pos] / 10 ** (i + 2)) % (10 ** (i + 1))
+          case mode
+          when 2
+            nil
+          when 1
+            @pos + i + 1
+          else
+            @instructions[@pos + i + 1]
+          end
         end
 
-        puts "#{instruction[:method].inspect} - #{@pos} - #{params} - #{@instructions[@pos..(@pos+instruction[:arguments])]}" if @debug
-        self.__send__(instruction[:method], @pos, *params)
+        puts "#{instruction[:method].inspect} - #{@pos} - #{pos_params} - #{@instructions[@pos..(@pos+instruction[:arguments])]}" if @debug
+        self.__send__(instruction[:method], @pos, *pos_params)
         @pos += instruction[:arguments] + 1
         i += 1
         raise "Too many iterations!!" if i > 1000
       end
     end
 
-    def equals(pos, a_param, b_param, target_param)
-      target = @instructions[pos + 3]
-      a = @instructions[@instructions[pos + 1]]
-      a = @instructions[pos + 1] if a_param
-      b = @instructions[@instructions[pos + 2]]
-      b = @instructions[pos + 2] if b_param
+    def equals(pos, x, y, z)
+      a = @instructions[x]
+      b = @instructions[y]
       result = 0
       result = 1 if a == b
-      @instructions[target] = result
+      @instructions[z] = result
     end
 
-    def less_than(pos, a_param, b_param, target_param)
-      target = @instructions[pos + 3]
-      a = @instructions[@instructions[pos + 1]]
-      a = @instructions[pos + 1] if a_param
-      b = @instructions[@instructions[pos + 2]]
-      b = @instructions[pos + 2] if b_param
+    def less_than(pos, x, y, z)
+      a = @instructions[x]
+      b = @instructions[y]
       result = 0
       result = 1 if a < b
-      @instructions[target] = result
+      @instructions[z] = result
     end
 
     # We can likely save some keystrokes here and swap the conditional around or something
-    def jmp_if_false(pos, cond_param, val_param)
-      puts "#{pos} - #{cond_param} - #{val_param}" if @debug
-      conditional = @instructions[@instructions[pos + 1]]
-      conditional = @instructions[pos + 1] if cond_param
+    def jmp_if_false(pos, x, y)
+      conditional = @instructions[x]
       puts "Conditional: #{conditional}" if @debug
       if conditional == 0
         # We need to update the position a little bit more nicely
-        @pos = @instructions[@instructions[pos + 2]] - 3
-        @pos = @instructions[pos + 2] - 3 if val_param
+        @pos = @instructions[y] - 3
       end
       puts "Pos: #{@pos}" if @debug
     end
 
-    def jmp_if_true(pos, cond_param, val_param)
-      puts "#{pos} - #{cond_param} - #{val_param}" if @debug
-      conditional = @instructions[@instructions[pos + 1]]
-      conditional = @instructions[pos + 1] if cond_param
+    def jmp_if_true(pos, x, y)
+      conditional = @instructions[x]
       puts "Conditional: #{conditional}" if @debug
       if conditional != 0
-        # We need to update the position a little bit more nicely
-        @pos = @instructions[@instructions[pos + 2]] - 3
-        @pos = @instructions[pos + 2] - 3 if val_param
+        @pos = @instructions[y] - 3
       end
       puts "Pos: #{@pos}" if @debug
     end
 
 
-    def add(pos, a_param, b_param, target_param)
-      target = @instructions[pos + 3]
-      a = @instructions[@instructions[pos + 1]]
-      a = @instructions[pos + 1] if a_param
-      b = @instructions[@instructions[pos + 2]]
-      b = @instructions[pos + 2] if b_param
-      @instructions[target] = a + b
+    def add(pos, x, y, z)
+      a = @instructions[x]
+      b = @instructions[y]
+      @instructions[z] = a + b
     end
 
-    def mult(pos, a_param, b_param, target_param)
-      target = @instructions[pos + 3]
-      a = @instructions[@instructions[pos + 1]]
-      a = @instructions[pos + 1] if a_param
-      b = @instructions[@instructions[pos + 2]]
-      b = @instructions[pos + 2] if b_param
-      @instructions[target] = a * b
+    def mult(pos, x, y, z)
+      a = @instructions[x]
+      b = @instructions[y]
+      @instructions[z] = a * b
     end
 
     # Will I ever need to deal with immediate mode?
-    def inp(pos, target_param)
-      @input_target = @instructions[pos + 1]
-      @input_target = pos + 1 if target_param
-      @instructions[@input_target] = @program_input
+    def inp(pos, x)
+      @input_target = x
+      @instructions[x] = @program_input
     end
 
-    def out(pos, target_param)
-      @output_target = @instructions[pos + 1]
-      @output_target = pos + 1 if target_param
+    def out(pos, x)
+      @output_target = x
     end
 
     def output
