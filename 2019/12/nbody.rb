@@ -45,7 +45,37 @@ module Advent
     def previous_state?
       @states.include? @moons.map(&:hash)
     end
+
+    def find_cycle(axis)
+      pos = @moons.map { |m| m.pos[axis] }
+      vel = pos.map { 0 }
+      previous = Set.new
+      i = 0
+
+      until previous.include? [pos, vel].hash do
+        previous.add [pos, vel].hash
+
+        pos.each_with_index do |pos_a, idx|
+          pos.each do |pos_b|
+            if pos_a > pos_b
+              vel[idx] -= 1
+            elsif pos_a < pos_b
+              vel[idx] += 1
+            end
+          end
+        end
+
+        pos.each_with_index do |p, idx|
+          pos[idx] += vel[idx]
+        end
+
+        i += 1
+      end
+
+      i
+    end
   end
+
 
   class Moon
     attr_reader :pos

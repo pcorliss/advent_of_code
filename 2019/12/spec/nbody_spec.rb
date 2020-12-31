@@ -51,6 +51,18 @@ describe Advent do
       end
     end
 
+    describe "#find_cycle" do
+      it "finds the cycle time for a specific axis" do
+        # expect(ad.find_cycle(0)).to eq(26)
+        # expect(ad.find_cycle(1)).to eq(36)
+        # expect(ad.find_cycle(2)).to eq(52)
+
+        expect(ad.find_cycle(0)).to eq(18)
+        expect(ad.find_cycle(1)).to eq(28)
+        expect(ad.find_cycle(2)).to eq(44)
+      end
+    end
+
     context "validation" do
       context "after ten steps" do
         [
@@ -79,6 +91,7 @@ describe Advent do
       end
 
       context "longer cycles" do
+        let(:ad) { Advent::Nbody.new(input) }
         let(:input) { <<~EOS
 <x=-8, y=-10, z=0>
 <x=5, y=5, z=10>
@@ -86,6 +99,22 @@ describe Advent do
 <x=9, y=-8, z=-3>
         EOS
         }
+
+        it "finds cycle time of individual axis" do
+          expect(ad.find_cycle(0)).to eq(2028)
+          expect(ad.find_cycle(1)).to eq(5898)
+          expect(ad.find_cycle(2)).to eq(4702)
+        end
+
+        it "takes a really long time to find a previous state" do
+          i = 5898
+          j = 5898
+          while true do
+            i += j
+            break if i % 2028 == 0 && i % 4702 == 0
+          end
+          expect(i).to eq(4_686_774_924)
+        end
 
         xit "takes a really long time to find a previous state" do
           i = 0
