@@ -25,6 +25,10 @@ module Advent
     # First, it will output a value indicating the color to paint the panel the robot is over: 0 means to paint the panel black, and 1 means to paint the panel white.
     # Second, it will output a value indicating the direction the robot should turn: 0 means it should turn left 90 degrees, and 1 means it should turn right 90 degrees.
 
+    def init_white_panel!
+      grid.cells[grid.pos] = 1
+    end
+
     def run!
       i = 0
       until @program.halted? do
@@ -67,9 +71,9 @@ module Advent
       90,
     ]
     DIRECTION={
-      0   => [ 0, 1],
+      0   => [ 0,-1],
       90  => [ 1, 0],
-      180 => [ 0,-1],
+      180 => [ 0, 1],
       270 => [-1, 0],
     }
 

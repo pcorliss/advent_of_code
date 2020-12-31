@@ -12,3 +12,9 @@ ad.run!
 puts "Count: #{ad.grid.cells.count}"
 # ~9K was too many
 puts "Render:\n#{ad.grid.render.tr('01',' █')}"
+
+ad = Advent::Police.new(input)
+ad.init_white_panel!
+ad.run!
+puts "Count: #{ad.grid.cells.count}"
+puts "Render:\n#{ad.grid.render.tr('01',' █')}"
