@@ -1,4 +1,6 @@
 require 'set'
+require '../lib/intcode.rb'
+require '../lib/grid.rb'
 
 module Advent
 
