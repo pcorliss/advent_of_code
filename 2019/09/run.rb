@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative 'sensor'
+require_relative '../lib/intcode.rb'
 
 input = File.read('./input.txt')
 
