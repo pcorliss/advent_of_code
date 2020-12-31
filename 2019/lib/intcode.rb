@@ -13,6 +13,7 @@ module Advent
     end
 
     def program_input
+      puts "XXX Full Inputs: #{@inputs}" if @debug
       @inputs.shift
     end
 
@@ -174,8 +175,8 @@ module Advent
     end
 
     def out(pos, x)
-      @output_targets ||= []
-      @output_targets << x
+      @outputs ||= []
+      @outputs << @instructions[x]
       puts "Output: #{@instructions[x]}" if @debug
     end
 
@@ -185,13 +186,13 @@ module Advent
     end
 
     def output
-      @instructions[@output_targets.shift] || 0
+      @outputs.shift || 0
     end
 
     # Unclear if we should be saving the output on assignment or if output is gauranteed not to be overwritten
     def full_output
-      @output_targets.map do |t|
-        @instructions[t] || 0
+      @outputs.map do |t|
+        t || 0
       end
     end
   end

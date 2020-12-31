@@ -75,7 +75,7 @@ describe Advent do
         end
 
         it "increases the relative base each time it's called" do
-          input = "109,1,109,3,4,11,21101,1,2,7,99,0"
+          input = "109,1,109,3,21101,1,2,7,4,11,99,0"
           ad = Advent::IntCode.new(input)
           ad.run!
           expect(ad.output).to eq(3)
@@ -141,7 +141,12 @@ describe Advent do
           expect(ad.output).to eq(0)
         end
 
-        # it "handles multiple outputs"
+        it "stores the output, not the target" do
+          input = "4,7,1101,1,1,7,99,0"
+          ad = Advent::IntCode.new(input)
+          ad.run!
+          expect(ad.output).to eq(0)
+        end
       end
 
       # Opcode 5 is jump-if-true: if the first parameter is non-zero, it sets the instruction pointer to the value from the second parameter. Otherwise, it does nothing.
