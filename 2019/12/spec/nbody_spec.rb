@@ -38,6 +38,19 @@ describe Advent do
       end
     end
 
+    describe "#previous_state?" do
+      it "returns false if we haven't seen this state before" do
+        expect(ad.previous_state?).to be_falsey
+      end
+
+      it "returns true if we have seen this state before" do
+        2771.times { ad.step! }
+        expect(ad.previous_state?).to be_falsey
+        ad.step!
+        expect(ad.previous_state?).to be_truthy
+      end
+    end
+
     context "validation" do
       context "after ten steps" do
         [
@@ -62,6 +75,27 @@ describe Advent do
             10.times { ad.step! }
             expect(ad.moons[i].velocity).to eq(expected)
           end
+        end
+      end
+
+      context "longer cycles" do
+        let(:input) { <<~EOS
+<x=-8, y=-10, z=0>
+<x=5, y=5, z=10>
+<x=2, y=-7, z=3>
+<x=9, y=-8, z=-3>
+        EOS
+        }
+
+        xit "takes a really long time to find a previous state" do
+          i = 0
+          until ad.previous_state? do
+            ad.step!
+            i += 1
+            puts "#{i}" if i % 100_000 == 0
+            break if i > 4_686_774_924
+          end
+          expect(i).to eq(4686774924)
         end
       end
     end

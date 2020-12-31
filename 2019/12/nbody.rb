@@ -13,9 +13,11 @@ module Advent
       @moons = input.lines.map do |l|
         Advent::Moon.new(l.chomp)
       end
+      @states = Set.new
     end
 
     def step!
+      @states.add @moons.map(&:hash)
       @moons.each do |moon_a|
         @moons.each do |moon_b|
           next if moon_a == moon_b
@@ -38,6 +40,10 @@ module Advent
 
     def debug!
       @debug = true
+    end
+
+    def previous_state?
+      @states.include? @moons.map(&:hash)
     end
   end
 
@@ -72,6 +78,10 @@ module Advent
 
     def energy
       kinetic_energy * potential_energy
+    end
+
+    def hash
+      [@pos,@velocity].hash
     end
   end
 end
