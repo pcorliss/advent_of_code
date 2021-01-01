@@ -28,6 +28,22 @@ module Advent
           val = @program.output
           @grid.cells[[x,y]] = val
         end
+
+        ball = @grid.cells.find do |cell, val|
+          val == 4
+        end.first
+
+        paddle = @grid.cells.find do |cell, val|
+          val == 3
+        end.first
+
+        if ball[0] < paddle[0]
+          @program.program_input = -1
+        elsif ball[0] > paddle[0]
+          @program.program_input = 1
+        else
+          @program.program_input = 0
+        end
       end
     end
 

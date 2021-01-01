@@ -9,3 +9,10 @@ ad.run!
 
 puts "Block Tiles: #{ad.grid.cells.values.count {|v| v == 2}}"
 puts "Render: \n#{ad.grid.render.tr(*Advent::Arcade::TILES)}"
+
+
+until ad.program.halted? do
+  ad.run!
+  puts "Render: \n#{ad.grid.render.tr(*Advent::Arcade::TILES)}"
+  puts "Score: #{ad.grid.cells[[-1,0]]}"
+end
