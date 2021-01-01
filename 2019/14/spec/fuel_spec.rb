@@ -98,7 +98,26 @@ describe Advent do
       end
 
       it "uses make_chems to calculate the basic chems required" do
-        expect(ad.base_chems({"FUEL" => 1})).to eq({"ORE" => 31, spare: {"A" => 2}})
+        expect(ad.base_chems).to eq({"ORE" => 31, spare: {"A" => 2}})
+      end
+    end
+
+    describe "#max_fuel" do
+      let(:input) { <<~EOS
+        157 ORE => 5 NZVS
+        165 ORE => 6 DCFZ
+        44 XJWVT, 5 KHKGT, 1 QDVJ, 29 NZVS, 9 GPVTF, 48 HKGWZ => 1 FUEL
+        12 HKGWZ, 1 GPVTF, 8 PSHF => 9 QDVJ
+        179 ORE => 7 PSHF
+        177 ORE => 5 HKGWZ
+        7 DCFZ, 7 PSHF => 2 XJWVT
+        165 ORE => 2 GPVTF
+        3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT
+        EOS
+      }
+
+      it "calculates the maximum amount of fuel we could produce" do
+        expect(ad.max_fuel).to eq(82892753)
       end
     end
 
@@ -114,7 +133,7 @@ describe Advent do
         2 AB, 3 BC, 4 CA => 1 FUEL
         EOS
         ad = Advent::Fuel.new(input)
-        expect(ad.base_chems({"FUEL" => 1})).to eq({
+        expect(ad.base_chems).to eq({
           "ORE" => 165, :spare => {"B" => 1, "C" => 3},
         })
       end
@@ -131,7 +150,8 @@ describe Advent do
         3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT
         EOS
         ad = Advent::Fuel.new(input)
-        expect(ad.base_chems({"FUEL" => 1})).to include({"ORE" => 13312})
+        expect(ad.base_chems).to include({"ORE" => 13312})
+        expect(ad.max_fuel).to eq(82892753)
       end
       it "handles more complicated input" do
         input = <<~EOS
@@ -149,7 +169,8 @@ describe Advent do
         176 ORE => 6 VJHF
         EOS
         ad = Advent::Fuel.new(input)
-        expect(ad.base_chems({"FUEL" => 1})).to include({"ORE" => 180697})
+        expect(ad.base_chems).to include({"ORE" => 180697})
+        expect(ad.max_fuel).to eq(5586022)
       end
       it "handles more complicated input" do
         input = <<~EOS
@@ -172,7 +193,8 @@ describe Advent do
         5 BHXH, 4 VRPVC => 5 LTCX
         EOS
         ad = Advent::Fuel.new(input)
-        expect(ad.base_chems({"FUEL" => 1})).to include({"ORE" => 2210736})
+        expect(ad.base_chems).to include({"ORE" => 2210736})
+        expect(ad.max_fuel).to eq(460664)
       end
     end
   end

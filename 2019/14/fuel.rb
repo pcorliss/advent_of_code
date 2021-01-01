@@ -80,6 +80,43 @@ module Advent
       end
       chems
     end
+
+    # Ideally we'd do an exponential search here but computers are faced so lets be lazy
+    def max_fuel_slow
+      base_ore = base_chems['ORE']
+      puts "Base Ore: #{base_ore}"
+      ore_capacity = 1_000_000_000_000
+      min_fuel_range = ore_capacity / base_ore
+      puts " Fuel Range: #{min_fuel_range}"
+      fuel = min_fuel_range
+      needed_ore = 0
+      while needed_ore < ore_capacity do
+        components = base_chems("FUEL" => fuel)
+        needed_ore = components["ORE"]
+        puts "Fuel: #{fuel} #{needed_ore} #{components}" if @debug
+        fuel += 1
+      end
+      fuel - 1
+    end
+
+    def max_fuel
+      base_ore = base_chems['ORE']
+      puts "Base Ore: #{base_ore}" if @debug
+      ore_capacity = 1_000_000_000_000
+      min_fuel_range = ore_capacity / base_ore
+      puts "Min Fuel Range: #{min_fuel_range}" if @debug
+      max_fuel_range = (min_fuel_range * 2).to_i
+      fuel = 0
+      (min_fuel_range..max_fuel_range).bsearch do |i|
+        ore = base_chems("FUEL" => i)['ORE']
+        puts "#{i} #{ore}" if @debug
+        fuel = i
+        ore_capacity - ore
+      end
+      fuel -= 1 if base_chems("FUEL" => fuel)['ORE'] > ore_capacity
+      fuel
+    end
+
     # def make_chem(chem, quant = 1, spare = {})
     #   spare = spare.clone
     #   if spare[chem] && spare[chem] >= quant
