@@ -1,6 +1,6 @@
 module Advent
   class IntCode
-    attr_reader :instructions, :inputs, :pos
+    attr_reader :instructions, :inputs, :pos, :outputs
     attr_accessor :debug
 
     def initialize(input)
