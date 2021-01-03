@@ -118,6 +118,24 @@ describe Advent do
         end
       end
 
+      describe "#deepclone" do
+        it "clones the object" do
+          ad.program_input = 1
+          ad.instance_variable_set(:@outputs, [1])
+          cloned = ad.deepclone
+          ad.instructions[0] = 99
+          ad.debug!
+          ad.instance_variable_set(:@pos, 1)
+          ad.outputs[9] = 99
+          ad.program_input = 2
+          expect(cloned.instructions).to_not eq(ad.instructions)
+          expect(cloned.inputs).to_not eq(ad.inputs)
+          expect(cloned.outputs).to_not eq(ad.outputs)
+          expect(cloned.debug).to_not eq(ad.debug)
+          expect(cloned.pos).to_not eq(ad.pos)
+        end
+      end
+
       describe "#paused?" do
         it "distringuishes between paused and halted" do
           input = "3,5,3,5,99,0"

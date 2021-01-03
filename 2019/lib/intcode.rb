@@ -25,6 +25,14 @@ module Advent
       @debug = true
     end
 
+    def deepclone
+      cloned = self.clone
+      cloned.instance_variable_set(:@instructions, self.instructions.clone)
+      cloned.instance_variable_set(:@inputs, self.inputs.clone)
+      cloned.instance_variable_set(:@outputs, self.outputs.clone)
+      cloned
+    end
+
     INST = {
       1 => {
         arguments: 3,
