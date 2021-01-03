@@ -4,7 +4,7 @@ require 'pry'
 
 describe Advent do
 
-  let(:input) { File.read('./input.txt') }
+  let(:input) { File.read('./spec_input.txt') }
 
   describe Advent::Oxygen do
     let(:ad) { Advent::Oxygen.new(input) }

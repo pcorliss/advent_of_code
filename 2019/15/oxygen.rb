@@ -6,7 +6,7 @@ module Advent
 
   class Oxygen
     attr_accessor :debug
-    attr_reader :grid, :program, :paths, :sensor, :sensor_found_in, :iter
+    attr_reader :grid, :program, :paths, :sensor, :sensor_found_in, :iter, :inflate_iter, :inflate_paths, :inflate_grid
 
     def initialize(input)
       @debug = false
@@ -83,8 +83,10 @@ module Advent
           program.run!
           out = program.output
           if out == 2
+            raise "Sensor already Set!" if @sensor
             @sensor = new_pos
             @sensor_found_in = @iter
+            @prog_at_sensor = program.deepclone
           end
           cell_val = OUT_MAP[out]
           @grid.cells[new_pos] = cell_val
@@ -99,6 +101,50 @@ module Advent
       end
 
       @paths = new_paths
+    end
+
+    def inflate!
+      if @inflate_paths.nil?
+        @inflate_paths = [{
+          program: @prog_at_sensor,
+          pos: @sensor
+        }]
+        @inflate_grid = Grid.new
+        @inflate_grid.cells[@sensor] = 'D'
+      end
+
+      return true if @inflate_paths.empty?
+
+      @inflate_iter ||= -1
+      @inflate_iter += 1
+
+      new_paths = []
+      @inflate_paths.each_with_index do |path, idx|
+        start_pos = path[:pos]
+        DIRECTIONS.each do |dir, delta|
+          pos = start_pos.clone
+          new_pos = [pos[0] + delta[0], pos[1] + delta[1]]
+          # TODO: Add some cell access helper methods
+          next if @inflate_grid.cells[new_pos]
+          program = path[:program].deepclone
+          program.program_input = dir
+          program.run!
+          out = program.output
+          cell_val = OUT_MAP[out]
+          @inflate_grid.cells[new_pos] = cell_val
+          @grid.cells[new_pos] = 'O' if cell_val == ' '
+          if out != 0
+            pos = new_pos
+            new_paths << {
+              program: program,
+              pos: pos,
+            }
+          end
+        end
+      end
+
+      @inflate_paths = new_paths
+      false
     end
 
     def grid_filled?
