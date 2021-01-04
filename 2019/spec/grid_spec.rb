@@ -75,4 +75,16 @@ describe Grid do
       expect(grid.render).to eq("01\n23")
     end
   end
+
+  describe "#neighbors" do
+    it "returns a subhash containing cardinal direction neighbors" do
+      grid = Grid.new(9.times.to_a, 3)
+      expect(grid.neighbors([1,1])).to eq({
+        [1,0] => 1,
+        [0,1] => 3,
+        [2,1] => 5,
+        [1,2] => 7,
+      })
+    end
+  end
 end

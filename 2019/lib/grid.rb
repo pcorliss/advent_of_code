@@ -88,4 +88,18 @@ class Grid
     end
     counter
   end
+
+  CARDINAL_DIRECTIONS = [
+    [-1, 0],
+    [ 1, 0],
+    [ 0,-1],
+    [ 0, 1],
+  ]
+
+  def neighbors(cell)
+    transformed = CARDINAL_DIRECTIONS.map do |dir|
+      [cell[X] + dir[X], cell[Y] + dir[Y]]
+    end
+    @cells.slice(*transformed)
+  end
 end
