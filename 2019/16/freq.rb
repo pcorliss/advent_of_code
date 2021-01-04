@@ -19,15 +19,19 @@ module Advent
     end
 
     def base_num(repeats, element)
-      BASE[((element + 1)/ (repeats + 1)) % BASE.length]
+      BASE[((element + 1)/ (repeats + 1)) % 4]
     end
 
-    def phase!
+    def phase!(offset = 0)
       acc = []
-      @digits.each_with_index do |x, i|
+      l = @digits.length
+      l.times do |i|
+        next if i < offset
         new_digit = 0
-        @digits.each_with_index do |d, j|
-          sub_digits = d * base_num(i, j)
+        l.times do |j|
+          b = BASE[((j + 1)/ (i + 1)) % 4]
+          next if b == 0
+          sub_digits = @digits[j] * b
           if sub_digits >= 10 || sub_digits <= -10
             new_digit += sub_digits.abs % 10
           else
@@ -38,5 +42,15 @@ module Advent
       end
       @digits = acc
     end
+
+    # def find_loops(i)
+    #   looped_digits = 800.times.map { phase![i] }
+    #   800.times do |i|
+    #     test_digits = looped_digits.first(i + 1)
+    #     3.times.all? do |j|
+    #       # test_digits == looped_digits[((j*(i+1))..(j+1(i+1)))]
+    #     end
+    #   end
+    # end
   end
 end
