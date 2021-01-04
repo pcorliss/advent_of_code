@@ -22,23 +22,64 @@ module Advent
       BASE[((element + 1)/ (repeats + 1)) % 4]
     end
 
+    # def phase_slow!(offset = 0)
+    #   acc = []
+    #   l = @digits.length
+    #   l.times do |i|
+    #     next if i < offset
+    #     new_digit = 0
+    #     l.times do |j|
+    #       b = BASE[((j + 1)/ (i + 1)) % 4]
+    #       next if b == 0
+    #       sub_digits = @digits[j] * b
+    #       if sub_digits >= 10 || sub_digits <= -10
+    #         new_digit += sub_digits.abs % 10
+    #       else
+    #         new_digit += sub_digits
+    #       end
+    #     end
+    #     acc[i] = new_digit.abs % 10
+    #   end
+    #   @digits = acc
+    # end
+
     def phase!(offset = 0)
+      unless @offset
+        @offset = offset
+        @digits = @digits[offset..]
+      end
       acc = []
-      l = @digits.length
-      l.times do |i|
-        next if i < offset
+      l = @digits.length + @offset
+      i = l - 1
+      while i >= offset do
         new_digit = 0
-        l.times do |j|
+        (i..(l-1)).each do |j|
           b = BASE[((j + 1)/ (i + 1)) % 4]
           next if b == 0
-          sub_digits = @digits[j] * b
-          if sub_digits >= 10 || sub_digits <= -10
-            new_digit += sub_digits.abs % 10
-          else
-            new_digit += sub_digits
-          end
+          new_digit += @digits[j - @offset] * b
         end
-        acc[i] = new_digit.abs % 10
+        acc[i - @offset] = new_digit.abs % 10
+        i -= 1
+      end
+      @digits = acc
+    end
+
+    def set_offset(offset)
+      @offset = offset
+      @digits = @digits[offset..]
+    end
+
+    # For part two all numbers will have a base of 1, no negatives or zeros.
+    # Because of that we can just use the reverse cumlative sum
+    def phase_ignore_base
+      acc = []
+      l = @digits.length + @offset
+      i = l - 1
+      sum = 0
+      while i >= @offset do
+        sum += @digits[i - @offset]
+        acc[i - @offset] = sum % 10
+        i -= 1
       end
       @digits = acc
     end

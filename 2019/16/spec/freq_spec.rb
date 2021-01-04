@@ -41,13 +41,13 @@ describe Advent do
 
       {
         0 => [4,8,2,2,6,1,5,8],
-        1 => [nil,8,2,2,6,1,5,8],
-        2 => [nil,nil,2,2,6,1,5,8],
-        3 => [nil,nil,nil,2,6,1,5,8],
-        4 => [nil,nil,nil,nil,6,1,5,8],
-        5 => [nil,nil,nil,nil,nil,1,5,8],
-        6 => [nil,nil,nil,nil,nil,nil,5,8],
-        7 => [nil,nil,nil,nil,nil,nil,nil,8],
+        1 => [8,2,2,6,1,5,8],
+        2 => [2,2,6,1,5,8],
+        3 => [2,6,1,5,8],
+        4 => [6,1,5,8],
+        5 => [1,5,8],
+        6 => [5,8],
+        7 => [8],
       }.each do |offset, expected|
         it "accepts an offset #{offset} and ignores digits before it" do
           ad.phase!(offset)
@@ -84,16 +84,15 @@ describe Advent do
 
       {
         "03036732577212944063491565474664" => "84462026",
-        # "02935109699940807407585447034323" => "78725270",
-        # "03081770884921959731165446850517" => "53553731",
+        "02935109699940807407585447034323" => "78725270",
+        "03081770884921959731165446850517" => "53553731",
       }.each do |inp, expected|
         it "takes #{inp} as input and produces #{expected} as 8 digits after offset" do
           ad = Advent::Freq.new(inp*10_000)
           offset = inp.chars.first(7).join('').to_i
-          puts "Offset: #{offset}"
-          100.times { |i| ad.phase!(offset); puts "Phase #{i} complete" }
-          binding.pry
-          expect(ad.digits[offset..(offset+8)].map(&:to_s).join("")).to eq(expected)
+          ad.set_offset(offset)
+          100.times { |i| ad.phase_ignore_base }
+          expect(ad.digits.first(8).map(&:to_s).join("")).to eq(expected)
         end
       end
     end
