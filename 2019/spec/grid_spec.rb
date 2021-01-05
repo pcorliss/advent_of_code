@@ -21,6 +21,24 @@ describe Grid do
         [1,1] => 3,
       })
     end
+
+    it "instantiates a filled grid using a string with newlines" do
+      grid = Grid.new(
+<<~EOS
+1##2
+#  #
+#  #
+3##4
+      EOS
+)
+      expect(grid.width).to eq(4)
+      expect(grid.cells).to include({
+        [0,0] => '1',
+        [3,0] => '2',
+        [0,3] => '3',
+        [3,3] => '4',
+      })
+    end
   end
 
   describe "#cell_direction" do

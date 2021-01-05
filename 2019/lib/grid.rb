@@ -17,6 +17,18 @@ class Grid
         @cells[[x, y]] = val
       end
     end
+    if init.is_a?(String) && width.nil?
+      @width = init.lines.first.length - 1
+      y = 0
+      init.lines do |line|
+        x = 0
+        line.chomp.chars.each do |val|
+          @cells[[x,y]] = val
+          x += 1
+        end
+        y += 1
+      end
+    end
   end
 
   def debug!
