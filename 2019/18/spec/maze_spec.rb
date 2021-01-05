@@ -146,7 +146,7 @@ describe Advent do
         B_SAMPLE => 132,
         D_SAMPLE => 81,
         E_SAMPLE => 86,
-        # C_SAMPLE => 136,
+        C_SAMPLE => 136,
       }.each do |inp, steps|
         it "calculates the number of steps to gather all keys at #{steps}" do
           ad = Advent::Maze.new(inp)

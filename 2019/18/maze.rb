@@ -40,14 +40,19 @@ module Advent
     def move!
       @steps += 1
 
+      @previous_states = Set.new
+
       new_paths = []
       @paths.each do |path|
         @grid.neighbors(path[:pos]).each do |cell, val|
           next if val == '#'
           next if path[:visited].include? cell
+          next if @previous_states.include? [cell, path[:keys]]
+            # create a position + keys hash, if it has been reached already prune the path
           if val.match(/[A-Z]/)
             next unless path[:keys].include?(val.downcase)
           end
+          @previous_states.add([cell, path[:keys]])
           k = path[:keys]
           visited = nil
           if val.match(/[a-z]/) && !k.include?(val)
@@ -59,9 +64,11 @@ module Advent
             ### skip if there's already another path with the same new keyset
             ### this is actually bad, because we can sometimes pick up a key while on the right path that may have been picked up  in another ill-fated path
             # next if new_paths.any? {|p| p[:keys] == keys }
+
             visited = Set.new()
           end
           visited ||= path[:visited].clone
+
           new_paths << {
             pos: cell,
             keys: k,
