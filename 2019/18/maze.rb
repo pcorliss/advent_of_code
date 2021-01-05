@@ -40,7 +40,7 @@ module Advent
     def move!
       @steps += 1
 
-      @previous_states = Set.new
+      @previous_states ||= Set.new
 
       new_paths = []
       @paths.each do |path|
