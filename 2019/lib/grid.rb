@@ -114,4 +114,21 @@ class Grid
     end
     @cells.slice(*transformed)
   end
+
+  def get(pos_x, pos_y = nil)
+    pos_x, pos_y = pos_x if pos_x.is_a? Array
+    @cells[[pos_x, pos_y]]
+  end
+
+  def [](pos_x, pos_y = nil)
+    get(pos_x, pos_y)
+  end
+
+  def []=(pos_x, pos_y = nil, val=nil)
+    if pos_x.is_a? Array
+      pos_x, pos_y = pos_x
+      val = pos_y
+    end
+    @cells[[pos_x, pos_y]] = val
+  end
 end

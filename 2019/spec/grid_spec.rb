@@ -105,4 +105,33 @@ describe Grid do
       })
     end
   end
+
+  describe "#get" do
+    before do
+      grid.cells[[1,1]] = true
+    end
+
+    it "it gets a value from cells using an array" do
+      expect(grid.get([1,1])).to be_truthy
+    end
+
+    it "gets a value from cells using params" do
+      expect(grid.get(1,1)).to be_truthy
+    end
+
+    it "gets a value from cells using array getter ([])" do
+      expect(grid[1,1]).to be_truthy
+      expect(grid[[1,1]]).to be_truthy
+    end
+  end
+
+  describe "#set" do
+    it "sets a value from cells using array setter ([])" do
+      grid[1,1] = 1
+      grid[[2,2]] = 2
+
+      expect(grid[1,1]).to eq(1)
+      expect(grid[2,2]).to eq(2)
+    end
+  end
 end
