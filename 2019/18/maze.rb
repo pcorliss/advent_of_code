@@ -17,6 +17,7 @@ module Advent
         visited: Set.new([starting_location]),
         keys: Set.new,
       }]
+      @key_counter = 0
     end
 
     # solver could be a breadth first algo with many paths
@@ -36,13 +37,6 @@ module Advent
       @debug = true
     end
 
-    DIRECTIONS = [
-      [ 0,-1], # North
-      [ 0, 1], # South
-      [-1, 0], # West
-      [ 1, 0], # East
-    ]
-
     def move!
       @steps += 1
 
@@ -54,35 +48,41 @@ module Advent
           if val.match(/[A-Z]/)
             next unless path[:keys].include?(val.downcase)
           end
-          keys = path[:keys]
+          k = path[:keys]
           visited = nil
-          if val.match(/[a-z]/)
-            keys = keys.clone.add(val) 
+          if val.match(/[a-z]/) && !k.include?(val)
+            k = k.clone.add(val)
+            @key_counter = k.count if k.count > @key_counter
+            # Skip if key count is too low
+            # This is about 33% faster and the sample cases work but not fast enough
+            # next if k.count < @key_counter - 2
+            ### skip if there's already another path with the same new keyset
+            ### this is actually bad, because we can sometimes pick up a key while on the right path that may have been picked up  in another ill-fated path
+            # next if new_paths.any? {|p| p[:keys] == keys }
             visited = Set.new()
           end
           visited ||= path[:visited].clone
           new_paths << {
             pos: cell,
-            keys: keys,
+            keys: k,
             visited: visited.add(cell),
           }
         end
       end
 
       # binding.pry if @debug
-      puts "Paths: #{new_paths}" if @debug
+      # puts "Paths: #{new_paths}" if @debug
       @paths = new_paths
     end
 
     def finished?
-      @paths.any? do |path|
-        path[:keys] == keys
-      end
+      @key_counter >= keys.count
     end
 
     def steps_until_finished
-      until finished? || @steps > 150 do
+      until finished? do
         move!
+        puts "Step: #{@steps} - Paths: #{@paths.count}" if @debug
       end
       @steps
     end

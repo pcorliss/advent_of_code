@@ -113,6 +113,22 @@ describe Advent do
 ########################
     EOS
 
+      D_SAMPLE = <<~EOS
+########################
+#@..............ac.GI.b#
+###d#e#f################
+###A#B#C################
+###g#h#i################
+########################
+    EOS
+
+      E_SAMPLE = <<~EOS
+########################
+#f.D.E.e.C.b.A.@.a.B.c.#
+######################.#
+#d.....................#
+########################
+    EOS
       C_SAMPLE = <<~EOS
 #################
 #i.G..c...e..H.p#
@@ -124,26 +140,19 @@ describe Advent do
 #l.F..d...h..C.m#
 #################
     EOS
-      D_SAMPLE = <<~EOS
-########################
-#@..............ac.GI.b#
-###d#e#f################
-###A#B#C################
-###g#h#i################
-########################
-    EOS
 
       {
         A_SAMPLE => 8,
-        # B_SAMPLE => 132,
+        B_SAMPLE => 132,
+        D_SAMPLE => 81,
+        E_SAMPLE => 86,
         # C_SAMPLE => 136,
-        # D_SAMPLE => 81,
       }.each do |inp, steps|
         it "calculates the number of steps to gather all keys at #{steps}" do
           ad = Advent::Maze.new(inp)
+          # ad.debug!
           expect(ad.steps_until_finished).to eq(steps)
         end
-
       end
     end
   end
