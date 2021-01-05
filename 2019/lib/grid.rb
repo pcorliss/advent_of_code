@@ -131,4 +131,18 @@ class Grid
     end
     @cells[[pos_x, pos_y]] = val
   end
+
+  def find(val)
+    cell = @cells.find do |cell, v|
+      v == val
+    end
+    cell.first unless cell.nil?
+  end
+
+  def find_all(val)
+    cells = @cells.find_all do |cell, v|
+      v == val
+    end
+    cells.map(&:first)
+  end
 end

@@ -134,4 +134,27 @@ describe Grid do
       expect(grid[2,2]).to eq(2)
     end
   end
+
+  describe "#find" do
+    it "returns nil if it can't find anything" do
+      expect(grid.find('@')).to be_nil
+    end
+
+    it "returns a single element if it finds a value match" do
+      grid[1,1] = '@'
+      expect(grid.find('@')).to eq([1,1])
+    end
+  end
+
+  describe "#find_all" do
+    it "returns an empty array if it can't find anything" do
+      expect(grid.find_all('@')).to be_empty
+    end
+
+    it "returns an array of matching values" do
+      grid[1,1] = '@'
+      grid[2,2] = '@'
+      expect(grid.find_all('@')).to contain_exactly([1,1], [2,2])
+    end
+  end
 end
