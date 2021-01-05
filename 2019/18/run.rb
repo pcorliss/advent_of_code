@@ -17,6 +17,7 @@ b = Benchmark.measure do
   map = ad.map
 end
 
-puts "Map:"
-pp map
+# puts "Map:"
+# pp map
 puts "Time: #{b}"
+

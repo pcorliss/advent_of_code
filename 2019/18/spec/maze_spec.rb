@@ -156,18 +156,19 @@ describe Advent do
     end
   end
   describe Advent::MultiMaze do
-    let(:input) {
-      <<~EOS
-#######
-#a.#Cd#
-##@#@##
-#######
-##@#@##
-#cB#Ab#
-#######
-      EOS
-    }
     let(:ad) { Advent::MultiMaze.new(input) }
+    let(:input) { INPUT }
+
+    INPUT = <<~EOS
+    #######
+    #a.#Cd#
+    ##@#@##
+    #######
+    ##@#@##
+    #cB#Ab#
+    #######
+    EOS
+    # 8 steps
 
     F_SAMPLE = <<~EOS
     ###############
@@ -219,23 +220,48 @@ describe Advent do
 
       it "maps requirements for keys" do
         expect(ad.map[0]['a'][:requirements]).to be_empty
-        expect(ad.map[1]['d'][:requirements]).to contain_exactly('C')
+        expect(ad.map[1]['d'][:requirements]).to contain_exactly('c')
       end
 
       context "more complexity" do
         let(:ad) { Advent::MultiMaze.new(G_SAMPLE) }
         it "maps key-to-key distances" do
           expect(ad.map['l']['j'][:distance]).to eq(4)
-          expect(ad.map['l']['j'][:requirements]).to contain_exactly('K', 'I')
+          expect(ad.map['l']['j'][:requirements]).to contain_exactly('k', 'i')
+        end
+
+        it "maps the reverse" do
+          expect(ad.map['j']['l'][:distance]).to eq(4)
+          expect(ad.map['j']['l'][:requirements]).to contain_exactly('k', 'i')
         end
       end
 
-      it "testing" do
-        ad = Advent::MultiMaze.new(H_SAMPLE)
-        # pp ad.map
-        expect(ad).to eq(ad)
+      describe "bfs" do
+        it "returns an array with each step and distance" do
+          # ad.debug!
+          expect(ad.bfs).to eq([
+            [0, "a", 2],
+            [3, "b", 2],
+            [2, "c", 2],
+            [1, "d", 2],
+          ])
+        end
       end
 
+      context "validation" do
+        {
+          INPUT => 8,
+          F_SAMPLE => 24,
+          G_SAMPLE => 32,
+          H_SAMPLE => 72,
+        }.each do |inp, steps|
+          it "finds the correct step count #{steps} for the given input" do
+            ad = Advent::MultiMaze.new(inp)
+            ad.debug!
+            expect(ad.bfs.map {|s| s[2] }.sum).to eq(steps)
+          end
+        end
+      end
     end
   end
 end
