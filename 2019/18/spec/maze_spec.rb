@@ -51,8 +51,8 @@ describe Advent do
 
       it "moves one step in all possible directions" do
         expect(ad.move!).to contain_exactly(
-          {pos: [14,1], visited: Set.new([[14,1], [15,1]]), keys: Set.new},
-          {pos: [16,1], visited: Set.new([[16,1], [15,1]]), keys: Set.new},
+          {pos: [14,1], keys: Set.new},
+          {pos: [16,1], keys: Set.new},
         )
       end
 
@@ -64,7 +64,7 @@ describe Advent do
 
       it "picks up keys" do
         2.times { ad.move! }
-        expect(ad.paths.first[:keys]).to eq(Set.new(["a"]))
+        expect(ad.paths.map { |p| p[:keys] }).to include(Set.new(["a"]))
       end
 
       it "allows backtracking if we have a new key (blow away visited set)" do
