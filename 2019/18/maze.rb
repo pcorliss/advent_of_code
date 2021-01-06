@@ -212,67 +212,78 @@ module Advent
         # handle this by insertion instead
         # paths.sort_by! {|p| p[:distance] }
         # path = paths[i]
-        path = nil
-        until path do
-          path = paths[last_distance].find { |p| !p[:done] } if paths[last_distance]
-          paths.delete(last_distance) if path.nil? && paths[last_distance]
-          last_distance += 1 if path.nil?
+        #
+
+        if paths[last_distance].nil? || paths[last_distance].empty?
+          last_distance += 1
+          next
         end
 
-        path[:done] = true
-        # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
-        puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
-        path[:pos].each_with_index do |start, quad|
-          # puts "\tQuad: #{quad} Start: #{start}" if @debug
-          # connections = map[start]
-          # puts "\t\tConnections: #{connections}" if @debug
-          # map[start].keys.each do |dest|
-          m = map[quad][start]
-          m.each do |dest, details|
-            # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
-            # prune
-            # We don't yet have the needed keys to visit this node
-            # binding.pry if @debug && last_distance == 10
-            next if path[:keys][dest.ord - 97]
-            # next unless details[:requirements].subset? path[:keys] # !!!
-            next unless (details[1] - path[:keys]).empty?
-            # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
-            # Why bother exploring a path that takes longer than our best
-            distance = path[:distance] + details[0]
-            next if best && distance >= best_distance
+        dist_paths = paths[last_distance]
+        # path = nil
+        # until path do
+        #   path = paths[last_distance].find { |p| !p[:done] } if paths[last_distance]
+        #   paths.delete(last_distance) if path.nil? && paths[last_distance]
+        #   last_distance += 1 if path.nil?
+        # end
 
-            k = path[:keys].clone
-            k.set(dest.ord - 97)
-            # puts "Found dupe! #{dest} #{path}" if visited.include? [dest, k.hash]
-            # next if visited.include? [dest, k.to_a.sort.hash]
-            # puts "\t\t\tPassed Best Distance Check" if @debug
+        dist_paths.each do |path|
+          #path[:done] = true
+          # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
+          puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
+          path[:pos].each_with_index do |start, quad|
+            # puts "\tQuad: #{quad} Start: #{start}" if @debug
+            # connections = map[start]
+            # puts "\t\tConnections: #{connections}" if @debug
+            # map[start].keys.each do |dest|
+            m = map[quad][start]
+            m.each do |dest, details|
+              # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
+              # prune
+              # We don't yet have the needed keys to visit this node
+              # binding.pry if @debug && last_distance == 10
+              next if path[:keys][dest.ord - 97]
+              # next unless details[:requirements].subset? path[:keys] # !!!
+              next unless (details[1] - path[:keys]).empty?
+              # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
+              # Why bother exploring a path that takes longer than our best
+              distance = path[:distance] + details[0]
+              next if best && distance >= best_distance
 
-            steps = path[:steps] + [[start,dest,details[0]]]
-            pos = path[:pos].clone
-            pos[quad] = dest
-            # visited.add [dest, k.to_a.sort.hash]
+              k = path[:keys].clone
+              k.set(dest.ord - 97)
+              # puts "Found dupe! #{dest} #{path}" if visited.include? [dest, k.hash]
+              # next if visited.include? [dest, k.to_a.sort.hash]
+              # puts "\t\t\tPassed Best Distance Check" if @debug
 
-            # test finished
-            if k == keys
-              puts "Found Solution: #{distance} #{steps}" if @debug
-              if best.nil? || distance < best_distance
-                best = steps
-                best_distance = distance
-                puts "\tNew Best!!" if @debug
+              steps = path[:steps] + [[start,dest,details[0]]]
+              pos = path[:pos].clone
+              pos[quad] = dest
+              # visited.add [dest, k.to_a.sort.hash]
+
+              # test finished
+              if k == keys
+                puts "Found Solution: #{distance} #{steps}" if @debug
+                if best.nil? || distance < best_distance
+                  best = steps
+                  best_distance = distance
+                  puts "\tNew Best!!" if @debug
+                end
               end
-            end
 
-            # new paths
-            paths[distance] ||= []
-            paths[distance] << {
-              pos: pos,
-              keys: k,
-              steps: steps,
-              distance: distance,
-            }
+              # new paths
+              paths[distance] ||= []
+              paths[distance] << {
+                pos: pos,
+                keys: k,
+                steps: steps,
+                distance: distance,
+              }
+            end
           end
+          i += 1
         end
-        i += 1
+        last_distance += 1
       end
       best
     end
