@@ -126,6 +126,7 @@ module Advent
       @map = {}
       starting_locations.each_with_index do |start, idx|
         map[idx] = {}
+        map[idx][idx] = {}
         paths = [{
           pos: start,
           keys: Set.new,
@@ -150,19 +151,14 @@ module Advent
 
               if ('a'..'z').include? val
                 k = k.clone.add val
-                begin
-                if map[path[:start]][val].nil?
-                  map[path[:start]][val] = {
+                if map[idx][path[:start]][val].nil?
+                  map[idx][path[:start]][val] = {
                     distance: path[:visited].count,
                     requirements: r.clone,
                   }
                 end
-                rescue => e
-                  binding.pry if @debug
-                  raise e
-                end
-                if !map[val] # We've never seen this value before so we'll start a new path from it
-                  map[val] ||= {}
+                if !map[idx][val] # We've never seen this value before so we'll start a new path from it
+                  map[idx][val] ||= {}
                   new_paths << {
                     pos: cell,
                     keys: Set.new([val]),
@@ -231,7 +227,8 @@ module Advent
           # connections = map[start]
           # puts "\t\tConnections: #{connections}" if @debug
           # map[start].keys.each do |dest|
-          map[start].each do |dest, details|
+          m = map[quad]
+          m[start].each do |dest, details|
             # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
             # prune
             # We don't yet have the needed keys to visit this node

@@ -215,30 +215,30 @@ describe Advent do
       end
 
       it "maps distances to keys" do
-        expect(ad.map[0]['a'][:distance]).to eq(2)
+        expect(ad.map[0][0]['a'][:distance]).to eq(2)
       end
 
       it "maps requirements for keys" do
-        expect(ad.map[0]['a'][:requirements]).to be_empty
+        expect(ad.map[0][0]['a'][:requirements]).to be_empty
         expected = Bitset.new(26)
         expected.set('c'.ord - 97)
-        expect(ad.map[1]['d'][:requirements]).to eq(expected)
+        expect(ad.map[1][1]['d'][:requirements]).to eq(expected)
       end
 
       context "more complexity" do
         let(:ad) { Advent::MultiMaze.new(G_SAMPLE) }
         it "maps key-to-key distances" do
-          expect(ad.map['l']['j'][:distance]).to eq(4)
+          expect(ad.map[1]['l']['j'][:distance]).to eq(4)
           expected = Bitset.new(26)
           expected.set(('i'.ord - 97),('k'.ord - 97))
-          expect(ad.map['l']['j'][:requirements]).to eq(expected)
+          expect(ad.map[1]['l']['j'][:requirements]).to eq(expected)
         end
 
         it "maps the reverse" do
-          expect(ad.map['j']['l'][:distance]).to eq(4)
+          expect(ad.map[1]['j']['l'][:distance]).to eq(4)
           expected = Bitset.new(26)
           expected.set(('i'.ord - 97),('k'.ord - 97))
-          expect(ad.map['j']['l'][:requirements]).to eq(expected)
+          expect(ad.map[1]['j']['l'][:requirements]).to eq(expected)
         end
       end
 
