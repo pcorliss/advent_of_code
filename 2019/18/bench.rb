@@ -14,14 +14,49 @@ C_SAMPLE = <<~EOS
 #################
 EOS
 
+# result = nil
+# b = Benchmark.measure do
+#   ad = Advent::Maze.new(C_SAMPLE)
+#   RubyProf.start
+#   ad.steps_until_finished
+#   result = RubyProf.stop
+# end
+#
+# puts "B: #{b}"
+# printer = RubyProf::FlatPrinter.new(result)
+# printer.print(STDOUT)
+
+H_SAMPLE = <<~EOS
+#############
+#g#f.D#..h#l#
+#F###e#E###.#
+#dCba@\#@BcIJ#
+#############
+#nK.L@\#@G...#
+#M###N#H###.#
+#o#m..#i#jk.#
+#############
+EOS
+
+
 result = nil
 b = Benchmark.measure do
-  ad = Advent::Maze.new(C_SAMPLE)
+  ad = Advent::MultiMaze.new(H_SAMPLE)
+  ad.map
   RubyProf.start
-  ad.steps_until_finished
+  ad.bfs
   result = RubyProf.stop
 end
-
 puts "B: #{b}"
 printer = RubyProf::FlatPrinter.new(result)
 printer.print(STDOUT)
+
+require 'pilfer'
+
+reporter = Pilfer::Logger.new('./pilfer.log')
+profiler = Pilfer::Profiler.new(reporter)
+ad = Advent::MultiMaze.new(H_SAMPLE)
+ad.map
+profiler.profile('maze finding') do
+  ad.bfs
+end

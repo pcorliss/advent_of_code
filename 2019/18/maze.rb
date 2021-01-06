@@ -197,7 +197,7 @@ module Advent
         distance: 0,
       }
 
-      visited = Set.new
+      # visited = Set.new
       best = nil
       best_distance = 0
       # Could sort the paths by distance continously and pop off a queue
@@ -222,15 +222,15 @@ module Advent
         puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].count}" if @debug && i % 1000 == 0
         path[:pos].each_with_index do |start, quad|
           # puts "\tQuad: #{quad} Start: #{start}" if @debug
-          connections = map[path[:pos][quad]]
+          # connections = map[start]
           # puts "\t\tConnections: #{connections}" if @debug
-          connections.each do |dest, details|
+          map[start].each do |dest, details|
             # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
             # prune
             # We don't yet have the needed keys to visit this node
             # binding.pry if @debug && path[:pos][0] == 'a' && quad == 3
             next if path[:keys].include? dest
-            next unless (details[:requirements] - path[:keys]).empty?
+            next unless details[:requirements].subset? path[:keys]
             # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
             # Why bother exploring a path that takes longer than our best
             distance = path[:distance] + details[:distance]
@@ -247,7 +247,7 @@ module Advent
             # visited.add [dest, k.to_a.sort.hash]
 
             # test finished
-            if k.count >= keys.count
+            if k == keys
               puts "Found Solution: #{distance} #{steps}" if @debug
               if best.nil? || distance < best_distance
                 best = steps
