@@ -26,6 +26,13 @@ puts "Time: #{b}"
 best = nil
 b = Benchmark.measure do
   best = ad.bfs
+  # require 'pilfer'
+  # reporter = Pilfer::Logger.new('./pilfer.log')
+  # profiler = Pilfer::Profiler.new(reporter)
+  # # ad.map
+  # profiler.profile('maze finding') do
+  #   ad.bfs
+  # end
 end
 
 puts "Time: #{b}"

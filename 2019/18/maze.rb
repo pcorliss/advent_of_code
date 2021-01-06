@@ -230,6 +230,7 @@ module Advent
           # puts "\tQuad: #{quad} Start: #{start}" if @debug
           # connections = map[start]
           # puts "\t\tConnections: #{connections}" if @debug
+          # map[start].keys.each do |dest|
           map[start].each do |dest, details|
             # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
             # prune

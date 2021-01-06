@@ -43,14 +43,18 @@ result = nil
 b = Benchmark.measure do
   ad = Advent::MultiMaze.new(H_SAMPLE)
   ad.map
+  ad.bfs
+end
+puts "B: #{b}"
+
+  ad = Advent::MultiMaze.new(H_SAMPLE)
+  ad.map
   RubyProf.start
   ad.bfs
   result = RubyProf.stop
-end
-puts "B: #{b}"
+
 printer = RubyProf::FlatPrinter.new(result)
 printer.print(STDOUT)
-
 require 'pilfer'
 
 reporter = Pilfer::Logger.new('./pilfer.log')
