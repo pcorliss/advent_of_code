@@ -227,8 +227,8 @@ module Advent
           # connections = map[start]
           # puts "\t\tConnections: #{connections}" if @debug
           # map[start].keys.each do |dest|
-          m = map[quad]
-          m[start].each do |dest, details|
+          m = map[quad][start]
+          m.each do |dest, details|
             # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
             # prune
             # We don't yet have the needed keys to visit this node
