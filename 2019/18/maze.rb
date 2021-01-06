@@ -1,6 +1,7 @@
 require 'set'
 require '../lib/intcode.rb'
 require '../lib/grid.rb'
+require 'bitset'
 
 module Advent
 
@@ -106,7 +107,11 @@ module Advent
     end
 
     def keys
-      @keys ||= Set.new @grid.cells.values.uniq.select { |v| v.match(/[a-z]/) }
+      return @keys if @keys
+
+      @keys = Bitset.new(26)
+      @keys.set(@grid.cells.values.uniq.select { |v| v.match(/[a-z]/) }.map {|char| char.ord - 97})
+      @keys
     end
 
     def debug!
@@ -124,7 +129,7 @@ module Advent
         paths = [{
           pos: start,
           keys: Set.new,
-          requirements: Set.new,
+          requirements: Bitset.new(26),
           visited: Set.new([start]),
           start: idx,
         }]
@@ -161,14 +166,15 @@ module Advent
                   new_paths << {
                     pos: cell,
                     keys: Set.new([val]),
-                    requirements: Set.new,
+                    requirements: Bitset.new(26),
                     visited: Set.new([cell]),
                     start: val,
                   }
                 end
               end
               if ('A'..'Z').include? val
-                r = r.clone.add val.downcase
+                r = r.clone
+                r.set (val.downcase.ord - 97)
               end
 
               # construct new path
@@ -192,7 +198,7 @@ module Advent
       paths = {0 => []}
       paths[0] << {
         pos: 4.times.to_a,
-        keys: Set.new,
+        keys: Bitset.new(26),
         steps: [],
         distance: 0,
       }
@@ -219,7 +225,7 @@ module Advent
 
         path[:done] = true
         # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
-        puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].count}" if @debug && i % 1000 == 0
+        puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
         path[:pos].each_with_index do |start, quad|
           # puts "\tQuad: #{quad} Start: #{start}" if @debug
           # connections = map[start]
@@ -228,15 +234,17 @@ module Advent
             # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
             # prune
             # We don't yet have the needed keys to visit this node
-            # binding.pry if @debug && path[:pos][0] == 'a' && quad == 3
-            next if path[:keys].include? dest
-            next unless details[:requirements].subset? path[:keys]
+            # binding.pry if @debug && last_distance == 10
+            next if path[:keys][dest.ord - 97]
+            # next unless details[:requirements].subset? path[:keys] # !!!
+            next unless (details[:requirements] - path[:keys]).empty?
             # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
             # Why bother exploring a path that takes longer than our best
             distance = path[:distance] + details[:distance]
             next if best && distance >= best_distance
 
-            k = path[:keys].clone.add(dest)
+            k = path[:keys].clone
+            k.set(dest.ord - 97)
             # puts "Found dupe! #{dest} #{path}" if visited.include? [dest, k.hash]
             # next if visited.include? [dest, k.to_a.sort.hash]
             # puts "\t\t\tPassed Best Distance Check" if @debug
