@@ -21,3 +21,11 @@ end
 # pp map
 puts "Time: #{b}"
 
+best = nil
+b = Benchmark.measure do
+  best = ad.bfs
+end
+
+puts "Time: #{b}"
+puts "Best: #{best}"
+puts "Steps: #{best.map {|s| s[2] }.sum}"

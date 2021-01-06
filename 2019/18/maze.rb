@@ -199,6 +199,8 @@ module Advent
 
       best = nil
       best_distance = 0
+      # Could sort the paths by distance continously and pop off a queue
+      # That way we don't waste time with very long paths
       until paths.empty? do
         puts "Paths: #{paths.count} #{best_distance}" if @debug
         new_paths = []
