@@ -152,10 +152,10 @@ module Advent
               if ('a'..'z').include? val
                 k = k.clone.add val
                 if map[idx][path[:start]][val].nil?
-                  map[idx][path[:start]][val] = {
-                    distance: path[:visited].count,
-                    requirements: r.clone,
-                  }
+                  map[idx][path[:start]][val] = [
+                    path[:visited].count,
+                    r.clone,
+                  ]
                 end
                 if !map[idx][val] # We've never seen this value before so we'll start a new path from it
                   map[idx][val] ||= {}
@@ -235,10 +235,10 @@ module Advent
             # binding.pry if @debug && last_distance == 10
             next if path[:keys][dest.ord - 97]
             # next unless details[:requirements].subset? path[:keys] # !!!
-            next unless (details[:requirements] - path[:keys]).empty?
+            next unless (details[1] - path[:keys]).empty?
             # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
             # Why bother exploring a path that takes longer than our best
-            distance = path[:distance] + details[:distance]
+            distance = path[:distance] + details[0]
             next if best && distance >= best_distance
 
             k = path[:keys].clone
@@ -247,7 +247,7 @@ module Advent
             # next if visited.include? [dest, k.to_a.sort.hash]
             # puts "\t\t\tPassed Best Distance Check" if @debug
 
-            steps = path[:steps] + [[start,dest,details[:distance]]]
+            steps = path[:steps] + [[start,dest,details[0]]]
             pos = path[:pos].clone
             pos[quad] = dest
             # visited.add [dest, k.to_a.sort.hash]
