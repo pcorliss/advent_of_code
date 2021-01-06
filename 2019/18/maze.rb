@@ -206,7 +206,8 @@ module Advent
         # puts "Paths: #{paths.count} #{best_distance}" if @debug
         paths.sort_by! {|p| p[:distance] }
         path = paths.shift
-        puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
+        # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
+        puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].count}" if @debug && i % 1000 == 0
         path[:pos].each_with_index do |start, quad|
           # puts "\tQuad: #{quad} Start: #{start}" if @debug
           connections = map[path[:pos][quad]]
