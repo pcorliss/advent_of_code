@@ -201,54 +201,54 @@ module Advent
       best_distance = 0
       # Could sort the paths by distance continously and pop off a queue
       # That way we don't waste time with very long paths
+      i = 0
       until paths.empty? do
-        puts "Paths: #{paths.count} #{best_distance}" if @debug
-        new_paths = []
-        paths.each do |path|
-          # puts "Path: #{path}" if @debug
-          path[:pos].each_with_index do |start, quad|
-            # puts "\tQuad: #{quad} Start: #{start}" if @debug
-            connections = map[path[:pos][quad]]
-            # puts "\t\tConnections: #{connections}" if @debug
-            connections.each do |dest, details|
-              # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
-              # prune
-              # We don't yet have the needed keys to visit this node
-              # binding.pry if @debug && path[:pos][0] == 'a' && quad == 3
-              next if path[:keys].include? dest
-              next unless (details[:requirements] - path[:keys]).empty?
-              # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
-              # Why bother exploring a path that takes longer than our best
-              distance = path[:distance] + details[:distance]
-              next if best && distance >= best_distance
-              # puts "\t\t\tPassed Best Distance Check" if @debug
+        # puts "Paths: #{paths.count} #{best_distance}" if @debug
+        paths.sort_by! {|p| p[:distance] }
+        path = paths.shift
+        puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
+        path[:pos].each_with_index do |start, quad|
+          # puts "\tQuad: #{quad} Start: #{start}" if @debug
+          connections = map[path[:pos][quad]]
+          # puts "\t\tConnections: #{connections}" if @debug
+          connections.each do |dest, details|
+            # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
+            # prune
+            # We don't yet have the needed keys to visit this node
+            # binding.pry if @debug && path[:pos][0] == 'a' && quad == 3
+            next if path[:keys].include? dest
+            next unless (details[:requirements] - path[:keys]).empty?
+            # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
+            # Why bother exploring a path that takes longer than our best
+            distance = path[:distance] + details[:distance]
+            next if best && distance >= best_distance
+            # puts "\t\t\tPassed Best Distance Check" if @debug
 
-              steps = path[:steps] + [[start,dest,details[:distance]]]
-              k = path[:keys].clone.add(dest)
-              pos = path[:pos].clone
-              pos[quad] = dest
+            steps = path[:steps] + [[start,dest,details[:distance]]]
+            k = path[:keys].clone.add(dest)
+            pos = path[:pos].clone
+            pos[quad] = dest
 
-              # test finished
-              if k.count >= keys.count
-                puts "Found Solution: #{distance} #{steps}" if @debug
-                if best.nil? || distance < best_distance
-                  best = steps
-                  best_distance = distance
-                  puts "\tNew Best!!" if @debug
-                end
+            # test finished
+            if k.count >= keys.count
+              puts "Found Solution: #{distance} #{steps}" if @debug
+              if best.nil? || distance < best_distance
+                best = steps
+                best_distance = distance
+                puts "\tNew Best!!" if @debug
               end
-
-              # new paths
-              new_paths << {
-                pos: pos,
-                keys: k,
-                steps: steps,
-                distance: distance,
-              }
             end
+
+            # new paths
+            paths << {
+              pos: pos,
+              keys: k,
+              steps: steps,
+              distance: distance,
+            }
           end
         end
-        paths = new_paths
+        i += 1
       end
       best
     end
