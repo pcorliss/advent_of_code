@@ -189,23 +189,35 @@ module Advent
     end
 
     def bfs
-      paths = []
-      paths << {
+      paths = {0 => []}
+      paths[0] << {
         pos: 4.times.to_a,
         keys: Set.new,
         steps: [],
         distance: 0,
       }
 
+      visited = Set.new
       best = nil
       best_distance = 0
       # Could sort the paths by distance continously and pop off a queue
       # That way we don't waste time with very long paths
       i = 0
-      until paths.empty? do
+      last_distance = 0
+      # until paths.empty? do
+      until best do
         # puts "Paths: #{paths.count} #{best_distance}" if @debug
-        paths.sort_by! {|p| p[:distance] }
-        path = paths.shift
+        # handle this by insertion instead
+        # paths.sort_by! {|p| p[:distance] }
+        # path = paths[i]
+        path = nil
+        until path do
+          path = paths[last_distance].find { |p| !p[:done] } if paths[last_distance]
+          paths.delete(last_distance) if path.nil? && paths[last_distance]
+          last_distance += 1 if path.nil?
+        end
+
+        path[:done] = true
         # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
         puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].count}" if @debug && i % 1000 == 0
         path[:pos].each_with_index do |start, quad|
@@ -223,12 +235,16 @@ module Advent
             # Why bother exploring a path that takes longer than our best
             distance = path[:distance] + details[:distance]
             next if best && distance >= best_distance
+
+            k = path[:keys].clone.add(dest)
+            # puts "Found dupe! #{dest} #{path}" if visited.include? [dest, k.hash]
+            # next if visited.include? [dest, k.to_a.sort.hash]
             # puts "\t\t\tPassed Best Distance Check" if @debug
 
             steps = path[:steps] + [[start,dest,details[:distance]]]
-            k = path[:keys].clone.add(dest)
             pos = path[:pos].clone
             pos[quad] = dest
+            # visited.add [dest, k.to_a.sort.hash]
 
             # test finished
             if k.count >= keys.count
@@ -241,7 +257,8 @@ module Advent
             end
 
             # new paths
-            paths << {
+            paths[distance] ||= []
+            paths[distance] << {
               pos: pos,
               keys: k,
               steps: steps,

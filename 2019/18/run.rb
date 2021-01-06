@@ -7,6 +7,8 @@ require 'benchmark'
 # ad = Advent::Maze.new(input)
 # ad.debug!
 # puts "Steps: #{ad.steps_until_finished}"
+#
+# exit
 
 input = File.read('./part_two_input.txt')
 ad = Advent::MultiMaze.new(input)
