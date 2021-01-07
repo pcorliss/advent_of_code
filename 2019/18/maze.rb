@@ -283,6 +283,7 @@ module Advent
           end
           i += 1
         end
+        paths.delete(last_distance) if paths[last_distance]
         last_distance += 1
       end
       best
