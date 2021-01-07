@@ -40,27 +40,27 @@ EOS
 
 
 result = nil
+ad = Advent::MultiMaze.new(H_SAMPLE)
+ad.map
 b = Benchmark.measure do
-  ad = Advent::MultiMaze.new(H_SAMPLE)
-  ad.map
-  ad.bfs
+  10.times { ad.bfs }
 end
 puts "B: #{b}"
 
-  ad = Advent::MultiMaze.new(H_SAMPLE)
-  ad.map
-  RubyProf.start
-  ad.bfs
-  result = RubyProf.stop
-
-printer = RubyProf::FlatPrinter.new(result)
-printer.print(STDOUT)
-require 'pilfer'
-
-reporter = Pilfer::Logger.new('./pilfer.log')
-profiler = Pilfer::Profiler.new(reporter)
-ad = Advent::MultiMaze.new(H_SAMPLE)
-ad.map
-profiler.profile('maze finding') do
-  ad.bfs
-end
+#   ad = Advent::MultiMaze.new(H_SAMPLE)
+#   ad.map
+#   RubyProf.start
+#   ad.bfs
+#   result = RubyProf.stop
+#
+# printer = RubyProf::FlatPrinter.new(result)
+# printer.print(STDOUT)
+# require 'pilfer'
+#
+# reporter = Pilfer::Logger.new('./pilfer.log')
+# profiler = Pilfer::Profiler.new(reporter)
+# ad = Advent::MultiMaze.new(H_SAMPLE)
+# ad.map
+# profiler.profile('maze finding') do
+#   ad.bfs
+# end

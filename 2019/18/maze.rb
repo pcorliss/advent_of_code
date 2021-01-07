@@ -121,6 +121,17 @@ module Advent
     def move!
     end
 
+    def quad_requirements
+      @quad_requirements ||= 4.times.map do |i|
+        m = map[i][i]
+        b = Bitset.new(26)
+        m.each do |key, details|
+          b = b | details[1]
+        end
+        b
+      end
+    end
+
     def map
       return @map if @map
       @map = {}
@@ -190,103 +201,145 @@ module Advent
       map
     end
 
+    def gen_paths(dist_paths, max_keys = keys)
+      i = 0
+      dist_paths.each do |path|
+        puts "Paths: #{@paths.count}-#{dist_paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
+        # binding.pry if path[:pos].nil? && @debug
+        path[:pos].each_with_index do |start, quad|
+          next unless start
+          m = map[quad][start]
+          m.each do |dest, details|
+            next if path[:keys][dest.ord - 97]
+            next unless (details[1] - path[:keys]).empty?
+            distance = path[:distance] + details[0]
+            next if @best && distance >= @best_distance
+
+            k = path[:keys].clone
+            k.set(dest.ord - 97)
+
+            steps = path[:steps] + [[start,dest,details[0]]]
+            pos = path[:pos].clone
+            pos[quad] = dest
+
+            if k == max_keys
+              puts "Found Solution: #{distance} #{steps}" if @debug
+              if @best.nil? || distance < @best_distance
+                @best = steps
+                @best_distance = distance
+                @best_path = {
+                  pos: pos,
+                  keys: k,
+                  steps: steps,
+                  distance: distance,
+                }
+                puts "\tNew Best!!" if @debug
+              end
+              next
+            end
+
+            @paths[distance] ||= []
+            @paths[distance] << {
+              pos: pos,
+              keys: k,
+              steps: steps,
+              distance: distance,
+            }
+          end
+        end
+        i += 1
+      end
+    end
+
     def bfs
-      paths = {0 => []}
-      paths[0] << {
-        pos: 4.times.to_a,
+      @paths = {0 => []}
+
+      starting_pos = []
+      quad_requirements.each_with_index do |req, idx|
+        if req.empty?
+          starting_pos[idx] = idx
+        else
+          starting_pos[idx] = nil
+        end
+      end
+
+      max_keys = Bitset.new(26)
+      starting_pos.each do |i|
+        if i
+          map[i][i].keys.each do |k|
+            max_keys.set(k.ord - 97)
+          end
+        end
+      end
+
+      @paths[0] << {
+        pos: starting_pos,
         keys: Bitset.new(26),
         steps: [],
         distance: 0,
       }
 
-      # visited = Set.new
-      best = nil
-      best_distance = 0
-      # Could sort the paths by distance continously and pop off a queue
-      # That way we don't waste time with very long paths
-      i = 0
+      @best = nil
+      @best_distance = 0
+      @best_path = nil
       last_distance = 0
-      # until paths.empty? do
-      until best do
-        # puts "Paths: #{paths.count} #{best_distance}" if @debug
-        # handle this by insertion instead
-        # paths.sort_by! {|p| p[:distance] }
-        # path = paths[i]
-        #
 
-        if paths[last_distance].nil? || paths[last_distance].empty?
+      until @best do
+        break if @paths.compact.empty?
+        if @paths[last_distance].nil? || @paths[last_distance].empty?
           last_distance += 1
           next
         end
 
-        dist_paths = paths[last_distance]
-        # path = nil
-        # until path do
-        #   path = paths[last_distance].find { |p| !p[:done] } if paths[last_distance]
-        #   paths.delete(last_distance) if path.nil? && paths[last_distance]
-        #   last_distance += 1 if path.nil?
-        # end
+        dist_paths = @paths[last_distance]
+        gen_paths(dist_paths, max_keys)
 
-        dist_paths.each do |path|
-          #path[:done] = true
-          # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
-          puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
-          path[:pos].each_with_index do |start, quad|
-            # puts "\tQuad: #{quad} Start: #{start}" if @debug
-            # connections = map[start]
-            # puts "\t\tConnections: #{connections}" if @debug
-            # map[start].keys.each do |dest|
-            m = map[quad][start]
-            m.each do |dest, details|
-              # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
-              # prune
-              # We don't yet have the needed keys to visit this node
-              # binding.pry if @debug && last_distance == 10
-              next if path[:keys][dest.ord - 97]
-              # next unless details[:requirements].subset? path[:keys] # !!!
-              next unless (details[1] - path[:keys]).empty?
-              # puts "\t\t\tPassed Requirements: #{details[:requirements]} - #{path[:keys]}" if @debug
-              # Why bother exploring a path that takes longer than our best
-              distance = path[:distance] + details[0]
-              next if best && distance >= best_distance
-
-              k = path[:keys].clone
-              k.set(dest.ord - 97)
-              # puts "Found dupe! #{dest} #{path}" if visited.include? [dest, k.hash]
-              # next if visited.include? [dest, k.to_a.sort.hash]
-              # puts "\t\t\tPassed Best Distance Check" if @debug
-
-              steps = path[:steps] + [[start,dest,details[0]]]
-              pos = path[:pos].clone
-              pos[quad] = dest
-              # visited.add [dest, k.to_a.sort.hash]
-
-              # test finished
-              if k == keys
-                puts "Found Solution: #{distance} #{steps}" if @debug
-                if best.nil? || distance < best_distance
-                  best = steps
-                  best_distance = distance
-                  puts "\tNew Best!!" if @debug
-                end
-              end
-
-              # new paths
-              paths[distance] ||= []
-              paths[distance] << {
-                pos: pos,
-                keys: k,
-                steps: steps,
-                distance: distance,
-              }
-            end
-          end
-          i += 1
-        end
-        paths.delete(last_distance) if paths[last_distance]
+        @paths.delete(last_distance) if @paths[last_distance]
         last_distance += 1
       end
-      best
+
+      positions = nil
+      if @best_path
+        positions = @best_path[:pos]
+        positions.each_with_index do |pos, idx|
+          if pos
+            @best_path[:pos][idx] = nil
+          else
+            @best_path[:pos][idx] = idx
+          end
+        end
+
+        @paths = {@best_distance => [@best_path]}
+      else
+        @paths = {
+          0 => [
+            pos: 4.times.to_a,
+            keys: Bitset.new(26),
+            steps: [],
+            distance: 0,
+          ]
+        }
+      end
+
+
+      @best = nil
+      @best_distance = 0
+      @best_path = nil
+      last_distance = 0
+
+      until @best do
+        if @paths[last_distance].nil? || @paths[last_distance].empty?
+          last_distance += 1
+          next
+        end
+
+        dist_paths = @paths[last_distance]
+        gen_paths(dist_paths)
+
+        @paths.delete(last_distance) if @paths[last_distance]
+        last_distance += 1
+      end
+      @best
     end
 
     def finished?
