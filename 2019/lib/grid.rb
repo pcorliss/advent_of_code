@@ -126,8 +126,8 @@ class Grid
 
   def []=(pos_x, pos_y = nil, val=nil)
     if pos_x.is_a? Array
-      pos_x, pos_y = pos_x
       val = pos_y
+      pos_x, pos_y = pos_x
     end
     @cells[[pos_x, pos_y]] = val
   end

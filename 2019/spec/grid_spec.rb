@@ -127,11 +127,11 @@ describe Grid do
 
   describe "#set" do
     it "sets a value from cells using array setter ([])" do
-      grid[1,1] = 1
-      grid[[2,2]] = 2
+      grid[1,1] = 7
+      grid[[2,2]] = 13
 
-      expect(grid[1,1]).to eq(1)
-      expect(grid[2,2]).to eq(2)
+      expect(grid[1,1]).to eq(7)
+      expect(grid[2,2]).to eq(13)
     end
   end
 
