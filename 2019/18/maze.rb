@@ -190,24 +190,6 @@ module Advent
       map
     end
 
-
-    def quad_keys
-      4.times.map do |i|
-        Set.new(map[i][i].keys)
-      end
-    end
-
-    def quad_requirements
-      @quad_requirements ||= 4.times.map do |i|
-        m = map[i][i]
-        b = Bitset.new(26)
-        m.each do |key, details|
-          b = b | details[1]
-        end
-        b
-      end
-    end
-
     def bfs
       paths = {0 => []}
       paths[0] << {
@@ -215,7 +197,6 @@ module Advent
         keys: Bitset.new(26),
         steps: [],
         distance: 0,
-        remaining: quad_keys,
       }
 
       # visited = Set.new
@@ -250,16 +231,13 @@ module Advent
           #path[:done] = true
           # puts "#{i} #{paths.count}  Path: #{path[:distance]} #{path}" if @debug && i % 1000 == 0
           puts "#{i} Paths: #{paths.count} Dist: #{path[:distance]} Keys: #{path[:keys].cardinality}" if @debug && i % 1000 == 0
-          path[:remaining].each_with_index do |remaining_keys, quad|
-            remaining_keys.each do |dest|
-              start = path[:pos][quad]
+          path[:pos].each_with_index do |start, quad|
             # puts "\tQuad: #{quad} Start: #{start}" if @debug
             # connections = map[start]
             # puts "\t\tConnections: #{connections}" if @debug
             # map[start].keys.each do |dest|
-              details = map[quad][start][dest]
-            # m = map[quad][start]
-            # m.each do |dest, details|
+            m = map[quad][start]
+            m.each do |dest, details|
               # puts "\t\t\tDest: #{dest.inspect} #{details}" if @debug
               # prune
               # We don't yet have the needed keys to visit this node
@@ -281,8 +259,6 @@ module Advent
               steps = path[:steps] + [[start,dest,details[0]]]
               pos = path[:pos].clone
               pos[quad] = dest
-              rem = path[:remaining].map(&:clone)
-              rem[quad].delete(dest)
               # visited.add [dest, k.to_a.sort.hash]
 
               # test finished
@@ -302,7 +278,6 @@ module Advent
                 keys: k,
                 steps: steps,
                 distance: distance,
-                remaining: rem,
               }
             end
           end

@@ -254,34 +254,6 @@ describe Advent do
         end
       end
 
-      describe "#quad_requirements" do
-        let(:ad) { Advent::MultiMaze.new(H_SAMPLE) }
-
-        it "returns a mapping of quads and the required keys to complete them" do
-          expected = [
-            Bitset.from_s("00110100000000000000000000"),
-            Bitset.from_s("01001000110000000000000000"),
-            Bitset.from_s("00000000001111000000000000"),
-            Bitset.from_s("00000011000000000000000000"),
-          ]
-          expect(ad.quad_requirements).to eq(expected)
-        end
-      end
-
-      describe "#quad_keys" do
-        let(:ad) { Advent::MultiMaze.new(H_SAMPLE) }
-
-        it "returns a mapping of keys in each quad" do
-          expected = [
-            Set.new([ "a", "e", "b", "d", "f", "g" ]),
-            Set.new([ "c", "h", "l" ]),
-            Set.new([ "n", "m", "o" ]),
-            Set.new([ "i", "k", "j" ]),
-          ]
-          expect(ad.quad_keys).to eq(expected)
-        end
-      end
-
       context "validation" do
         {
           INPUT => 8,
