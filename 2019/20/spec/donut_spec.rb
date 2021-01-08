@@ -98,10 +98,6 @@ EOS
       end
     end
 
-    describe "#steps" do
-
-    end
-
     context "validation" do
       {
         A_SAMPLE => 23,
