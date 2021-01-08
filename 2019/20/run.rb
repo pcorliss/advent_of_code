@@ -5,3 +5,4 @@ require_relative 'donut'
 input = File.read('./input.txt')
 
 ad = Advent::Donut.new(input)
+puts "Steps: #{ad.steps}"
