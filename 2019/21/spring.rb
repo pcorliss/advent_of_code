@@ -17,8 +17,8 @@ module Advent
       @debug = true
     end
 
-    def write_program(inp)
-      to_program = inp + "WALK\n"
+    def write_program(inp, tail = "WALK")
+      to_program = inp + "#{tail}\n"
       to_program.chars.map(&:ord).each do |char|
         @program.program_input = char
       end

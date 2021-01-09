@@ -88,6 +88,29 @@ describe Advent do
         expect(out).to_not include("expected something like AND, OR, or NOT")
         expect(out).to end_with("19354928")
       end
+
+      # #.#.#...#
+      # ABCDEFGHI
+      it "makes it across the gap when running" do
+        spring_script = <<~EOS
+        NOT A J
+        NOT B T
+        OR T J
+        NOT C T
+        OR T J
+        AND D J
+        NOT H T
+        NOT T T
+        OR E T
+        AND T J
+        EOS
+        ad.write_program(spring_script, 'RUN')
+        out = ad.run_and_output
+        puts out
+        expect(out).to_not include("Didn't make it across")
+        expect(out).to_not include("expected something like AND, OR, or NOT")
+        expect(out).to end_with("1141997803")
+      end
     end
   end
 end
