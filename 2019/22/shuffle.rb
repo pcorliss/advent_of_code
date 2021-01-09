@@ -6,11 +6,11 @@ module Advent
 
   class Shuffle
     attr_accessor :debug
-    attr_reader :deck, :instructions
+    attr_reader :instructions, :deck
 
     def initialize(input, deck_size = 10007)
       @debug = false
-      @deck = deck_size.times.to_a
+      @deck = Deck.new(deck_size)
       @instructions = input.lines.map(&:chomp).to_a
     end
 
@@ -23,16 +23,7 @@ module Advent
     end
 
     def deal_with_increment!(n)
-      new = []
-      l = @deck.length
-      j = 0
-      i = 0
-      while j < l do
-        new[i % l] = @deck[(i / n) % l]
-        i += n
-        j += 1
-      end
-      @deck = new
+      @deck.deal_with_increment!(n)
     end
 
     def cut!(n)
@@ -52,6 +43,41 @@ module Advent
           raise "Unhandled instruction"
         end
       end
+    end
+  end
+
+  class Deck
+    def initialize(size)
+      @deck = size.times.to_a
+    end
+
+    def reverse!
+      @deck.reverse!
+    end
+
+    def rotate!(n)
+      @deck.rotate!(n)
+    end
+
+    def deal_with_increment!(n)
+      new = []
+      l = @deck.length
+      j = 0
+      i = 0
+      while j < l do
+        new[i % l] = @deck[(i / n) % l]
+        i += n
+        j += 1
+      end
+      @deck = new
+    end
+
+    def to_a
+      @deck
+    end
+
+    def ==(other)
+      @deck == other
     end
   end
 end
