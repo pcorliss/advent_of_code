@@ -48,36 +48,43 @@ module Advent
 
   class Deck
     def initialize(size)
-      @deck = size.times.to_a
+      @size = size
+      @inst = []
     end
 
     def reverse!
-      @deck.reverse!
+      @inst << [:rev, 0]
     end
 
     def rotate!(n)
-      @deck.rotate!(n)
+      @inst << [:rot, n]
     end
 
     def deal_with_increment!(n)
-      new = []
-      l = @deck.length
-      j = 0
-      i = 0
-      while j < l do
-        new[i % l] = @deck[(i / n) % l]
-        i += n
-        j += 1
+      @inst << [:incr, n]
+    end
+
+    def [](i)
+      acc = i
+      @inst.each do |inst, n|
+        case inst
+        when :rev
+          acc = @size - acc - 1
+        when :incr
+          acc = (@size * ((n - i) % n) + i) / n
+        when :rot
+          acc = (acc + n) % @size
+        end
       end
-      @deck = new
+      acc
     end
 
     def to_a
-      @deck
+      @size.times.map { |i| self.[](i) }
     end
 
     def ==(other)
-      @deck == other
+      self.to_a == other
     end
   end
 end
