@@ -53,14 +53,17 @@ module Advent
     end
 
     def reverse!
+      # @deck.reverse!
       @inst << [:rev, 0]
     end
 
     def rotate!(n)
+      # @deck.rotate!(n)
       @inst << [:rot, n]
     end
 
     def deal_with_increment!(n)
+
       @inst << [:incr, n]
     end
 
@@ -71,7 +74,28 @@ module Advent
         when :rev
           acc = @size - acc - 1
         when :incr
-          acc = (@size * ((n - i) % n) + i) / n
+          # new_d = []
+          # oth_d = []
+          # deck = @size.times.to_a
+          # l = @size
+          # j = 0
+          # k = 0
+          # while j < l do
+          #   new_d[k % l] = deck[(k / n) % l]
+          #   oth_d[k] = deck[(k / n) % l]
+          #   k += n
+          #   j += 1
+          # end
+          #
+          # puts "OthD: #{oth_d} #{oth_d.length - 1}" if i == 0 #&& n != 1 && n != 9
+          # puts "Indexes: #{@size.times.map {|o| oth_d.index(o) }}" if i == 0 #&& n != 1 && n != 9
+          # puts "NewD   : #{new_d} #{new_d.length - 1}" if i == 0 #&& n != 1 && n != 9
+          #
+          # acc = new_d[i]
+          #
+          # acc = i / n
+          acc = (i * n) % @size if n == 9
+          acc = (@size - (i * n) % @size) % @size if n == 7 || n == 3
         when :rot
           acc = (acc + n) % @size
         end

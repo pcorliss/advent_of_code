@@ -38,15 +38,17 @@ cut 1712
     end
 
     describe "#deal_with_increment" do
-      it "takes an argument" do
-        ad.deal_with_increment!(1)
-        expect(ad.deck.to_a).to eq(big_deck)
-      end
-
-      it "skips spaces and wraps around" do
-        ad = Advent::Shuffle.new(input, 10)
-        ad.deal_with_increment!(3)
-        expect(ad.deck.to_a).to eq([0,7,4,1,8,5,2,9,6,3])
+      {
+        1 => [0,1,2,3,4,5,6,7,8,9],
+        3 => [0,7,4,1,8,5,2,9,6,3],
+        7 => [0,3,6,9,2,5,8,1,4,7],
+        9 => [0,9,8,7,6,5,4,3,2,1],
+      }.each do |offset, expected|
+        it "skips spaces and wraps around #{offset} gets #{expected}" do
+          ad = Advent::Shuffle.new(input, 10)
+          ad.deal_with_increment!(offset)
+          expect(ad.deck.to_a).to eq(expected)
+        end
       end
     end
 
@@ -97,9 +99,10 @@ cut -1
 
       {
         A_SAMPLE => [0,3,6,9,2,5,8,1,4,7],
-        # B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
+        B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
         # C_SAMPLE => [6,3,0,7,4,1,8,5,2,9],
         # D_SAMPLE => [9,2,5,8,1,4,7,0,3,6],
+        #
       }.each do |inp, expected|
         it "gets the expected result #{expected}" do
           ad = Advent::Shuffle.new(inp, 10)
