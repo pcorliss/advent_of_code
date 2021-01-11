@@ -121,6 +121,19 @@ cut -1
           expect(ad.deck.to_a).to eq(expected)
         end
       end
+
+      {
+        A_SAMPLE => [0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11],
+        B_SAMPLE => [4, 2, 0, 11, 9, 7, 5, 3, 1, 12, 10, 8, 6],
+        C_SAMPLE => [1, 7, 0, 6, 12, 5, 11, 4, 10, 3, 9, 2, 8],
+        D_SAMPLE => [11, 7, 3, 12, 8, 4, 0, 9, 5, 1, 10, 6, 2],
+      }.each do |inp, expected|
+        it "gets the expected result #{expected} with a prime sized deck" do
+          ad = Advent::Shuffle.new(inp, 13)
+          ad.run!
+          expect(ad.deck).to eq(expected)
+        end
+      end
     end
   end
 end
