@@ -38,19 +38,6 @@ cut 1712
     end
 
     describe "#deal_with_increment" do
-      # The inverse mod only works with prime number deck lengths
-      # {
-      #   1 => [0,1,2,3,4,5,6,7,8,9],
-      #   3 => [0,7,4,1,8,5,2,9,6,3],
-      #   7 => [0,3,6,9,2,5,8,1,4,7],
-      #   9 => [0,9,8,7,6,5,4,3,2,1],
-      # }.each do |offset, expected|
-      #   it "skips spaces and wraps around #{offset} gets #{expected}" do
-      #     ad = Advent::Shuffle.new(input, 10)
-      #     ad.deal_with_increment!(offset)
-      #     expect(ad.deck.to_a).to eq(expected)
-      #   end
-      # end
       {
         3 => [0, 9, 5, 1, 10, 6, 2, 11, 7, 3, 12, 8, 4],
         7 => [0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11],
@@ -110,18 +97,18 @@ cut -1
       EOS
 
       # Inverse mod requires a prime deck length
-      # {
-      #   A_SAMPLE => [0,3,6,9,2,5,8,1,4,7],
-      #   B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
-      #   C_SAMPLE => [6,3,0,7,4,1,8,5,2,9],
-      #   D_SAMPLE => [9,2,5,8,1,4,7,0,3,6],
-      # }.each do |inp, expected|
-      #   it "gets the expected result #{expected}" do
-      #     ad = Advent::Shuffle.new(inp, 13)
-      #     ad.run!
-      #     expect(ad.deck.to_a).to eq(expected)
-      #   end
-      # end
+      {
+        # A_SAMPLE => [0,3,6,9,2,5,8,1,4,7],
+        # B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
+        # C_SAMPLE => [6,3,0,7,4,1,8,5,2,9],
+        # D_SAMPLE => [9,2,5,8,1,4,7,0,3,6],
+      }.each do |inp, expected|
+        it "gets the expected result #{expected}" do
+          ad = Advent::Shuffle.new(inp, 10)
+          ad.run!
+          expect(ad.deck.to_a).to eq(expected)
+        end
+      end
 
       {
         A_SAMPLE => [0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11],
