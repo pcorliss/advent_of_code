@@ -50,6 +50,17 @@ cut 1712
           expect(ad.deck.to_a).to eq(expected)
         end
       end
+      {
+        3 => [0, 9, 5, 1, 10, 6, 2, 11, 7, 3, 12, 8, 4],
+        7 => [0, 2, 4, 6, 8, 10, 12, 1, 3, 5, 7, 9, 11],
+        9 => [0, 3, 6, 9, 12, 2, 5, 8, 11, 1, 4, 7, 10],
+      }.each do |offset, expected|
+        it "skips spaces and wraps around #{offset} gets #{expected}" do
+          ad = Advent::Shuffle.new(input, 13)
+          ad.deal_with_increment!(offset)
+          expect(ad.deck.to_a).to eq(expected)
+        end
+      end
     end
 
     describe "#cut" do
@@ -99,7 +110,7 @@ cut -1
 
       {
         A_SAMPLE => [0,3,6,9,2,5,8,1,4,7],
-        B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
+        # B_SAMPLE => [3,0,7,4,1,8,5,2,9,6],
         # C_SAMPLE => [6,3,0,7,4,1,8,5,2,9],
         # D_SAMPLE => [9,2,5,8,1,4,7,0,3,6],
         #
