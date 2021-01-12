@@ -14,6 +14,95 @@ describe Advent do
     EOS
   }
 
+  describe Advent::RecursiveGrid do
+    let(:grid) { Advent::RecursiveGrid.new(input) }
+
+    describe "#neighbors" do
+      it "returns adjacent tiles" do
+        expect(grid.neighbors([1,1])).to eq({
+          [1,0] => '.',
+          [0,1] => '#',
+          [1,2] => '.',
+          [2,1] => '.',
+        })
+      end
+
+      it "returns recursive tiles on the edges" do
+        expect(grid.neighbors([0,0])).to eq({
+          [0, 1] => "#",
+          [1, 0] => ".",
+          [2,1,-1] => ".",
+          [1,2,-1] => ".",
+        })
+        expect(grid.neighbors([4,4])).to eq({
+          [3,4] => ".",
+          [4,3] => ".",
+          [3,2,-1] => ".",
+          [2,3,-1] => ".",
+        })
+      end
+
+      it "returns recursive tiles in the center" do
+        expect(grid.neighbors([2,1])).to eq({
+          [1,1] => '.',
+          [3,1] => '#',
+          [2,0] => '.',
+
+          [0,0,1] => '.',
+          [1,0,1] => '.',
+          [2,0,1] => '.',
+          [3,0,1] => '.',
+          [4,0,1] => '.',
+        })
+      end
+
+      it "maintains z-val" do
+        expect(grid.neighbors([2,1,3])).to eq({
+          [1,1,3] => '.',
+          [3,1,3] => '.',
+          [2,0,3] => '.',
+
+          [0,0,4] => '.',
+          [1,0,4] => '.',
+          [2,0,4] => '.',
+          [3,0,4] => '.',
+          [4,0,4] => '.',
+        })
+      end
+    end
+  end
+
+  describe Advent::RecursiveBugs do
+    let(:ad) { Advent::RecursiveBugs.new(input) }
+
+    describe "#new" do
+      it "inits a 5x5 grid" do
+        expect(ad.grid).to be_a(Advent::RecursiveGrid)
+        min_x, max_x = ad.grid.cells.keys.map(&:first).minmax
+        min_y, max_y = ad.grid.cells.keys.map(&:last).minmax
+        expect(min_x).to eq(0)
+        expect(max_x).to eq(4)
+        expect(min_y).to eq(0)
+        expect(max_y).to eq(4)
+      end
+    end
+
+    context "validation" do
+      {
+          0 =>  8,
+          1 => 27,
+         10 => 99,
+      }.each do |steps, expected|
+        it "#{expected} bugs are present after #{steps} steps" do
+          # ad.debug!
+          steps.times { ad.step! }
+          bug_count = ad.grid.cells.count { |cell, val| val == '#' }
+          expect(bug_count).to eq(expected)
+        end
+      end
+    end
+  end
+
   describe Advent::Bugs do
     let(:ad) { Advent::Bugs.new(input) }
 

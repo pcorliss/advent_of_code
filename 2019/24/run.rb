@@ -13,3 +13,9 @@ end
 puts "Iterations: #{i}"
 puts "Rendered:\n#{ad.grid.render}"
 puts "BioRating: #{ad.biodiversity_rating}"
+
+
+ad = Advent::RecursiveBugs.new(input)
+200.times { ad.step! }
+count = ad.grid.cells.count { |cell, val| val == '#' }
+puts "Bug Count: #{count}"
