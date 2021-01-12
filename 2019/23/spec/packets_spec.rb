@@ -18,9 +18,6 @@ describe Advent do
     end
 
     context "validation" do
-      it "retrieves a value form run" do
-        ad.run_until_255
-      end
     end
   end
 end
