@@ -1,0 +1,54 @@
+east
+take semiconductor
+east
+take ornament
+east
+north
+west
+west
+east
+east
+south
+west
+west
+north
+east
+west
+east
+north
+take loom
+south
+west
+north
+north
+take mutex
+south
+south
+south
+west
+south
+north
+west
+take sand
+south
+east
+take asterisk
+north
+take wreath
+south
+west
+north
+north
+take dark matter
+east
+inv
+drop semiconductor
+drop loom
+drop mutex
+drop sand
+drop asterisk
+drop wreath
+drop ornament
+drop dark matter
+inv
+east
