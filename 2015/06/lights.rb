@@ -32,10 +32,36 @@ module Advent
       :toggle => [:^, 1],
     }
 
+    BRIGHT_MAP = {
+      :on => Proc.new do |val|
+        val ||= 0
+        val += 1
+      end,
+      :off => Proc.new do |val|
+        val ||= 0
+        val -= 1 if val > 0
+        val
+      end,
+      :toggle =>  Proc.new do |val|
+        val ||= 0
+        val += 2
+      end,
+    }
+
     def apply!
       @instructions.each do |op_sym, start, finish|
         op, val = OP_MAP[op_sym]
         @grid.box!(start, finish, val, op)
+        puts "Applied #{op_sym}, #{start}, #{finish}" if @debug
+      end
+    end
+
+    def bright_apply!
+      @instructions.each do |op_sym, start, finish|
+        op = BRIGHT_MAP[op_sym]
+        @grid.box!(start, finish) do |val|
+          op.call(val)
+        end
         puts "Applied #{op_sym}, #{start}, #{finish}" if @debug
       end
     end

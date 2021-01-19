@@ -101,7 +101,7 @@ class Grid
     counter
   end
 
-  def box!(start, finish, val, operator = nil)
+  def box!(start, finish, val = nil, operator = nil)
     x_start, y_start = start
     x_finish, y_finish = finish
 
@@ -111,6 +111,8 @@ class Grid
         if operator
           @cells[new_pos] ||= 0
           @cells[new_pos] = @cells[new_pos].__send__(operator, val)
+        elsif val.nil?
+          @cells[new_pos] = yield(@cells[new_pos])
         else
           @cells[new_pos] = val
         end

@@ -101,6 +101,19 @@ describe Grid do
         [2,2] => 5,
       })
     end
+
+    it "takes a block" do
+      grid.box!([1,1],[2,2]) do |val|
+        val ||= 0
+        val += 5
+      end
+      expect(grid.cells).to eq({
+        [1,1] => 5,
+        [1,2] => 5,
+        [2,1] => 5,
+        [2,2] => 5,
+      })
+    end
   end
 
   describe "#render" do
