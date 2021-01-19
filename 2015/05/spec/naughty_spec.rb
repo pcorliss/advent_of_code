@@ -45,5 +45,47 @@ dvszwmarrgswjxmb
         expect(ad.nice_count).to eq(2)
       end
     end
+
+    context "part two" do
+      let(:input) {
+        <<~EOS
+    qjhvhtzxzqqjkmpb
+    xxyxx
+    uurcxstgmygtbstg
+    ieodomkazucvgmuy
+        EOS
+      }
+
+      describe "#super_nice?" do
+        it "returns true if it matches the conditions" do
+          expect(ad.super_nice?('xxyxx')).to be_truthy
+          expect(ad.super_nice?('qjhvhtzxzqqjkmpb')).to be_truthy
+        end
+
+        it "returns false if it doesn't contain a pair of two letters twice" do
+          expect(ad.super_nice?('aabdbcc')).to be_falsey
+        end
+
+        it "returns false if the repeating pair overlaps" do
+          expect(ad.super_nice?('xxx')).to be_falsey
+        end
+
+        it "returns true if there are many pairs that don't overlap" do
+          expect(ad.super_nice?('xxxx')).to be_truthy
+          expect(ad.super_nice?('xxxxx')).to be_truthy
+        end
+
+        it "returns false if it doesn't contain a repeating letter with a letter between" do
+          expect(ad.super_nice?('aabcdefaa')).to be_falsey
+        end
+      end
+
+      context "validation" do
+        it "counts the nice strings" do
+          # ad.list.each { |str| puts "#{str} Nice: #{ad.super_nice?(str)}" }
+          expect(ad.super_nice_count).to eq(2)
+        end
+      end
+    end
   end
 end

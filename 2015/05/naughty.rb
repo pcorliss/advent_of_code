@@ -38,5 +38,32 @@ module Advent
     def nice_count
       @list.count { |str| nice?(str) }
     end
+
+    def super_nice?(str)
+      letter_between = false
+      pairs = {}
+      prev_char = nil
+      str.chars.each_with_index do |char, idx|
+        letter_between = true if idx > 1 && char == str[idx - 2]
+
+        if prev_char
+          pairs[prev_char + char] ||= []
+          pairs[prev_char + char] << idx
+        end
+        prev_char = char
+      end
+
+      repeats = pairs.any? do |char, indexes|
+        if indexes.count > 1
+          min, max = indexes.minmax
+          (max - min) > 1
+        end
+      end
+      letter_between && repeats
+    end
+
+    def super_nice_count
+      @list.count { |str| super_nice?(str) }
+    end
   end
 end
