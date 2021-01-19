@@ -102,10 +102,10 @@ class Grid
   end
 
   CARDINAL_DIRECTIONS = [
-    [-1, 0],
-    [ 1, 0],
-    [ 0,-1],
-    [ 0, 1],
+    [-1, 0], # West
+    [ 1, 0], # East
+    [ 0,-1], # North
+    [ 0, 1], # South
   ]
 
   def neighbors(cell)
