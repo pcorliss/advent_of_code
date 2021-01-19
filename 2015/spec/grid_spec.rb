@@ -81,6 +81,28 @@ describe Grid do
     end
   end
 
+  describe "#box!" do
+    it "takes a beginning end and val" do
+      grid.box!([1,1],[2,2],5)
+      expect(grid.cells).to eq({
+        [1,1] => 5,
+        [1,2] => 5,
+        [2,1] => 5,
+        [2,2] => 5,
+      })
+    end
+
+    it "takes an operator" do
+      grid.box!([1,1],[2,2],-5,:-)
+      expect(grid.cells).to eq({
+        [1,1] => 5,
+        [1,2] => 5,
+        [2,1] => 5,
+        [2,2] => 5,
+      })
+    end
+  end
+
   describe "#render" do
     it "returns a string suitable for printing" do
       grid.cells = {
