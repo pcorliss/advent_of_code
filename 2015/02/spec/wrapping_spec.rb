@@ -31,9 +31,35 @@ describe Advent do
       end
     end
 
+    describe "#ribbon" do
+      {
+        [2,3,4] => 10,
+        [1,1,10] => 4,
+      }.each do |dims, expected|
+        it "returns #{expected} for dimensions #{dims}" do
+          expect(ad.ribbon(dims)).to eq(expected)
+        end
+      end
+    end
+
+    describe "#bow" do
+      {
+        [2,3,4] => 24,
+        [1,1,10] => 10,
+      }.each do |dims, expected|
+        it "returns #{expected} for dimensions #{dims}" do
+          expect(ad.bow(dims)).to eq(expected)
+        end
+      end
+    end
+
     context "validation" do
       it "returns the total paper requirements" do
         expect(ad.total_paper).to eq(101)
+      end
+
+      it "returns the total ribbon requirements" do
+        expect(ad.total_ribbon).to eq(48)
       end
     end
   end

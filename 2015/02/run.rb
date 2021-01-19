@@ -6,3 +6,4 @@ input = File.read('./input.txt')
 
 ad = Advent::Wrapping.new(input)
 puts "Total Paper: #{ad.total_paper}"
+puts "Total Ribbon: #{ad.total_ribbon}"

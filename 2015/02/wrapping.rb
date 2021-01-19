@@ -29,9 +29,24 @@ module Advent
       min + 2*a + 2*b + 2*c
     end
 
+    def bow(dims)
+      dims.inject(:*)
+    end
+
+    def ribbon(dims)
+      a, b = dims.sort.first(2)
+      2*a + 2*b
+    end
+
     def total_paper
       @presents.sum do |p|
         paper(p)
+      end
+    end
+
+    def total_ribbon
+      @presents.sum do |p|
+        ribbon(p) + bow(p)
       end
     end
   end
