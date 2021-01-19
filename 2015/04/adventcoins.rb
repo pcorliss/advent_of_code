@@ -8,9 +8,10 @@ module Advent
     attr_accessor :debug
     attr_reader :secret
 
-    def initialize(input)
+    def initialize(input, zeroes = 5)
       @debug = false
       @secret = input.chomp
+      @start = '0' * zeroes
     end
 
     def debug!
@@ -22,7 +23,7 @@ module Advent
       loop do
         @counter += 1
         digest = Digest::MD5.hexdigest(secret + @counter.to_s)
-        return @counter if digest.start_with?('00000')
+        return @counter if digest.start_with? @start
       end
     end
   end
