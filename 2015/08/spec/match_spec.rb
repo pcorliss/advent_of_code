@@ -68,6 +68,30 @@ describe Advent do
       end
     end
 
+    describe "#encoded" do
+      it "handles empty strings" do
+        expect(ad.encoded('""')).to eq('"\"\""')
+      end
+
+      it "handles regular strings" do
+        expect(ad.encoded('"abc"')).to eq('"\"abc\""')
+      end
+
+      it "handles strings with double-quotes in them" do
+        expect(ad.encoded('"aaa\"aaa"')).to eq('"\"aaa\\\\\"aaa\""')
+      end
+
+      it "handles special chars" do
+        expect(ad.encoded('"\x27"')).to eq('"\"\\\\x27\""')
+      end
+
+      [6,9,16,11].each_with_index do |expected, idx|
+        it "returns #{expected} for #{idx}" do
+          expect(ad.code_length(ad.encoded(ad.strings[idx]))).to eq(expected)
+        end
+      end
+    end
+
     context "validation" do
       it "returns the total code minus the total str length" do
         expect(ad.total_code_minus_str).to eq(12)
@@ -82,6 +106,10 @@ describe Advent do
       it "returns the correct total code for a larger input" do
         ad = Advent::Match.new(File.read('validation_input.txt'))
         expect(ad.total_code_minus_str).to eq(1342)
+      end
+
+      it "returns the total_encoded minus code original" do
+        expect(ad.total_encoded_minus_code).to eq(19)
       end
     end
   end

@@ -41,9 +41,22 @@ module Advent
       l
     end
 
+    def encoded(str)
+      acc = str
+      acc = acc.gsub('\\', '\\\\\\')
+      acc = acc.gsub('"', '\"')
+      '"' + acc + '"'
+    end
+
     def total_code_minus_str
       @strings.sum do |str|
         code_length(str) - string_length(str)
+      end
+    end
+
+    def total_encoded_minus_code
+      @strings.sum do |str|
+        encoded(str).length - code_length(str)
       end
     end
   end
