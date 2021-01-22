@@ -63,7 +63,7 @@ module Advent
       i = 0
       until i > 0 && valid?(next_pw) do
         next_pw = next_password(next_pw)
-        puts "Next:\t#{i}\t#{next_pw}" if @debug && i % 10000 == 0
+        puts "Next:\t#{i}\t#{next_pw}" if @debug && i % 100000 == 0
         i += 1
       end
       next_pw
