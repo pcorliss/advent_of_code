@@ -49,6 +49,24 @@ Cinnamon: capacity 2, durability 3, flavor -2, texture -1, calories 3
         expect(score[:capacity]).to eq(-97)
         expect(score[:total]).to eq(0)
       end
+
+      it "takes a calories restriction as an optional argument" do
+        ingredients = {
+          'Butterscotch' => 40,
+          'Cinnamon' => 60,
+        }
+        score = ad.score(ingredients, 500)
+        expect(score[:total]).to eq(57600000)
+      end
+
+      it "returns 0, if it exceeds the restriction" do
+        ingredients = {
+          'Butterscotch' => 44,
+          'Cinnamon' => 56,
+        }
+        score = ad.score(ingredients, 500)
+        expect(score[:total]).to eq(0)
+      end
     end
 
     describe "#optimal" do
@@ -68,11 +86,36 @@ Sugar: capacity 0, durability 0, flavor -2, texture 2, calories 1
         EOS
         ad = Advent::Cookie.new(input)
         opt = ad.optimal
-        score = ad.score(ad.optimal)
+        score = ad.score(opt)
         # puts "Opt: #{opt}"
         # puts "Score: #{score}"
 
         expect(score[:total]).to_not eq(0)
+      end
+
+    end
+
+    describe "#optimal_with_calories" do
+      it "handles a high calorie count" do
+        expect(ad.optimal_with_calories(60000)).to eq(ad.optimal)
+      end
+
+      it "handles calorie restrictions" do
+        expect(ad.optimal_with_calories(500)).to eq({
+          'Butterscotch' => 40,
+          'Cinnamon' => 60,
+        })
+      end
+
+      it "handles more complex cases" do
+        input = <<~EOS
+Frosting: capacity 4, durability -2, flavor 0, texture 0, calories 5
+Candy: capacity 0, durability 5, flavor -1, texture 0, calories 8
+Butterscotch: capacity -1, durability 0, flavor 5, texture 0, calories 6
+Sugar: capacity 0, durability 0, flavor -2, texture 2, calories 1
+        EOS
+        ad = Advent::Cookie.new(input)
+        expect(ad.optimal_with_calories(60000)).to eq(ad.optimal)
       end
     end
 

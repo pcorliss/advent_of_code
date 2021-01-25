@@ -31,7 +31,7 @@ module Advent
       @debug = true
     end
 
-    def score(ings)
+    def score(ings, max_calories = nil)
       return_score = {total: 1}
 
       @properties.each do |prop|
@@ -39,7 +39,12 @@ module Advent
           @ingredients[ing][prop] * quant
         end
         return_score[prop] = total
-        next if prop == :calories
+        if prop == :calories
+          if max_calories && total > max_calories
+            return_score[:total] = 0
+          end
+          next
+        end
         total = 0 if total < 0
         return_score[:total] *= total 
       end
@@ -68,6 +73,16 @@ module Advent
       end
 
       opt
+    end
+
+    def optimal_with_calories(max_calories)
+      ing_list = @ingredients.keys
+
+      best = (0..100).to_a.repeated_permutation(ing_list.length).max_by do |combo|
+        combo.sum == 100 ? score(Hash[ing_list.zip(combo)], max_calories)[:total] : 0
+      end
+
+      Hash[ing_list.zip(best)]
     end
   end
 end
