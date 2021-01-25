@@ -17,4 +17,5 @@ find . | grep rb | xargs sed -i "s/blank/${FNAME}/g"
 find . | grep rb | xargs sed -i "s/Blank/${NAME}/g"
 mv blank.rb ${FNAME}.rb
 mv spec/blank_spec.rb spec/${FNAME}_spec.rb
+touch input.txt
 popd
