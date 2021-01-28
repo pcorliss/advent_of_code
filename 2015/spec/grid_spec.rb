@@ -139,6 +139,20 @@ describe Grid do
         [1,2] => 7,
       })
     end
+
+    it "takes an optional argument to handle diagonals as well as cardinal direction neigbors" do
+      grid = Grid.new(9.times.to_a, 3)
+      expect(grid.neighbors([1,1], true)).to eq({
+        [0,0] => 0,
+        [1,0] => 1,
+        [2,0] => 2,
+        [0,1] => 3,
+        [2,1] => 5,
+        [0,2] => 6,
+        [1,2] => 7,
+        [2,2] => 8,
+      })
+    end
   end
 
   describe "#get" do
