@@ -130,29 +130,6 @@ describe Advent do
         EOS
 
         5.times { ad.corners_on!; ad.step!; ad.corners_on! }
-        # ad.corners_on!
-        # puts ad.grid.render
-        # ad.step!
-        # ad.corners_on!
-        # puts ""
-        # puts ad.grid.render
-        # ad.step!
-        # ad.corners_on!
-        # puts ""
-        # puts ad.grid.render
-        # ad.step!
-        # ad.corners_on!
-        # puts ""
-        # puts ad.grid.render
-        # ad.step!
-        # ad.corners_on!
-        # puts ""
-        # puts ad.grid.render
-        # ad.step!
-        # ad.corners_on!
-        # puts ""
-        # puts ad.grid.render
-        # puts ""
         expect(ad.grid.cells).to eq(Grid.new(expected).cells)
       end
     end
