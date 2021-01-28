@@ -40,5 +40,13 @@ module Advent
 
       @grid = new_grid
     end
+
+    def corners_on!
+      @w ||= @grid.width - 1
+      @grid[0,@w] = '#'
+      @grid[@w,@w] = '#'
+      @grid[@w,0] = '#'
+      @grid[0,0] = '#'
+    end
   end
 end

@@ -64,6 +64,14 @@ describe Advent do
       end
     end
 
+    describe "#corners_on!" do
+      it "flips the corners on" do
+        ad.corners_on!
+        expect(ad.grid[0,0]).to eq('#')
+        expect(ad.grid[5,5]).to eq('#')
+      end
+    end
+
     context "validation" do
       it "steps through different states" do
         init = input
@@ -109,6 +117,43 @@ describe Advent do
         expect(ad.grid.cells).to eq(Grid.new(c).cells)
         ad.step!
         expect(ad.grid.cells).to eq(Grid.new(d).cells)
+      end
+
+      it "handles the corners being on" do
+        expected = <<~EOS
+##.###
+.##..#
+.##...
+.##...
+#.#...
+##...#
+        EOS
+
+        5.times { ad.corners_on!; ad.step!; ad.corners_on! }
+        # ad.corners_on!
+        # puts ad.grid.render
+        # ad.step!
+        # ad.corners_on!
+        # puts ""
+        # puts ad.grid.render
+        # ad.step!
+        # ad.corners_on!
+        # puts ""
+        # puts ad.grid.render
+        # ad.step!
+        # ad.corners_on!
+        # puts ""
+        # puts ad.grid.render
+        # ad.step!
+        # ad.corners_on!
+        # puts ""
+        # puts ad.grid.render
+        # ad.step!
+        # ad.corners_on!
+        # puts ""
+        # puts ad.grid.render
+        # puts ""
+        expect(ad.grid.cells).to eq(Grid.new(expected).cells)
       end
     end
   end
