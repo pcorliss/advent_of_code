@@ -9,6 +9,8 @@ describe Advent do
 H => HO
 H => OH
 O => HH
+e => H
+e => O
 
 HOH
     EOS
@@ -32,6 +34,12 @@ HaOHbH
       it "inits a replace hash" do
         expect(ad.replace['H']).to contain_exactly(['H','O'], ['O','H'])
         expect(ad.replace['O']).to contain_exactly(['H','H'])
+      end
+
+      it "inits a from hash" do
+        expect(ad.replace_from[['H', 'O']]).to eq('H')
+        expect(ad.replace_from[['O', 'H']]).to eq('H')
+        expect(ad.replace_from[['H', 'H']]).to eq('O')
       end
 
       it "inits a starting molecule" do
@@ -64,6 +72,34 @@ HaOHbH
 
       it "doesn't blow up if there's no replacement for a given atom" do
         expect(ad.replacements(['C'])).to be_empty
+      end
+    end
+
+    describe "#find_replacement" do
+      {
+        [['H','H'], ['H','O','H']] => 1,
+        [['O'], ['H','O','H']] => 2,
+        [['e'], ['H','O','H']] => 3,
+        [['e'], ['H','O','H','O','H','O']] => 6,
+      }.each do |in_out, expected|
+        it "returns the expected steps #{expected} given a starting point of #{in_out.first} and an end point of #{in_out.last}" do
+          #ad.debug!
+          expect(ad.find_replacement(*in_out)).to eq(expected)
+        end
+      end
+    end
+
+    describe "#greedy_backwards" do
+      {
+        [['e'], ['H','O','H']] => 3,
+        # Notably the input and the sample differ and will yield incorret answers
+        # [['e'], ['H','O','H','O','H','O']] => 6,
+      }.each do |in_out, expected|
+        it "returns the expected steps #{expected} given a starting point of #{in_out.last} and an end point of #{in_out.first}" do
+          #ad.debug!
+          ending, starting = in_out
+          expect(ad.greedy_backwards(starting)).to eq(expected)
+        end
       end
     end
 
