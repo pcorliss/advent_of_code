@@ -16,11 +16,19 @@ module Advent
     end
 
     # Refactor to quickly return all factors instead
-    def presents(house)
+    def presents(house, mult = 10, filter=nil)
       # Sourced: https://stackoverflow.com/questions/3398159/all-factors-of-a-given-number
       1.upto(Math.sqrt(house)).select {|i| (house % i).zero?}.inject(0) do |acc, i|
-        acc += i*10
-        acc += (house / i)*10 unless i == house / i
+        a = i
+        b = house / i
+
+        if filter
+          acc += a*mult if b <= filter
+          acc += b*mult if a != b && a <= filter
+        else
+          acc += a*mult
+          acc += b*mult if a != b
+        end
         acc
       end
     end
@@ -34,12 +42,12 @@ module Advent
       end
     end
 
-    def find_house_prime(pres)
+    def find_house_prime(pres, mult = 10, filter = nil)
       largest = 0
       Prime.each do |i|
         # next if i % 10 != 1 || i % 10 != 9
-        a = presents(i-1)
-        b = presents(i+1)
+        a = presents(i-1, mult, filter)
+        b = presents(i+1, mult, filter)
         return i-1 if a >= pres
         return i+1 if b >= pres
         m = [a,b].max

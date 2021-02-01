@@ -9,33 +9,42 @@ ad = Advent::Presents.new
 # house = ad.find_house(input)
 # puts "House: #{house} for #{input}"
 
-p_map = 1000.times.map do |i|
-  ad.presents(i)
-end
+# p_map = 1000.times.map do |i|
+#   ad.presents(i)
+# end
+#
+# best = 0
+# bests = {}
+# prime_adjacent_h = {true => 0, false => 0}
+#
+# (2000..3000).each do |i|
+#   p = ad.presents(i)
+#   prime = i.prime? ? " Prime" : ""
+#   if p > best
+#     prime_adjacent = (i - 1).prime? || (i + 1).prime?
+#     prime_adjacent_h[prime_adjacent] += 1
+#     puts "#{i}\t#{p} New Best #{(i - 1).prime?}#{(i + 1).prime?}" if prime_adjacent
+#     bests[i] = p
+#     best = p
+#   else
+#     # puts "#{i}\t#{p}#{prime}"
+#   end
+# end
+#
+# puts "Max: #{p_map.max} #{p_map.index(p_map.max)}"
+# puts "Mean: #{p_map.sum / p_map.count}"
+# puts "Bests: #{bests}"
+# puts "Prime Adjacent: #{prime_adjacent_h}"
 
-best = 0
-bests = {}
-prime_adjacent_h = {true => 0, false => 0}
-
-(2000..3000).each do |i|
-  p = ad.presents(i)
-  prime = i.prime? ? " Prime" : ""
-  if p > best
-    prime_adjacent = (i - 1).prime? || (i + 1).prime?
-    prime_adjacent_h[prime_adjacent] += 1
-    puts "#{i}\t#{p} New Best #{(i - 1).prime?}#{(i + 1).prime?}" if prime_adjacent
-    bests[i] = p
-    best = p
-  else
-    # puts "#{i}\t#{p}#{prime}"
-  end
-end
-
-puts "Max: #{p_map.max} #{p_map.index(p_map.max)}"
-puts "Mean: #{p_map.sum / p_map.count}"
-puts "Bests: #{bests}"
-puts "Prime Adjacent: #{prime_adjacent_h}"
-
+require 'benchmark'
 ad.debug!
-house = ad.find_house_prime(input)
-puts "House: #{house} for #{input}"
+house = 0
+b = Benchmark.measure do
+  house = ad.find_house_prime(input)
+end
+puts "House: #{house} for #{input} in #{b}"
+
+b = Benchmark.measure do
+  house = ad.find_house_prime(input, 11, 50)
+end
+puts "House: #{house} for #{input} in #{b}"

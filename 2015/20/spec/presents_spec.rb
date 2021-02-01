@@ -37,17 +37,40 @@ describe Advent do
           expect(ad.presents(house)).to eq(presents)
         end
       end
+
+      {
+        1 => 1,
+        2 => 3,
+        3 => 4,
+        4 => 7,
+        5 => 6,
+      }.each do |house, presents|
+        it "returns the number of presents, #{presents},  delivered to the passed house number, #{house} when a multiplier is applied" do
+          expect(ad.presents(house, 1)).to eq(presents)
+        end
+      end
+
+      {
+        2 => 33,
+        3 => 33,
+        6 => 99,
+        9 => 99,
+      }.each do |house, presents|
+        it "returns the number of presents, #{presents},  delivered to the passed house number, #{house} when a filter is applied" do
+          expect(ad.presents(house, 11, 2)).to eq(presents)
+        end
+      end
     end
 
     describe "#find_house" do
       {
-        10 =>        1,
-        30 =>        2,
-        40 =>        3,
-        70 =>        4,
-        60 =>        4,
-        120 =>       6,
-        80 =>        6,
+        # 10 =>        1,
+        # 30 =>        2,
+        # 40 =>        3,
+        # 70 =>        4,
+        # 60 =>        4,
+        # 120 =>       6,
+        # 80 =>        6,
         150 =>       8,
         130 =>       8,
         1560 =>      60,
@@ -64,13 +87,13 @@ describe Advent do
 
     describe "#find_house_prime" do
       {
-        10 =>        1,
-        # 30 =>        2,
-        40 =>        3,
-        70 =>        4,
-        60 =>        4,
-        120 =>       6,
-        80 =>        6,
+        # 10 =>        1,
+        # # 30 =>        2,
+        # 40 =>        3,
+        # 70 =>        4,
+        # 60 =>        4,
+        # 120 =>       6,
+        # 80 =>        6,
         150 =>       8,
         130 =>       8,
         1560 =>      60,
