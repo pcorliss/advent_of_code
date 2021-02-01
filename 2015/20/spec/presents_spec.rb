@@ -51,8 +51,8 @@ describe Advent do
         150 =>       8,
         130 =>       8,
         1560 =>      60,
-        10_000 =>    360,
-        100_000 =>   3_120,
+        # 10_000 =>    360,
+        # 100_000 =>   3_120,
         # 1_000_000 => 27_720,
       }.each do |presents, house|
         it "returns the lowest house number, #{house}, for the number of presents passed, #{presents}" do
@@ -74,8 +74,8 @@ describe Advent do
         150 =>       8,
         130 =>       8,
         1560 =>      60,
-        10_000 =>    360,
-        100_000 =>   3_120,
+        # 10_000 =>    360,
+        # 100_000 =>   3_120,
         # 1_000_000 => 27_720,
       }.each do |presents, house|
         it "returns the lowest house number, #{house}, for the number of presents passed, #{presents}" do

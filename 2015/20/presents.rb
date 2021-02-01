@@ -17,14 +17,12 @@ module Advent
 
     # Refactor to quickly return all factors instead
     def presents(house)
-      acc = house * 10
-      (1..(house/2)).each do |n|
-        if house % n == 0
-          acc += n * 10
-        end
+      # Sourced: https://stackoverflow.com/questions/3398159/all-factors-of-a-given-number
+      1.upto(Math.sqrt(house)).select {|i| (house % i).zero?}.inject(0) do |acc, i|
+        acc += i*10
+        acc += (house / i)*10 unless i == house / i
+        acc
       end
-
-      acc
     end
 
     def find_house(presents)
