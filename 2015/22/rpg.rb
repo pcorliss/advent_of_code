@@ -5,7 +5,7 @@ module Advent
 
   class Rpg
     attr_accessor :debug
-    attr_reader :boss
+    attr_reader :boss, :turn
 
     ATTR_MAP = {
       'Hit Points' => :hit,
@@ -14,7 +14,12 @@ module Advent
     }
     def initialize(input)
       @debug = false
-      @boss = {}
+      @turn = 0
+      @boss = {
+        hit: 0,
+        damage: 0,
+        armor: 0,
+      }
       input.each_line do |line|
         line.chomp!
         attribute, val = line.split(': ')
@@ -76,6 +81,70 @@ module Advent
       {cost:  0, dmg: 0, arm: 0},
       {cost:  0, dmg: 0, arm: 0},
     ]
+
+    # Magic Missile costs 53 mana. It instantly does 4 damage.
+    # Drain costs 73 mana. It instantly does 2 damage and heals you for 2 hit points.
+    # Shield costs 113 mana. It starts an effect that lasts for 6 turns. While it is active, your armor is increased by 7.
+    # Poison costs 173 mana. It starts an effect that lasts for 6 turns. At the start of each turn while it is active, it deals the boss 3 damage.
+    # Recharge costs 229 mana. It starts an effect that lasts for 5 turns. At the start of each turn while it is active, it gives you 101 new mana.
+    SPELLS = [
+      {mana: 53, dmg: 4},
+      {mana: 73, dmg: 2, heal: 2},
+      {mana: 113, duration: 6, arm: 7},
+      {mana: 173, duration: 6, dmg: 3},
+      {mana: 229, duration: 5, mana_delta: 101},
+    ]
+
+    def simulate_step(player, spell)
+      raise "Fail!!!" if player.nil?
+      @turn += 1
+
+      player[:mana] -= spell[:mana] if spell[:mana]
+
+      @effects ||= []
+
+      # Player Turn
+      # Apply Spell Effects
+      @effects.each do |effect|
+        effect[:duration] -= 1
+        player[:mana] += effect[:mana_delta] if effect[:mana_delta]
+        @boss[:hit] -= effect[:dmg] if effect[:dmg]
+      end
+
+      if spell[:duration]
+        @effects << spell
+        spell = {}
+      end
+
+      # Do Damage
+      @boss[:hit] -= spell[:dmg] if spell[:dmg]
+      player[:hit] += spell[:heal] if spell[:heal]
+      return player if @boss[:hit] <= 0
+
+      # Boss Turn
+      # Apply Spell Effects
+      @effects.each do |effect|
+        effect[:duration] -= 1
+        player[:mana] += effect[:mana_delta] if effect[:mana_delta]
+        @boss[:hit] -= effect[:dmg] if effect[:dmg]
+      end
+      # Do Damage
+      player[:hit] -= @boss[:damage]
+      player
+    end
+
+    def magic_options
+
+    end
+
+    def magic_win?(player)
+      raise "Fail!!!" if player.nil?
+      return false if player[:mana] < 53 # Min mana cost
+      return nil if player[:hit] > 0 && @boss[:hit] > 0
+      return true if player[:hit] > 0
+      return false if @boss[:hit] > 0
+      nil
+    end
 
     def inventory
       inv = []
