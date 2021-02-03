@@ -187,6 +187,8 @@ module Advent
       temp_armor = 0
       effects.each do |effect|
         next if effect[:duration] == 0
+        player[:hit] -= effect[:burn] if effect[:burn]
+        return [player, boss] if player[:hit] <= 0
         effect[:duration] -= 1
         player[:mana] += effect[:mana_delta] if effect[:mana_delta]
         boss[:hit] -= effect[:dmg] if effect[:dmg]
@@ -212,6 +214,8 @@ module Advent
       # Apply Spell Effects
       effects.each do |effect|
         next if effect[:duration] == 0
+        player[:hit] -= effect[:burn] if effect[:burn]
+        return [player, boss] if player[:hit] <= 0
         effect[:duration] -= 1
         player[:mana] += effect[:mana_delta] if effect[:mana_delta]
         boss[:hit] -= effect[:dmg] if effect[:dmg]
