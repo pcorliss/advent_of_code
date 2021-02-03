@@ -19,8 +19,8 @@ module Advent
       @debug = true
     end
 
-    def configurations
-      target_sum = @packages.sum / 3
+    def configurations(groups = 3)
+      target_sum = @packages.sum / groups
       group_a = []
       @packages.length.times do |i|
         group_a = @packages.combination(i).select {|group| group.sum == target_sum}

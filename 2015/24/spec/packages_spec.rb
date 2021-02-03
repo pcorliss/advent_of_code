@@ -20,6 +20,14 @@ describe Advent do
       it "returns the shortest combo that has the right weight" do
         expect(ad.configurations).to eq([[9,11]])
       end
+
+      it "takes an argument for the number of groups" do
+        expect(ad.configurations(4)).to contain_exactly(
+          contain_exactly(11,4),
+          contain_exactly(10,5),
+          contain_exactly(8,7),
+        )
+      end
     end
 
     context "validation" do
