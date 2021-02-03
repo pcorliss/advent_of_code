@@ -4,7 +4,7 @@ require '../lib/grid.rb'
 module Advent
 
   class Machine
-    attr_accessor :debug, :instructions
+    attr_accessor :debug, :instructions, :register
 
     def initialize(input)
       @debug = false
