@@ -23,21 +23,65 @@ describe Advent do
       end
     end
 
-    describe "#contains_abba?" do
+    describe "#abba?" do
       it "returns true if the string is an abba" do
-        expect(ad.contains_abba?("abba")).to be_truthy
+        expect(ad.abba?("abba")).to be_truthy
       end
 
       it "returns true if the abbs is part of a larger string" do
-        expect(ad.contains_abba?("zabbay")).to be_truthy
+        expect(ad.abba?("zabbay")).to be_truthy
       end
 
       it "returns false if the string doesn't contain an abba" do
-        expect(ad.contains_abba?("qwer")).to be_falsey
+        expect(ad.abba?("qwer")).to be_falsey
       end
 
       it "returns false if the string contains the same four chars repeated" do
-        expect(ad.contains_abba?("aaaa")).to be_falsey
+        expect(ad.abba?("aaaa")).to be_falsey
+      end
+    end
+
+    describe "#aba" do
+      it "returns true if the string is an aba" do
+        expect(ad.aba("aba")).to eq([['a', 'b']])
+      end
+
+      it "returns true if the abbs is part of a larger string" do
+        expect(ad.aba("zabay")).to eq([['a','b']])
+      end
+
+      it "returns false if the string doesn't contain an aba" do
+        expect(ad.aba("qwer")).to be_empty
+      end
+
+      it "returns false if the string contains the same four chars repeated" do
+        expect(ad.aba("aaaa")).to be_empty
+      end
+
+      it "returns all repeated sequences" do
+        expect(ad.aba("zazbz")).to eq([['z','a'], ['z','b']])
+      end
+    end
+
+    describe "#bab?" do
+      it "returns true if the string is an bab" do
+        expect(ad.bab?("bab", [['a','b']])).to be_truthy
+      end
+
+      it "returns true if the abbs is part of a larger string" do
+        expect(ad.bab?("zbaby", [['a', 'b']])).to be_truthy
+      end
+
+      it "returns false if the string doesn't contain an bab" do
+        expect(ad.bab?("qwer", [['a', 'b']])).to be_falsey
+      end
+
+      it "returns false if the string contains the same four chars repeated" do
+        expect(ad.bab?("aaaa", [['a', 'b']])).to be_falsey
+      end
+
+      it "returns false if the string contains the wrong chars" do
+        expect(ad.bab?("aba", [['a', 'b']])).to be_falsey
       end
     end
 
@@ -60,6 +104,20 @@ describe Advent do
       }.each do |str, expected|
         it "returns #{expected} for #{str}" do
           expect(ad.supports_tls?(str)).to eq(expected)
+        end
+      end
+    end
+
+    describe "#supports_ssl?" do
+      {
+        "aba[bab]xyz" => true, # supports SSL (aba outside square brackets with corresponding bab within square brackets).
+        "xyx[xyx]xyx" => false, # does not support SSL (xyx, but no corresponding yxy).
+        "aaa[kek]eke" => true, # supports SSL (eke in supernet with corresponding kek in hypernet; the aaa sequence is not related, because the interior character must be different).
+        "zazbz[bzb]cdb" => true, # supports SSL (zaz has no corresponding aza, but zbz has a corresponding bzb, even though zaz and zbz overlap).
+      }.each do |str, expected|
+        it "returns #{expected} for #{str}" do
+          # ad.debug!
+          expect(ad.supports_ssl?(str)).to eq(expected)
         end
       end
     end
