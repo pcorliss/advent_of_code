@@ -37,6 +37,12 @@ totally-real-room-200[decoy]
       end
     end
 
+    describe "#decrypt" do
+      it "decrypts room names" do
+        expect(ad.decrypt("qzmt-zixmtkozy-ivhz-343[decoy]")).to eq("very encrypted name")
+      end
+    end
+
     context "validation" do
     end
   end

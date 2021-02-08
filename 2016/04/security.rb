@@ -48,5 +48,17 @@ module Advent
 
       checksum == gen_sum.first(5).join
     end
+
+    def decrypt(room)
+      encrypted, sector_id, _ = room_comp(room).values
+      offset = sector_id % 26
+      encrypted.each_char.map do |char|
+        if char == '-'
+          " "
+        else
+          (((char.ord - 97) + offset) % 26 + 97).chr
+        end
+      end.join
+    end
   end
 end
