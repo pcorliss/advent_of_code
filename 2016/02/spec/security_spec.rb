@@ -47,6 +47,20 @@ describe Advent do
         instructions = %w( U L L L L )
         expect(ad.run_inst(start, instructions)).to eq([0,0])
       end
+
+      it "handles boundaries on alternate keypads" do
+        keypad = [
+          nil, nil, 1, nil, nil,
+          nil, 2, 3, 4, nil,
+          5, 6, 7, 8, 9,
+          nil, 'A', 'B', 'C', nil,
+          nil, nil, 'D', nil, nil,
+        ]
+        ad.keypad = Grid.new(keypad, 5)
+        # start position is on the 2
+        instructions = %w( U L )
+        expect(ad.run_inst(start, instructions)).to eq(start)
+      end
     end
 
     describe "#run_all_instructions" do
@@ -57,6 +71,24 @@ describe Advent do
           [2,2],
           [1,2],
           [1,1],
+        ])
+      end
+
+      it "handles part 2 keypad" do
+        keypad = [
+          nil, nil, 1, nil, nil,
+          nil, 2, 3, 4, nil,
+          5, 6, 7, 8, 9,
+          nil, 'A', 'B', 'C', nil,
+          nil, nil, 'D', nil, nil,
+        ]
+        ad.keypad = Grid.new(keypad, 5)
+        start = [0, 2] # still start at 5
+        expect(ad.run_all_instructions(start)).to eq([
+          [0,2],
+          [2,4],
+          [2,3],
+          [2,1],
         ])
       end
     end
@@ -71,10 +103,27 @@ describe Advent do
         ]
         expect(ad.map_code(positions)).to eq([1, 9, 8, 5])
       end
+
+      it "handles alternate keypads" do
+        keypad = [
+          nil, nil, 1, nil, nil,
+          nil, 2, 3, 4, nil,
+          5, 6, 7, 8, 9,
+          nil, 'A', 'B', 'C', nil,
+          nil, nil, 'D', nil, nil,
+        ]
+        positions = [
+          [0,2],
+          [2,4],
+          [2,3],
+          [2,1],
+        ]
+        ad.keypad = Grid.new(keypad, 5)
+        expect(ad.map_code(positions)).to eq([5, 'D', 'B', 3])
+      end
     end
 
     context "validation" do
-
     end
   end
 end

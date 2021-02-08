@@ -4,8 +4,8 @@ require '../lib/grid.rb'
 module Advent
 
   class Security
-    attr_accessor :debug
-    attr_reader :inst, :keypad
+    attr_accessor :debug, :keypad
+    attr_reader :inst
 
     def initialize(input)
       @debug = false
@@ -35,7 +35,8 @@ module Advent
         x_delta, y_delta = INST_MAP[instruction]
         new_x = new_pos[X] + x_delta
         new_y = new_pos[Y] + y_delta
-        new_pos = [new_x, new_y] if new_x >= 0 && new_y >= 0 && new_x < 3 && new_y < 3
+        new_pos = [new_x, new_y] if @keypad[new_x, new_y]
+        # new_pos = [new_x, new_y] if new_x >= 0 && new_y >= 0 && new_x < 3 && new_y < 3
       end
       new_pos
     end
