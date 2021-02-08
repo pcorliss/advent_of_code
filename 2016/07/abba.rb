@@ -35,12 +35,23 @@ module Advent
       end
     end
 
+    # kinda a palindrome, needs a better name
     def palindrome?(str, len)
       pos = len - 1
       sequences = []
       while pos < str.length do
         chars = str[(pos - len + 1)..pos].chars
-        sequences << [chars.first, chars[1]] if chars.first == chars.last && chars.first != chars[1]
+        j = 0
+        palin = true
+        while j < len / 2 do
+          if chars[j] != chars[len - j - 1]
+            palin = false
+            break
+          end
+          j += 1
+        end
+
+        sequences << [chars.first, chars[1]] if palin && chars[0] != chars[1]
         pos += 1
       end
       sequences
@@ -78,6 +89,7 @@ module Advent
 
     def supports_tls?(str)
       decomposed = decompose_ip(str)
+      # decomposed[:nonhyper].any? { |segment| abba?(segment) } && !decomposed[:hypernet].any? { |segment| abba?(segment) }
       decomposed[:nonhyper].any? { |segment| abba?(segment) } && decomposed[:hypernet].all? { |segment| !abba?(segment) }
     end
 

@@ -39,6 +39,10 @@ describe Advent do
       it "returns false if the string contains the same four chars repeated" do
         expect(ad.abba?("aaaa")).to be_falsey
       end
+
+      it "returns false if the string contains a non matching central pair" do
+        expect(ad.abba?("abca")).to be_falsey
+      end
     end
 
     describe "#aba" do
