@@ -39,6 +39,12 @@ describe Grid do
         [3,3] => '4',
       })
     end
+
+    it "instantiates an empty grid using width and height" do
+      grid = Grid.new([], 10, 11)
+      expect(grid.width).to eq(10)
+      expect(grid.height).to eq(11)
+    end
   end
 
   describe "#cell_direction" do

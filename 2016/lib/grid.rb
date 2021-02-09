@@ -1,11 +1,11 @@
 class Grid
-  attr_accessor :width
+  attr_accessor :width, :height
   attr_accessor :cells, :pos
 
   X = 0
   Y = 1
 
-  def initialize(init = nil, width = nil)
+  def initialize(init = nil, width = nil, height = nil)
     @debug = false
     @cells = {}
     @pos = [0,0]
@@ -16,6 +16,7 @@ class Grid
         y = idx / width
         @cells[[x, y]] = val
       end
+      @height = height
     end
     if init.is_a?(String) && width.nil?
       @width = init.lines.first.length - 1
