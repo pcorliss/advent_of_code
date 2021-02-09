@@ -59,5 +59,23 @@ module Advent
       end
       new_str
     end
+
+    def decode_length(str)
+      counter = 0
+      i = 0
+      depth = Kernel.caller.select {|c| c.include? __method__.to_s}.count
+      while i < str.length do
+        i, sub = read_until(str, i, '(')
+        counter += sub.length
+        puts "#{"\t" * depth}Counter: #{counter} - Added #{sub.length} '#{sub}'" if @debug
+        break unless i < str.length
+        i, chars_to_read = read_until(str, i + 1, 'x')
+        i, times_to_repeat = read_until(str, i + 1, ')')
+        sub = str[(i+1)..(i+chars_to_read.to_i)]
+        counter += times_to_repeat.to_i * decode_length(sub)
+        i += chars_to_read.to_i + 1
+      end
+      counter
+    end
   end
 end

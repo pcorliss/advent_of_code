@@ -65,6 +65,26 @@ and decompresses to itself with no changes, resulting in a decompressed length o
       end
     end
 
+    describe "#decode_length" do
+      it "decodes a string with no markers as itself" do
+        expect(ad.decode_length("TheQuickBrownFox")).to eq(16)
+      end
+
+      it "handles multiple chars repeating" do
+        expect(ad.decode_length("(3x3)XYZ")).to eq(9)
+      end
+
+      it "handles nesting" do
+        ad.debug!
+        expect(ad.decode_length("X(8x2)(3x3)ABCY")).to eq(20)
+      end
+
+      it "handles very long strings" do
+        expect(ad.decode_length("(27x12)(20x12)(13x14)(7x10)(1x12)A")).to eq(241920)
+        expect(ad.decode_length("(25x3)(3x3)ABC(2x3)XY(5x2)PQRSTX(18x9)(3x2)TWO(5x7)SEVEN")).to eq(445)
+      end
+    end
+
     context "validation" do
     end
   end
