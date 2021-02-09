@@ -70,7 +70,25 @@ module Advent
           end
         end
       end
+      # depth = Kernel.caller.select {|c| c.include? __method__.to_s}.count 
+      # puts "#{'  ' * depth}Bot #{bot} gets #{acc} chips" if @debug
       @bot_inputs[bot] = acc.sort
+    end
+
+    def output_value(out)
+      @bots.each_with_index do |vals, bot|
+        low_out, low_out_num, high_out, high_out_num = vals
+        # puts "#{low_out}, #{low_out_num}, #{high_out}, #{high_out_num}, #{bot}" if @debug
+        target = nil
+        target = :low if (low_out == :output && low_out_num == out)
+        target = :high if (high_out == :output && high_out_num == out)
+        next unless target
+        puts "Found Bot: #{target} #{bot}" if @debug
+        low, high = get_inputs(bot)
+        return low if target == :low
+        return high if target == :high
+      end
+      nil
     end
   end
 end

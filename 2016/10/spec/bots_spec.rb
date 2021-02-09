@@ -69,6 +69,14 @@ describe Advent do
       end
     end
 
+    describe "#output_value" do
+      [ 5, 2, 3 ].each_with_index do |val, output|
+        it "returns the value #{val} received by a given output #{output}" do
+          expect(ad.output_value(output)).to eq(val)
+        end
+      end
+    end
+
     context "validation" do
     end
   end
