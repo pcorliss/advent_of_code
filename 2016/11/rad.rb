@@ -69,8 +69,13 @@ module Advent
           combos = objs.to_a.combination(2) + objs.map {|o| [o]}
           [pos-1,pos+1].each do |new_floor|
             next if new_floor < 1 || new_floor > 4
+            step_down = pos - 1 == new_floor
+            step_up = !!step_down
             next if pos - 1 == new_floor && (1..new_floor).all? { |f| state[f].empty? }
+            new_states = []
             combos.each do |combo|
+              next if step_down && combo.count == 2
+              next if step_up && !new_states.empty? && combo.count == 1
               new_state = DeepClone.clone(state)
               new_state[0] = new_floor
               new_state[pos] -= combo
@@ -81,8 +86,9 @@ module Advent
               return steps + 1 if success?(new_state)
               previous.add state
 
-              new_queue << new_state
+              new_states << new_state
             end
+            new_queue.concat new_states
           end
         end
         queue = new_queue
