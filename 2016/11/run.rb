@@ -2,7 +2,8 @@
 
 require_relative 'rad'
 
-input = File.read('./input-part2.txt')
+input = File.read('./input.txt')
+# input = File.read('./input-part2.txt')
 
 ad = Advent::Rad.new(input)
 ad.debug!
