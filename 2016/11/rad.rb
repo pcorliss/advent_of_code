@@ -108,7 +108,7 @@ module Advent
 
     def score(state)
       s = (1..4).sum do |floor|
-        state[floor].count * floor
+        state[floor].count * (floor - 1) * 4
       end
       s -= state.last if state.length > 5
       s
@@ -121,7 +121,7 @@ module Advent
       i = 0
       loop do
         i += 1
-        raise "Too many iterations!!" if i > 100
+        raise "Too many iterations!!" if i > 10_000
         top_score = pri_queue.keys.max
         puts "Score: #{top_score} Possibilites: #{pri_queue[top_score].length} - Sample: #{pri_queue[top_score].first}" if @debug
         new_states = []
