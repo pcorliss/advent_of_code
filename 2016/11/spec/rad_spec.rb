@@ -99,6 +99,13 @@ describe Advent do
       end
     end
 
+    describe "#find_solution_prime" do
+      it "returns the steps" do
+        ad.debug!
+        expect(ad.find_solution_prime).to eq(11)
+      end
+    end
+
     context "validation" do
     end
   end

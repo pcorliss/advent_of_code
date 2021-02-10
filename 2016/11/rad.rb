@@ -101,21 +101,72 @@ module Advent
         [pairs, unmatched]
       end
       s = [state.first] + s
+      s << state.last if state.length > 5
       # puts "S: #{s}" if @debug
       s.hash
     end
 
+    def score(state)
+      s = (1..4).sum do |floor|
+        state[floor].count * floor
+      end
+      s -= state.last if state.length > 5
+      s
+    end
+
     def find_solution_prime
-      initial_state = [1] + DeepClone.clone(@floors)
-      previous = Set.new(initial_state)
+      initial_state = [1] + DeepClone.clone(@floors) + [0]
       pair_states = Set.new()
-      # score => [states]
-      pri_queue = {0 => [initial_state]}
+      pri_queue = {score(initial_state) => [initial_state]}
+      i = 0
+      loop do
+        i += 1
+        raise "Too many iterations!!" if i > 100
+        top_score = pri_queue.keys.max
+        puts "Score: #{top_score} Possibilites: #{pri_queue[top_score].length} - Sample: #{pri_queue[top_score].first}" if @debug
+        new_states = []
+        pri_queue[top_score].each do |state|
+          pos = state[0]
+          objs = state[pos]
+          combos = objs.map {|o| [o]}.to_a + objs.to_a.combination(2).to_a
+          [pos-1,pos+1].each do |new_floor|
+            next if new_floor < 1 || new_floor > 4
+            step_down = pos - 1 == new_floor
+            step_up = !!step_down
+            next if pos - 1 == new_floor && (1..new_floor).all? { |f| state[f].empty? } # don't bother stepping down to floors that are empty below us
+            combos.reverse! if combos.first.length == 1 && step_up
+            combos.each do |combo|
+              next if step_down && combo.count == 2 && !new_states.empty? # Don't move two down if you can avoid it
+              # next if step_up &&   combo.count == 1 && !new_states.empty? # Don't move just one up if we can
+              new_state = DeepClone.clone(state)
+              new_state[0] = new_floor
+              new_state[5] += 1
+              new_state[pos] -= combo
+              new_state[new_floor] += combo
+
+              next if failure?(new_state)
+              # We could do something a little smarter here where we map the state to a number of steps
+              # if the number of steps is less we prune, if not we update
+              next if pair_states.include? pairing_state(new_state)
+              return new_state[5] if success?(new_state)
+              pair_states.add pairing_state(new_state)
+
+              new_states << new_state
+            end
+          end
+        end
+        pri_queue.delete(top_score)
+        new_states.each do |state|
+          s = score(state)
+          pri_queue[s] ||= []
+          pri_queue[s] << state
+        end
+      end
     end
 
     def find_solution
       initial_state = [1] + DeepClone.clone(@floors)
-      previous = Set.new(initial_state)
+      # previous = Set.new(initial_state)
       pair_states = Set.new()
       queue = [initial_state]
 
@@ -133,7 +184,7 @@ module Advent
             step_up = !!step_down
             next if pos - 1 == new_floor && (1..new_floor).all? { |f| state[f].empty? }
             new_states = []
-            combos.reverse! if step_up
+            combos.reverse! if combos.first.length == 1 && step_up
             combos.each do |combo|
               next if step_down && combo.count == 2 && !new_states.empty? # Don't move two down if you can avoid it
               # next if step_up &&   combo.count == 1 && !new_states.empty? # Don't move just one up if we can
@@ -143,10 +194,10 @@ module Advent
               new_state[new_floor] += combo
 
               next if failure?(new_state)
-              next if previous.include? new_state
+              # next if previous.include? new_state
               next if pair_states.include? pairing_state(new_state)
               return steps + 1 if success?(new_state)
-              previous.add state
+              # previous.add state
               pair_states.add pairing_state(new_state)
 
               new_states << new_state

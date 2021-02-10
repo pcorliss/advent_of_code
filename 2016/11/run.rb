@@ -7,5 +7,6 @@ input = File.read('./input.txt')
 
 ad = Advent::Rad.new(input)
 ad.debug!
-steps = ad.find_solution
+# steps = ad.find_solution
+steps = ad.find_solution_prime
 puts "Steps: #{steps}"
