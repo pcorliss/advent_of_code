@@ -49,14 +49,27 @@ module Advent
       s
     end
 
+    def pairing_state(state)
+      s = (1..4).map do |floor|
+        objs = state[floor]
+        generators = objs.select {|o| o.end_with? '-g'}.map {|o| o.split('-').first }
+        microchips = objs.select {|o| o.end_with? '-m'}.map {|o| o.split('-').first }
+        pairs = generators & microchips
+        [pairs.count, generators - pairs, microchips - pairs]
+      end
+      s = [state.first] + s
+      s.hash
+    end
+
     def find_solution
       # [elevator_pos, floor0 , ...]
       initial_state = [1] + DeepClone.clone(@floors)
       previous = Set.new(initial_state)
+      pair_states = Set.new()
       queue = [initial_state]
 
       steps = 0
-      while steps < 13 do
+      while steps < 100 do
         new_queue = []
         puts "Step: #{steps} Possibilites: #{queue.length}" if @debug
         queue.each do |state|
@@ -66,16 +79,17 @@ module Advent
 
           pos = state[0]
           objs = state[pos]
-          combos = objs.to_a.combination(2) + objs.map {|o| [o]}
+          combos = objs.map {|o| [o]}.to_a + objs.to_a.combination(2).to_a
           [pos-1,pos+1].each do |new_floor|
             next if new_floor < 1 || new_floor > 4
             step_down = pos - 1 == new_floor
             step_up = !!step_down
             next if pos - 1 == new_floor && (1..new_floor).all? { |f| state[f].empty? }
             new_states = []
+            combos.reverse! if step_up
             combos.each do |combo|
-              next if step_down && combo.count == 2
-              next if step_up && !new_states.empty? && combo.count == 1
+              # next if step_down && combo.count == 2 && !new_states.empty? # Don't move two down if you can avoid it
+              # next if step_up &&   combo.count == 1 && !new_states.empty? # Don't move just one up if we can
               new_state = DeepClone.clone(state)
               new_state[0] = new_floor
               new_state[pos] -= combo
@@ -83,8 +97,10 @@ module Advent
 
               next if failure?(new_state)
               next if previous.include? new_state
+              next if pair_states.include? pairing_state(new_state)
               return steps + 1 if success?(new_state)
               previous.add state
+              pair_states.add pairing_state(new_state)
 
               new_states << new_state
             end
