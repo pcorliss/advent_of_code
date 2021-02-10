@@ -105,6 +105,14 @@ module Advent
       s.hash
     end
 
+    def find_solution_prime
+      initial_state = [1] + DeepClone.clone(@floors)
+      previous = Set.new(initial_state)
+      pair_states = Set.new()
+      # score => [states]
+      pri_queue = {0 => [initial_state]}
+    end
+
     def find_solution
       initial_state = [1] + DeepClone.clone(@floors)
       previous = Set.new(initial_state)
@@ -128,7 +136,7 @@ module Advent
             combos.reverse! if step_up
             combos.each do |combo|
               next if step_down && combo.count == 2 && !new_states.empty? # Don't move two down if you can avoid it
-              next if step_up &&   combo.count == 1 && !new_states.empty? # Don't move just one up if we can
+              # next if step_up &&   combo.count == 1 && !new_states.empty? # Don't move just one up if we can
               new_state = DeepClone.clone(state)
               new_state[0] = new_floor
               new_state[pos] -= combo
