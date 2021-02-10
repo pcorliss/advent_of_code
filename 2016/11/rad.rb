@@ -101,29 +101,37 @@ module Advent
         [pairs, unmatched]
       end
       s = [state.first] + s
-      s << state.last if state.length > 5
+      # s << state.last if state.length > 5
       # puts "S: #{s}" if @debug
       s.hash
     end
 
     def score(state)
-      s = (1..4).sum do |floor|
-        state[floor].count * (floor - 1) * 4
+      # s = (1..4).sum do |floor|
+      #   state[floor].count * (floor - 1) * 4
+      # end
+
+      s = (1..4).find {|f| !state[f].empty?} * 100
+      s += (1..4).sum do |floor|
+        state[floor].count * (floor - 1)
       end
-      s -= state.last if state.length > 5
+      s -= state.last / 5 if state.length > 5
       s
     end
 
     def find_solution_prime
       initial_state = [1] + DeepClone.clone(@floors) + [0]
-      pair_states = Set.new()
+      pair_states = {}
       pri_queue = {score(initial_state) => [initial_state]}
+      best_success = 1_000
+      best_score = 0
       i = 0
       loop do
         i += 1
         raise "Too many iterations!!" if i > 10_000
         top_score = pri_queue.keys.max
-        puts "Score: #{top_score} Possibilites: #{pri_queue[top_score].length} - Sample: #{pri_queue[top_score].first}" if @debug
+        return best_success if top_score.nil? || top_score < best_score - 300
+        puts "Score: #{top_score} Possibilites: #{pri_queue[top_score].length} - Sample: #{pri_queue[top_score].first} - Success: #{best_success}" if @debug
         new_states = []
         pri_queue[top_score].each do |state|
           pos = state[0]
@@ -141,15 +149,22 @@ module Advent
               new_state = DeepClone.clone(state)
               new_state[0] = new_floor
               new_state[5] += 1
+              next if new_state[5] > 63 || new_state[5] >= best_success
+
               new_state[pos] -= combo
               new_state[new_floor] += combo
 
               next if failure?(new_state)
               # We could do something a little smarter here where we map the state to a number of steps
               # if the number of steps is less we prune, if not we update
-              next if pair_states.include? pairing_state(new_state)
-              return new_state[5] if success?(new_state)
-              pair_states.add pairing_state(new_state)
+              pairing = pairing_state(new_state)
+              next if pair_states.has_key?(pairing) && pair_states[pairing] <= new_state[5]
+              if success?(new_state)
+                best_success = new_state[5]
+                best_score = top_score
+                next
+              end
+              pair_states[pairing] = new_state[5]
 
               new_states << new_state
             end
