@@ -52,6 +52,10 @@ describe Advent do
           expect(ad.steps(pos)).to eq(steps)
         end
       end
+
+      it "returns the number of distinct locations visited once max_steps has been reached" do
+          expect(ad.steps([1000,1000], 10)).to eq(18)
+      end
     end
 
     context "validation" do
