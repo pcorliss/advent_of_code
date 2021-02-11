@@ -27,6 +27,17 @@ module Advent
       @md5.hexdigest
     end
 
+    STRETCH_NUM = 2016
+    def stretch(msg)
+      md5_hash = md5(msg)
+      STRETCH_NUM.times do |i|
+        @md5.reset
+        @md5 << md5_hash
+        md5_hash = @md5.hexdigest
+      end
+      md5_hash
+    end
+
     def debug!
       @debug = true
     end
@@ -35,10 +46,10 @@ module Advent
     CHAR = 1
     HASH = 2
 
-    def find_keys(n)
+    def find_keys(n, stretch = false)
       (@pos...(@pos + n)).each do |i|
         @candidates.delete_at(0) if !@candidates.empty? && @candidates.first[IDX] + 1000 < i
-        m = md5(i.to_s)
+        m = stretch ? stretch(i.to_s) : md5(i.to_s)
         if m =~ TRIPLE_REGEX
           (@candidates.length - 1).downto(0).each do |idx|
             if m.include? (@candidates[idx][CHAR] * 5)

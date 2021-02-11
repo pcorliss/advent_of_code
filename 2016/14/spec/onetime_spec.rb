@@ -52,9 +52,27 @@ describe Advent do
         expect(ad.keys.count).to eq(64)
         expect(ad.keys.max).to eq([22728, 'c', "26ccc731a8706e0c4f979aeb341871f0"])
       end
+
+      it "accepts an argument to enable stretching" do
+        ad.find_keys(90, true)
+        expect(ad.keys.sort.first).to eq([10, 'e', '4a81e578d9f43511ab693eee1a75f194'])
+      end
+
+      # Expensive operation
+      xit "marks all needed stretch keys" do
+        ad.find_keys(22859 + 1, true)
+        expect(ad.keys.sort[63]).to eq([22551, 'f', '2df6e9378c3c53abed6d3508b6285fff'])
+      end
+    end
+
+    describe "#stretch" do
+      it "rehashes a key 2016 times" do
+        expect(ad.stretch('0')).to eq('a107ff634856bb300138cac6568c0f24')
+      end
     end
 
     context "validation" do
+
     end
   end
 end

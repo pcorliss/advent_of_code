@@ -10,3 +10,10 @@ while ad.keys.count < 64 do
   puts "Keys: #{ad.keys.count}"
 end
 puts "64th Key: #{ad.keys.sort[63]}"
+
+ad = Advent::Onetime.new(input)
+while ad.keys.count < 64 do
+  ad.find_keys(1000, true)
+  puts "Keys: #{ad.keys.count}"
+end
+puts "64th Key: #{ad.keys.sort[63]}"
