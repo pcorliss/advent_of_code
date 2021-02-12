@@ -26,14 +26,25 @@ module Advent
     STARTING_POSITION = 3
 
     def position_at(t)
+      @discs.map do |disc, positions, start|
+        (start + t) % positions
+      end
+    end
 
+    def target_positions
+      @discs.map do |disc, positions, start|
+        (positions - disc) % positions
+      end
     end
 
     def find_common
-      # target for disc 1 is t + 1,
-      # target for disc 2 is t + 2,
-      # disc 1 should be at position POSITIONS - 1
-      # disc 2 should be at position POSITIONS - 2
+      target = target_positions
+      t = 0
+      until target == position_at(t) do
+        puts "#{t} #{target} #{position_at(t)}" if @debug && t % 10000 == 0 
+        t += 1
+      end
+      t
     end
   end
 end

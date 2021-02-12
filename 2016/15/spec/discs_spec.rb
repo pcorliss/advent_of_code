@@ -22,6 +22,28 @@ describe Advent do
       end
     end
 
+    describe "#position_at" do
+      [
+        [4,1],
+        [0,0],
+        [1,1],
+        [2,0],
+        [3,1],
+        [4,0],
+        [0,1],
+      ].each_with_index do |expected, t|
+        it "returns the position at a current timestamp for all discs" do
+          expect(ad.position_at(t)).to eq(expected)
+        end
+      end
+    end
+
+    describe "#target_positions" do
+      it "returns the expected target positions for a successful drop" do
+        expect(ad.target_positions).to eq([4,0])
+      end
+    end
+
     describe "#find_common" do
       it "finds the common zero point for all discs" do
         expect(ad.find_common).to eq(5)
