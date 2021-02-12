@@ -76,6 +76,18 @@ describe Advent do
           expect(ad.find_path).to eq(expected)
         end
       end
+
+      {
+        'ihgpwlah' => 370,
+        'kglvqrro' => 492,
+        'ulqzkmiv' => 830,
+      }.each do |pw, expected|
+        it "finds the longest path #{expected} given a password #{pw}" do
+          ad =Advent::Vault.new(pw)
+          ad.debug!
+          expect(ad.find_path(false).map(&:length).max).to eq(expected)
+        end
+      end
     end
 
     context "validation" do

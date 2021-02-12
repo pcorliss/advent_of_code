@@ -82,12 +82,14 @@ module Advent
       end
     end
 
-    def find_path
+    def find_path(return_on_target = true)
       paths = [[]]
       steps = 0
-      while steps < 100 do
+      successes = []
+      while steps < 1000 do
         new_paths = []
         puts "Steps: #{steps} - Possible Paths: #{paths.count}" if @debug
+        return successes if paths.count.zero?
         paths.each do |path|
           available_directions(path).each do |dir|
             new_path = path.clone
@@ -95,7 +97,11 @@ module Advent
             new_pos = pos(new_path)
 
             next if out_of_bounds?(new_pos)
-            return new_path.join if reached_target?(new_pos)
+            if reached_target?(new_pos)
+              return new_path.join if return_on_target
+              successes << new_path.join
+              next
+            end
 
             new_paths <<  new_path
           end
