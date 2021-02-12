@@ -139,12 +139,16 @@ class Grid
     [ 1, 1], # SouthEast
   ]
 
-  def neighbors(cell, diagonals = false)
+  def neighbor_coords(cell, diagonals = false)
     directions = CARDINAL_DIRECTIONS
     directions = DIAGONAL_DIRECTIONS if diagonals
-    transformed = directions.map do |dir|
+    directions.map do |dir|
       [cell[X] + dir[X], cell[Y] + dir[Y]]
     end
+  end
+
+  def neighbors(cell, diagonals = false)
+    transformed = neighbor_coords(cell, diagonals)
     @cells.slice(*transformed)
   end
 

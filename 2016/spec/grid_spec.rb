@@ -161,6 +161,23 @@ describe Grid do
     end
   end
 
+  describe "#neighbor_coords" do
+    it "returns just the coordinates of the cardinal direction neighbors" do
+      grid = Grid.new
+      expect(grid.neighbor_coords([1,1])).to contain_exactly(
+        [0,1], [2,1], [1,0], [1,2],
+      )
+    end
+
+    it "takes an optional argument to consider diagonals" do
+      grid = Grid.new
+      expect(grid.neighbor_coords([1,1], true)).to contain_exactly(
+        [0,0], [1,0], [2,0], [0,1],
+        [2,1], [0,2], [1,2], [2,2],
+      )
+    end
+  end
+
   describe "#get" do
     before do
       grid.cells[[1,1]] = true
