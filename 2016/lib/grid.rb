@@ -19,7 +19,7 @@ class Grid
       @height = height
     end
     if init.is_a?(String) && width.nil?
-      @width = init.lines.first.length - 1
+      @width = init.lines.first.chomp.length
       y = 0
       init.lines do |line|
         x = 0
