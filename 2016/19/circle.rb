@@ -49,14 +49,6 @@ module Advent
       @length = @nodes.length
     end
 
-    def init_cross!
-      @nodes.each_with_index do |n, idx|
-        cross_idx = (@length / 2 + idx) % @length
-        n.cross = @nodes[cross_idx]
-        n.cross.rev_cross = n
-      end
-    end
-
     def first
       @nodes.first
     end
@@ -64,10 +56,8 @@ module Advent
     def destroy(node)
       prev_node = node.prev
       next_node = node.next
-      cross_node = node.rev_cross
       prev_node.next = next_node
       next_node.prev = prev_node
-      cross_node.cross = next_node if cross_node
       @length -= 1
     end
 
@@ -81,7 +71,7 @@ module Advent
     end
 
     class Node
-      attr_accessor :val, :next, :prev, :cross, :rev_cross
+      attr_accessor :val, :next, :prev
       def initialize(val, n = nil, p = nil)
         @val = val
         @next = n

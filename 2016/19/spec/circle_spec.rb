@@ -62,7 +62,7 @@ describe Advent do
       end
 
       it "does nothing if there are no elves remaining" do
-        8.times { puts ad.elves.render(ad.current_elf); ad.step_across! }
+        8.times { ad.step_across! }
         expect(ad.current_elf.val).to eq(2)
         expect(ad.current_elf.next).to eq(ad.current_elf)
         expect(ad.current_elf.prev).to eq(ad.current_elf)
@@ -99,14 +99,6 @@ describe Advent do
       end
     end
 
-    describe "#init_cross" do
-      it "populates the cross circle pointers" do
-        list.init_cross!
-        expect(node.cross).to eq(node.next.next)
-        expect(node.cross.rev_cross).to eq(node)
-      end
-    end
-
     describe "#destroy" do
       it "resets the next element" do
         prev_node = node
@@ -127,19 +119,6 @@ describe Advent do
       it "decrements the length" do
         list.destroy(node)
         expect(list.length).to eq(4)
-      end
-
-      context "cross attrs" do
-        before do 
-          list.init_cross!
-        end
-
-        it "updates the cross attr" do
-          cross = node.cross
-          expected_cross = cross.next
-          list.destroy(cross)
-          expect(node.cross).to eq(expected_cross)
-        end
       end
     end
   end
