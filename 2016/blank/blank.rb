@@ -1,5 +1,6 @@
 require 'set'
 require '../lib/grid.rb'
+require '../lib/ring.rb'
 
 module Advent
 
