@@ -24,6 +24,7 @@ module Advent
     def lowest
       num = 0
       prev_num = -1
+      i = 0
       while num != prev_num do
         prev_num = num
         @rules.each do |rule|
@@ -31,8 +32,50 @@ module Advent
             num = rule.last + 1
           end
         end
+        i += 1
       end
+      puts "Loops: #{i}" if @debug
       num
+    end
+
+    def highest
+      num = 2**32 - 1
+      prev_num = 0
+      i = 0
+      while num != prev_num do
+        prev_num = num
+        @rules.each do |rule|
+          if rule.include? num
+            num = rule.first - 1
+          end
+        end
+        i += 1
+      end
+      puts "Loops: #{i}" if @debug
+      num
+    end
+
+    def allowed_count(upper)
+      num = 0
+      count = 0
+      r = @rules.sort_by(&:last)
+
+      while num <= upper do
+        allowed = r.all? do |rule|
+          if rule.include? num
+            num = rule.last + 1
+            false
+          else
+            true
+          end
+        end
+        if allowed
+          num += 1
+          count += 1
+        end
+      end
+
+      count
     end
   end
 end

@@ -28,6 +28,18 @@ describe Advent do
       end
     end
 
+    describe "#highest" do
+      it "returns the highestt possible number" do
+        expect(ad.highest).to eq(4294967295)
+      end
+    end
+
+    describe "#allowed_count" do
+      it "returns the number of allowed ips" do
+        expect(ad.allowed_count(9)).to eq(2)
+      end
+    end
+
     context "validation" do
     end
   end
