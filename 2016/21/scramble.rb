@@ -54,16 +54,19 @@ module Advent
           char
         end
       end
+      chars
     end
 
     def reverse_positions(chars, a, b)
       i = a
-      k = (b - a) / 2
+      j = b
+      k = (b - a) / 2 + a
       while i <= k do
         tmp = chars[i]
-        chars[i] = chars[b - i]
-        chars[b - i] = tmp
+        chars[i] = chars[j]
+        chars[j] = tmp
         i += 1
+        j -= 1
       end
       chars
     end
@@ -117,7 +120,9 @@ module Advent
       pw = pw.chars.to_a
       @rules.each do |rule|
         meth, *args = rule
+        pw_orig = pw.clone
         pw = self.__send__(meth, pw, *args)
+        puts "#{meth.inspect} #{args} - #{pw_orig.join} -> #{pw.join}" if @debug
       end
       pw.join
     end

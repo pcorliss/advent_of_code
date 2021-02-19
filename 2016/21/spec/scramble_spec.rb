@@ -47,9 +47,14 @@ describe Advent do
         expect(ad.scramble('ebcda')).to eq('edcba')
       end
 
-      it "reverses positions" do
+      it "reverses entire strings" do
         ad = Advent::Scramble.new("reverse positions 0 through 4")
         expect(ad.scramble('edcba')).to eq('abcde')
+      end
+
+      it "reverses positions" do
+        ad = Advent::Scramble.new("reverse positions 1 through 6")
+        expect(ad.scramble('abcfdhge')).to eq('aghdfcbe')
       end
 
       it "rotate left" do
