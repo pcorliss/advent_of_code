@@ -116,6 +116,16 @@ module Advent
       rotate_right(chars, idx + 1)
     end
 
+    def rotate_reversed(chars, a)
+      # idx = (chars.index(a) + 1) / 2
+      # idx += 1 if idx >= 4
+      idx = ((chars.index(a) + chars.length - 1) / 2)
+      rotate_left(chars, idx + 1)
+      # idx = chars.index(a)
+      # idx += 1 if idx >= 4
+      # rotate_left(chars, idx - 1)
+    end
+
     def scramble(pw)
       pw = pw.chars.to_a
       @rules.each do |rule|
@@ -125,6 +135,33 @@ module Advent
         puts "#{meth.inspect} #{args} - #{pw_orig.join} -> #{pw.join}" if @debug
       end
       pw.join
+    end
+
+    def reverse_scramble(pw)
+      pw = pw.chars.to_a
+      @rules.reverse.each do |rule|
+        meth, *args = rule
+        if meth == :rotate_right
+          meth = :rotate_left
+        elsif meth == :rotate_left
+          meth = :rotate_right
+        end
+
+        meth = :rotate_reversed if meth == :rotate_based
+        args.reverse! if meth == :move_position
+
+        pw_orig = pw.clone
+        pw = self.__send__(meth, pw, *args)
+        puts "#{meth.inspect} #{args} - #{pw_orig.join} -> #{pw.join}" if @debug
+      end
+      pw.join
+    end
+
+    def reverse_scramble_prime(pw)
+      combinations = pw.chars.permutation.select do |perm|
+        scramble(perm.join) == pw
+      end
+      combinations.map(&:join)
     end
   end
 end
