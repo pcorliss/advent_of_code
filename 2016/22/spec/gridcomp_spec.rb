@@ -53,7 +53,44 @@ describe Advent do
       end
     end
 
-    context "validation" do
+    context "part 2" do
+      let(:input) {
+        <<~EOS
+        Filesystem            Size  Used  Avail  Use%
+        /dev/grid/node-x0-y0   10T    8T     2T   80%
+        /dev/grid/node-x0-y1   11T    6T     5T   54%
+        /dev/grid/node-x0-y2   32T   28T     4T   87%
+        /dev/grid/node-x1-y0    9T    7T     2T   77%
+        /dev/grid/node-x1-y1    8T    0T     8T    0%
+        /dev/grid/node-x1-y2   11T    7T     4T   63%
+        /dev/grid/node-x2-y0   10T    6T     4T   60%
+        /dev/grid/node-x2-y1    9T    8T     1T   88%
+        /dev/grid/node-x2-y2    9T    6T     3T   66%
+        EOS
+      }
+
+      describe "#adjacent?" do
+        it "returns true for adjacent pairs" do
+          a = ad.nodes.find {|n| n.first == [0,0]}
+          b = ad.nodes.find {|n| n.first == [1,0]}
+          c = ad.nodes.find {|n| n.first == [0,1]}
+          expect(ad.adjacent?(a,b)).to be_truthy
+          expect(ad.adjacent?(a,c)).to be_truthy
+        end
+
+        it "returns false for non-adjacent pairs" do
+          a = ad.nodes.find {|n| n.first == [1,0]}
+          b = ad.nodes.find {|n| n.first == [0,1]}
+          expect(ad.adjacent?(a,b)).to be_falsey
+        end
+      end
+
+      describe "#fewest_steps" do
+        it "returns the fewest number of steps to move data to target" do
+          ad.debug!
+          expect(ad.fewest_steps).to eq(7)
+        end
+      end
     end
   end
 end

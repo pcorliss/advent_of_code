@@ -1,6 +1,7 @@
 require 'set'
 require '../lib/grid.rb'
 require '../lib/ring.rb'
+require 'deep_clone'
 
 module Advent
 
@@ -43,6 +44,76 @@ module Advent
         count += 1 if viable_pair?(*combo.reverse)
       end
       count
+    end
+
+    def adjacent?(a, b)
+      xa, ya = a[POS]
+      xb, yb = b[POS]
+
+      x_delta = (xa - xb).abs
+      y_delta = (ya - yb).abs
+
+      x_delta + y_delta == 1
+    end
+
+    def fewest_steps
+      read_point = [0,0]
+      max_x = @nodes.map(&:first).map(&:first).max
+      data_pos = [max_x, 0]
+
+      steps = 1
+      paths = [[DeepClone.clone(@nodes), DeepClone.clone(data_pos)]]
+      loop do
+        new_paths = []
+        puts "#{steps}: #{paths.count} #{paths.map(&:last).uniq}" if @debug
+        paths.each do |path|
+          nodes, path_data_pos = path
+          moves = []
+          nodes.combination(2).each do |combo|
+            # TODO: could speed this up by turning nodes into a hash keyed by position and pre-computing adjacent node pairs
+            # binding.pry if @debug && combo.map(&:first).sort == [[1,0],[2,0]]
+            next unless adjacent?(*combo)
+            moves << combo if viable_pair?(*combo)
+            moves << combo.reverse if viable_pair?(*combo.reverse)
+          end
+
+          puts "\t #{steps} Working on: #{moves.count} moves" if @debug && false
+          moves.each do |move|
+            a, b = move
+            next if b[POS] == path_data_pos
+            # puts "Goal Moving: #{a} #{b}" if @debug && a[POS] == path_data_pos
+            new_nodes = DeepClone.clone(nodes)
+            a = new_nodes.find {|n| n == a}
+            b = new_nodes.find {|n| n == b}
+            new_data_pos = path_data_pos
+            new_data_pos = b[POS] if a[POS] == path_data_pos
+
+            b[USED] += a[USED]
+            a[USED] = 0
+            if @debug && false
+              if a[POS] == path_data_pos
+                print "\tG\t"
+              else
+                print "\t\t"
+              end
+              print "#{steps}: #{a} => #{b}\n"
+            end
+            # puts "g: #{a} => #{b}" if @debug
+            return steps if new_data_pos == read_point
+            new_paths << [new_nodes, new_data_pos]
+          end
+        end
+
+        paths = new_paths
+        raise "Unable to find path #{steps}" if paths.empty?
+        raise "Too many iterations!!! #{steps}"  if steps >= 10
+        steps += 1
+      end
+      # @nodes.combination(2).each do |combo|
+      #
+      # end
+
+      steps
     end
   end
 end
