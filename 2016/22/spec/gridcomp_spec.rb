@@ -91,6 +91,34 @@ describe Advent do
           expect(ad.fewest_steps).to eq(7)
         end
       end
+
+      describe "#render" do
+        it "prints the grid" do
+          expected = <<~EOS
+          X.G
+          ._.
+          ...
+          EOS
+          expect(ad.render).to eq(expected.chomp)
+        end
+      end
+
+      context "large input" do
+        let(:input) { File.read('./spec_input.txt') }
+
+        describe "#distance_to_goal" do
+          it "calculates the steps to move the empty node to the left of the goal" do
+            #ad.debug!
+            expect(ad.distance_to_goal).to eq(61)
+          end
+        end
+
+        describe "#distance_to_target" do
+          it "returns the manhattan distance from the goal to the target" do
+            expect(ad.distance_to_target).to eq(33)
+          end
+        end
+      end
     end
   end
 end
