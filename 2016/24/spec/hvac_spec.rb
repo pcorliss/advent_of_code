@@ -52,13 +52,35 @@ describe Advent do
       end
 
       it "maps non-starting point distances" do
-        ad.debug!
         expect(ad.map['3']).to eq({
           '1' => 8,
           '4' => 8,
           '0' => 10,
           '2' => 2,
         })
+      end
+
+      it "maps correct values" do
+        # ad.debug!
+        expect(ad.map['4']).to include({
+          '1' => 4,
+        })
+      end
+    end
+
+    describe "#steps_from_path" do
+      it "returns the number of steps in a given path starting at '0'" do
+        expect(ad.steps_from_path(%w(0 4 1 2 3))).to eq(14)
+      end
+    end
+
+    describe "#fewest_steps" do
+      it "returns the shortest path" do
+        expect(ad.fewest_steps).to eq(%w(0 4 1 2 3))
+      end
+
+      it "returns the shortest path with a return to origin" do
+        expect(ad.fewest_steps(true)).to eq(%w(0 1 2 3 4 0))
       end
     end
 

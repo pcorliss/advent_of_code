@@ -52,12 +52,13 @@ module Advent
           @grid.neighbors(pos).each do |n_pos, val|
             next if val == '#'
             next if visited[start].include? n_pos
+            # puts "#{steps} - #{start} - #{n_pos} - #{val}" if @debug && start == '4'
 
             if val =~ /\d/
-              next if @map[start][val]
+              # puts "Found: #{val} for #{start} in #{steps} #{@map}" if @debug && (start == '4' && val =='1') || (start == '1' && val == '4')
+              # next if @map[start][val]
               @map[start][val] ||= steps
               @map[val][start] ||= steps
-              puts "Found: #{val} for #{start} in #{steps} #{@map}" if @debug
             end
 
             visited[start].add n_pos
@@ -68,6 +69,29 @@ module Advent
       end
 
       @map
+    end
+
+    def steps_from_path(path)
+      sum = 0
+      (1..path.length-1).each do |i|
+        start = path[i-1]
+        targ = path[i]
+        sum += map[start][targ]
+      end
+      sum
+    end
+
+    def fewest_steps(return_to_origin = false)
+      start = '0'
+      targets = locations.values - [start]
+      shortest = targets.permutation.min_by do |perm|
+        test_path = [start] + perm
+        test_path << start if return_to_origin
+        steps_from_path(test_path)
+      end
+      path = [start] + shortest
+      path << start if return_to_origin
+      path
     end
   end
 end
