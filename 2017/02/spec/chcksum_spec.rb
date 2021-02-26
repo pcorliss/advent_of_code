@@ -34,7 +34,32 @@ describe Advent do
       end
     end
 
+    describe "#evenly_div" do
+      {
+        [5,9,2,8,] => 4,
+        [9,4,7,3,] => 3,
+        [3,8,6,5,] => 2,
+      }.each do |digits, expected|
+        it "returns the result of dividing the only two integers that are evenly divisible #{digits} => #{expected}" do 
+          expect(ad.evenly_div(digits)).to eq(expected)
+        end
+      end
+    end
+
     context "validation" do
+      let(:input) {
+        <<~EOS
+        5 9 2 8
+        9 4 7 3
+        3 8 6 5
+        EOS
+      }
+
+      describe "#checksum_div" do
+        it "yields the expected checksum" do
+          expect(ad.checksum_div).to eq(9)
+        end
+      end
     end
   end
 end

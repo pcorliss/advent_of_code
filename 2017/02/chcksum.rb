@@ -26,7 +26,19 @@ module Advent
     end
 
     def checksum
-      @sheet.map {|digits| min_max_diff(digits)}.sum
+      @sheet.sum {|digits| min_max_diff(digits)}
+    end
+
+    def evenly_div(digits)
+      a, b = digits.combination(2).find do |a, b|
+        (a > b && a % b == 0) || (a < b && b % a == 0)
+      end
+
+      a > b ? a / b : b / a
+    end
+
+    def checksum_div
+      @sheet.sum {|digits| evenly_div(digits)}
     end
   end
 end
