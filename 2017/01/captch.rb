@@ -25,5 +25,15 @@ module Advent
       end
       acc
     end
+
+    def matches_opposite_digits(inp)
+      acc = []
+      l = inp.length
+      inp.chars.each_with_index do |char, idx|
+        n = inp[(idx + l/2) % inp.length]
+        acc << char.to_i if n == char
+      end
+      acc
+    end
   end
 end

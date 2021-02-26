@@ -10,3 +10,7 @@ puts "Matching Digits: #{digits}"
 puts "Sum: #{digits.sum}"
 
 # 1332 is too low
+
+digits = ad.matches_opposite_digits(input.chomp)
+puts "Matching Digits: #{digits}"
+puts "Sum: #{digits.sum}"

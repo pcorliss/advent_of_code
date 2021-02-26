@@ -32,6 +32,20 @@ describe Advent do
       end
     end
 
+    describe "#matches_opposite_digits" do
+      {
+        "1212" => [1,2,1,2],
+        "1221" => [],
+        "123425" => [2,2],
+        "123123" => [1,2,3,1,2,3],
+        "12131415" => [1,1,1,1]
+      }.each do |inp, expected|
+        it "returns the digits that match their opposite digit" do
+          expect(ad.matches_opposite_digits(inp)).to eq(expected)
+        end
+      end
+    end
+
     context "validation" do
     end
   end
