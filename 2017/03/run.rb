@@ -9,3 +9,7 @@ ad.debug!
 x, y = ad.get_pos(ad.square)
 puts "Pos: #{x},#{y}"
 puts "Manhattan: #{x.abs + y.abs}"
+
+val = ad.gen_grid(ad.square)
+puts "Val: #{val}"
+

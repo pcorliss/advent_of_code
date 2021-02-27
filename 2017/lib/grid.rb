@@ -56,6 +56,7 @@ class Grid
   def render
     min_y, max_y = @cells.keys.map(&:last).minmax
     min_x, max_x = @cells.keys.map(&:first).minmax
+    max_val_width = @cells.values.map(&:to_s).map(&:length).max
 
     puts "Grid: #{@cells}" if @debug
     puts "Cells: #{@cells.keys}" if @debug
@@ -64,7 +65,10 @@ class Grid
     (min_y..max_y).each do |y|
       (min_x..max_x).each do |x|
         cell = @cells[[x,y]] || ' '
-        acc << cell.to_s
+        str = cell.to_s
+        padding = ' '*(max_val_width - str.length)
+        acc << padding
+        acc << str
       end
       acc << "\n"
     end

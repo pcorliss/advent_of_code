@@ -6,11 +6,12 @@ module Advent
 
   class Spiral
     attr_accessor :debug
-    attr_reader :square
+    attr_reader :square, :grid
 
     def initialize(input)
       @debug = false
       @square = input.to_i
+      @grid = Grid.new
     end
 
     def debug!
@@ -48,6 +49,34 @@ module Advent
         end
       end
       pos
+    end
+
+    def gen_grid(inp)
+      @grid[0,0] ||= 1
+      axis = 0
+      dir_arr = [1, -1, -1, 1]
+      dir_count = 0
+      dir = dir_arr[dir_count]
+      shell = find_shell(2)
+      i = 1
+      pos = [0,0]
+      loop do
+        i += 1
+        shell = find_shell(i)
+        if (pos[axis] + dir).abs > shell
+          axis += 1
+          axis %= 2
+          dir_count += 1
+          dir = dir_arr[dir_count % dir_arr.length]
+          puts "New Dir: #{dir} Axis: #{axis}" if @debug
+        end
+        pos[axis] += dir
+        @grid[pos] ||= @grid.neighbors(pos, true).sum(&:last)
+        puts "Shell: #{shell} Pos: #{pos} Sum: #{@grid[pos]}" if @debug
+        puts "#{@grid.render}" if @debug
+        return @grid[pos] if @grid[pos] > inp
+        raise "Too many iterations!!! #{i}" if i > 1000
+      end
     end
   end
 end

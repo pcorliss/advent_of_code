@@ -133,6 +133,17 @@ describe Grid do
       grid.width = 2
       expect(grid.render).to eq("01\n23")
     end
+
+    it "finds the max width and adds spacing" do
+      grid.cells = {
+        [0,0] => 0,
+        [1,0] => 1,
+        [0,1] => 2,
+        [1,1] => 999,
+      }
+      grid.width = 2
+      expect(grid.render).to eq("  0  1\n  2999")
+    end
   end
 
   describe "#neighbors" do

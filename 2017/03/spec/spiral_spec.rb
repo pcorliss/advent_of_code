@@ -63,6 +63,23 @@ describe Advent do
       end
     end
 
+    describe "#gen_grid" do
+      it "updates a grid with values up to the input" do
+        ad.gen_grid(1)
+        expect(ad.grid[1,-1]).to eq(2)
+      end
+
+      it "returns the first value larger than the passed input" do
+        expect(ad.gen_grid(24)).to eq(25)
+      end
+
+      it "handles large values" do
+        ad.debug!
+        expect(ad.gen_grid(805)).to eq(806)
+        expect(ad.grid[0,2]).to eq(806)
+      end
+    end
+
     context "validation" do
     end
   end
