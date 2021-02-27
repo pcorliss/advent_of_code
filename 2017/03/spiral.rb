@@ -18,20 +18,23 @@ module Advent
       @debug = true
     end
 
+    def find_shell_old(sq)
+      i = 0
+      loop do
+        squared = (i*2+1)**2
+        return i if sq <= squared
+        i += 1
+        return nil if i > 1000
+      end
+    end
+
     def find_shell(sq)
-      # i = 0
-      # loop do
-      #   squared = (i*2+1)**2
-      #   return i if sq <= squared
-      #   i += 1
-      #   return nil if i > 1000
-      # end
       shell = Math.sqrt(sq - 1).to_i
       (shell + 1) / 2
     end
 
-    def get_pos(sq)
-      shell = find_shell(sq)
+    def get_pos_old(sq)
+      shell = find_shell_old(sq)
 
       pos = [shell, -shell]
       dir_arr = [1, -1, -1, 1]
@@ -50,6 +53,34 @@ module Advent
           puts "New Dir: #{dir} Axis: #{axis}" if @debug
         end
       end
+      pos
+    end
+
+    def get_pos(sq)
+      shell = find_shell(sq)
+      pos = [shell, -shell]
+      return pos if shell == 0
+
+      last_elem_in_shell = (shell * 2 + 1)**2
+      distance_to_last = last_elem_in_shell - sq
+      distance_to_corner = shell * 2
+
+      sides = distance_to_last / distance_to_corner
+      rem = distance_to_last % distance_to_corner
+
+      axis = 0
+      dir_arr = [-1, 1, 1, -1]
+      dir_count = 0
+
+      sides.times do |i|
+        pos[axis] += dir_arr[dir_count] * distance_to_corner
+        axis += 1
+        axis %= 2
+        dir_count += 1
+      end
+
+      pos[axis] += dir_arr[dir_count] * rem
+
       pos
     end
 

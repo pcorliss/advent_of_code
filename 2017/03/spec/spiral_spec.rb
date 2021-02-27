@@ -31,6 +31,7 @@ describe Advent do
         21 => 2,
         25 => 2,
         26 => 3,
+        49 => 3,
       }.each do |sq, shell|
         it "returns the #{shell} shell of a given #{sq} square" do
           expect(ad.find_shell(sq)).to eq(shell)
@@ -56,7 +57,7 @@ describe Advent do
         1024 => [-15,16],
         277678 => [212, -263],
       }.each do |square, expected|
-        it "returns the coordinates of a given square" do
+        it "returns the coordinates #{expected} of a given square #{square}" do
           # ad.debug!
           expect(ad.get_pos(square)).to eq(expected)
         end
