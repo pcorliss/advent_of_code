@@ -74,7 +74,7 @@ describe Advent do
       end
 
       it "handles large values" do
-        ad.debug!
+        # ad.debug!
         expect(ad.gen_grid(805)).to eq(806)
         expect(ad.grid[0,2]).to eq(806)
       end

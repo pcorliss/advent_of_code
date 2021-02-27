@@ -19,13 +19,15 @@ module Advent
     end
 
     def find_shell(sq)
-      i = 0
-      loop do
-        squared = (i*2+1)**2
-        return i if sq <= squared
-        i += 1
-        return nil if i > 1000
-      end
+      # i = 0
+      # loop do
+      #   squared = (i*2+1)**2
+      #   return i if sq <= squared
+      #   i += 1
+      #   return nil if i > 1000
+      # end
+      shell = Math.sqrt(sq - 1).to_i
+      (shell + 1) / 2
     end
 
     def get_pos(sq)
