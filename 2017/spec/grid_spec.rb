@@ -123,26 +123,29 @@ describe Grid do
   end
 
   describe "#render" do
+    let(:cells) {{
+      [0,0] => 0,
+      [1,0] => 1,
+      [0,1] => 2,
+      [1,1] => 3,
+    }}
     it "returns a string suitable for printing" do
-      grid.cells = {
-        [0,0] => 0,
-        [1,0] => 1,
-        [0,1] => 2,
-        [1,1] => 3,
-      }
+      grid.cells = cells
       grid.width = 2
       expect(grid.render).to eq("01\n23")
     end
 
     it "finds the max width and adds spacing" do
-      grid.cells = {
-        [0,0] => 0,
-        [1,0] => 1,
-        [0,1] => 2,
-        [1,1] => 999,
-      }
+      grid.cells = cells
+      grid[1,1] = 999
       grid.width = 2
       expect(grid.render).to eq("  0  1\n  2999")
+    end
+
+    it "renders padding" do
+      grid.cells = cells
+      grid.width = 2
+      expect(grid.render(1)).to eq(" 0 1\n 2 3")
     end
   end
 

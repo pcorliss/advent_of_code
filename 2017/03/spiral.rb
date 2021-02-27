@@ -106,7 +106,7 @@ module Advent
         pos[axis] += dir
         @grid[pos] ||= @grid.neighbors(pos, true).sum(&:last)
         puts "Shell: #{shell} Pos: #{pos} Sum: #{@grid[pos]}" if @debug
-        puts "#{@grid.render}" if @debug
+        puts "#{@grid.render(1)}" if @debug
         return @grid[pos] if @grid[pos] > inp
         raise "Too many iterations!!! #{i}" if i > 1000
       end

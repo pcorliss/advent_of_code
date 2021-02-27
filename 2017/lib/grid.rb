@@ -53,10 +53,11 @@ class Grid
     directions
   end
 
-  def render
+  def render(pad = 0)
     min_y, max_y = @cells.keys.map(&:last).minmax
     min_x, max_x = @cells.keys.map(&:first).minmax
     max_val_width = @cells.values.map(&:to_s).map(&:length).max
+    max_val_width += pad
 
     puts "Grid: #{@cells}" if @debug
     puts "Cells: #{@cells.keys}" if @debug
