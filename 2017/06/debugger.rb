@@ -6,11 +6,12 @@ module Advent
 
   class Debugger
     attr_accessor :debug
-    attr_reader :blocks
+    attr_reader :blocks, :states
 
     def initialize(input)
       @debug = false
       @blocks = input.split(/\s+/).map(&:to_i)
+      @states = {}
     end
 
     def debug!
@@ -38,14 +39,13 @@ module Advent
 
     def run!
       steps = 0
-      states = Set.new
-      states.add @blocks.hash
+      states[@blocks.hash] = 0
       loop do
         redist!
         steps += 1
         puts "Steps: #{steps} Blocks: #{blocks}" if @debug
-        return steps if states.include? @blocks.hash
-        states.add @blocks.hash
+        return steps if states[@blocks.hash]
+        states[@blocks.hash] = steps
         raise "Too many iterations!!!" if steps > 100000
       end
     end

@@ -30,6 +30,11 @@ describe Advent do
       it "returns the number of cycles until a repeated state is hit" do
         expect(ad.run!).to eq(5)
       end
+
+      it "updates the states hash" do
+        ad.run!
+        expect(ad.states[ad.blocks.hash]).to eq(1)
+      end
     end
 
     context "validation" do
