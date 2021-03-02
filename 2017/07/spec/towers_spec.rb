@@ -48,6 +48,31 @@ describe Advent do
       end
     end
 
+    describe "#tower_weight" do
+      it "returns the weight of a single element that has no descendants" do
+        expect(ad.tower_weight('pbga')).to eq(66)
+      end
+
+      it "returns the sum'd weight of an element with descendants" do
+        expect(ad.tower_weight('ugml')).to eq(251)
+      end
+
+      it "returns the weight of nested elements" do
+        expect(ad.tower_weight('tknk')).to eq(778)
+      end
+    end
+
+    describe "#reweight" do
+      it "identifies the node that is off weight" do
+        ad.debug!
+        expect(ad.reweight.first).to eq('ugml')
+      end
+
+      it "identifies the correct weight it should be" do
+        expect(ad.reweight.last).to eq(60)
+      end
+    end
+
     context "validation" do
     end
   end
