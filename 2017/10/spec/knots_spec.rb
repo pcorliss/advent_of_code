@@ -97,5 +97,59 @@ describe Advent do
         end
       end
     end
+
+    context "part 2" do
+      describe "#new" do
+        let(:input) {
+          <<~EOS
+          1,2,3
+          EOS
+        }
+        it "returns the ascii sequence of the original numbers" do
+          expect(ad.lengths_prime).to start_with(49,44,50,44,51)
+        end
+
+        it "appends a special sequence" do
+          expect(ad.lengths_prime).to eq([49,44,50,44,51,17,31,73,47,23])
+        end
+      end
+
+      describe "#dense_hash" do
+        let(:ad) { Advent::Knots.new(input) }
+        it "returns groups of 16 numbers xor'd together" do
+          expect(ad.dense_hash.length).to eq(16)
+          expect(ad.dense_hash.first).to eq(0)
+          expect(ad.dense_hash.last).to eq(0)
+        end
+      end
+
+      describe "#to_hex" do
+        let(:ad) { Advent::Knots.new(input) }
+        it "returns hex representation" do
+          expect(ad.to_hex).to eq('0'*16*2)
+        end
+      end
+
+      describe "#run_prime!" do
+        # it "runs 64 times" do
+        #
+        # end
+      end
+
+      context "validation" do
+        {
+          "" => "a2582a3a0e66e6e86e3812dcb672a272",
+          "AoC 2017" => "33efeb34ea91902bb2f59c9920caa6cd",
+          "1,2,3" => "3efbe78a8d82f29979031a4aa0b16a9d",
+          "1,2,4" => "63960835bcdc130f0b66d7ff4f6a5a8e",
+        }.each do |inp, expected|
+          it "returns the correct hex value #{expected} for '#{inp}' input" do
+            ad = Advent::Knots.new(inp)
+            ad.run_prime!
+            expect(ad.to_hex).to eq(expected)
+          end
+        end
+      end
+    end
   end
 end
