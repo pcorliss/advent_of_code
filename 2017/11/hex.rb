@@ -43,5 +43,19 @@ module Advent
     def distance(pos)
       pos.map(&:abs).max
     end
+
+    def furthest_away(steps)
+      pos = [0,0,0]
+      max_dist = 0
+      steps.each do |step|
+        x, y, z = HEX_DIR[step]
+        pos[X] += x
+        pos[Y] += y
+        pos[Z] += z
+        d = distance(pos)
+        max_dist = d if d > max_dist
+      end
+      max_dist
+    end
   end
 end

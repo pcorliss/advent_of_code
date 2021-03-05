@@ -9,3 +9,5 @@ pos = ad.follow_path(ad.steps)
 puts "Position: #{pos}"
 distance = ad.distance(pos)
 puts "Distance: #{distance}"
+
+puts "Max Distance: #{ad.furthest_away(ad.steps)}"

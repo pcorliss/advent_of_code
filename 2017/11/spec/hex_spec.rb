@@ -39,6 +39,13 @@ describe Advent do
       end
     end
 
+    describe "#furthest_away" do
+      let(:path) { %w(n n n s s s) }
+      it "returns the max distance away from origin" do
+        expect(ad.furthest_away(path)).to eq(3)
+      end
+    end
+
     describe "#distance" do
       it "returns the distance to a specific grid position" do
         expect(ad.distance([-1,-2,3])).to eq(3)
