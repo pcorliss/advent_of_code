@@ -51,5 +51,48 @@ describe Advent do
         expect(list.length).to eq(4)
       end
     end
+
+    describe "#to_a" do
+      it "returns the list as an array" do
+        expect(list.to_a).to eq(5.times.to_a)
+      end
+    end
+
+    describe "#reverse" do
+      it "reverses a section of the linked list" do
+        list.reverse(node, 3) # Node 0 and 3 total elements (0, 1, 2)
+        # [0, 1, 2, 3, 4] becomes [2, 1, 0, 3, 4]
+        expect(list.to_a).to eq([0, 3, 4, 2, 1])
+        expect(node.next.val).to eq(3)
+        expect(node.prev.val).to eq(1)
+        expect(node.prev.prev.prev.val).to eq(4)
+        expect(node.next.next.next.val).to eq(2)
+      end
+
+      it "handles reversing the entire list" do
+        list.reverse(node, 5)
+        expect(list.to_a).to eq([0, 4, 3, 2, 1])
+        expect(node.next.val).to eq(4)
+        expect(node.prev.val).to eq(1)
+        expect(node.next.prev).to eq(node)
+        expect(node.prev.next).to eq(node)
+      end
+
+      [
+        [0, 1, 2, 3, 4],
+        [0, 1, 2, 3, 4],
+        [0, 2, 3, 4, 1],
+        [0, 3, 4, 2, 1],
+        [0, 4, 3, 2, 1],
+        [0, 4, 3, 2, 1],
+      ].each_with_index do |expected, count|
+        it "reverses with a count of #{count}" do
+          list.reverse(node, count)
+          expect(list.to_a).to eq(expected)
+          expect(node.next.prev).to eq(node)
+          expect(node.prev.next).to eq(node)
+        end
+      end
+    end
   end
 end
