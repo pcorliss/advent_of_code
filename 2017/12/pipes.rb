@@ -47,5 +47,18 @@ module Advent
       end
       acc
     end
+
+    def groups
+      # acc = [[1], [0,2,3,4,5,6]]
+      acc = []
+      seen = Set.new
+      @pipe.keys.each do |prog|
+        next if seen.include? prog
+        g = connected(prog)
+        acc << g
+        seen |= g
+      end
+      acc
+    end
   end
 end

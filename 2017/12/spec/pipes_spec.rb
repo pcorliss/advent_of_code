@@ -45,6 +45,16 @@ describe Advent do
       end
     end
 
+    describe "#groups" do
+      it "returns distinct unconnected groups" do
+        expect(ad.groups.count).to eq(2)
+        expect(ad.groups).to contain_exactly(
+          contain_exactly(1),
+          contain_exactly(0,2,3,4,5,6),
+        )
+      end
+    end
+
     context "validation" do
       it "returns the correct amount of connected programs" do
         expect(ad.connected(0).count).to eq(6)
