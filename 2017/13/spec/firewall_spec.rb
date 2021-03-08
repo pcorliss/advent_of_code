@@ -62,7 +62,8 @@ describe Advent do
         5 => false,
       }.each do |t, caught|
         it "returns #{caught} at time index #{t}" do
-          expect(ad.caught?(t)).to eq(caught)
+          layer = t
+          expect(ad.caught?(layer, t)).to eq(caught)
         end
       end
     end
@@ -70,6 +71,16 @@ describe Advent do
     describe "#severity" do
       it "returns the total severity of the trip" do
         expect(ad.severity).to eq(24)
+      end
+
+      it "handles a delay" do
+        expect(ad.severity(10)).to eq(0)
+      end
+    end
+
+    describe "#find_stealth_offset" do
+      it "returns the smallest offset without getting caught" do
+        expect(ad.find_stealth_offset).to eq(10)
       end
     end
 

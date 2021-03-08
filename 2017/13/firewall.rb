@@ -33,19 +33,28 @@ module Advent
       depth
     end
 
-    def caught?(time)
-      layer = time
+    def caught?(layer, time)
       cur_depth(layer, time) == 0
     end
 
-    def severity
+    def severity(offset = 0)
       sev = 0
       @layers.each do |layer, depth|
-        if caught?(layer)
+        if caught?(layer, layer + offset)
           sev += layer * depth
         end
       end
       sev
+    end
+
+    def find_stealth_offset
+      offset = 0
+      loop do
+        offset += 1
+        return offset if @layers.all? { |layer, depth| !caught?(layer, layer + offset) }
+        puts "#{offset}" if @debug && offset % 100_000 == 0
+        raise "Too many iterations" if offset > 10_000_000
+      end
     end
   end
 end
