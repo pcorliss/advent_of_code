@@ -30,10 +30,19 @@ module Advent
     # multiplied by factor
     # modulo 2147483647
 
-    def generate!
-      @generators = @generators.each_with_index.map do |val, idx|
-        (val * FACTORS[idx]) % MOD
+    A = 0
+    B = 1
+
+    def generate!(filter = [1, 1])
+      loop do
+        @generators[A] = (@generators[A] * FACTORS[A]) % MOD
+        break if @generators[A] % filter[A] == 0
       end
+      loop do
+        @generators[B] = (@generators[B] * FACTORS[B]) % MOD
+        break if @generators[B] % filter[B] == 0
+      end
+      @generators
     end
 
     TWO_BYTES_MASK = 2 ** 16 - 1
@@ -43,10 +52,10 @@ module Advent
       a & TWO_BYTES_MASK == b & TWO_BYTES_MASK
     end
 
-    def sample(n)
+    def sample(n, filter = [1, 1])
       count = 0
       n.times do
-        generate!
+        generate!(filter)
         count += 1 if match?
       end
       count
