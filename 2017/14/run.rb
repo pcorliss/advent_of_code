@@ -32,3 +32,8 @@ ad.fill_grid!
 puts "Render:\n" + ad.grid.render
 used = ad.used_squares
 puts "Used: #{used}"
+
+groups = ad.grouping
+puts "Render:\n" + ad.grid.render(1)
+puts "Groups: #{groups}"
+

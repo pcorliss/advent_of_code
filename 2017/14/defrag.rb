@@ -50,5 +50,42 @@ module Advent
     def used_squares
       @grid.cells.values.count { |v| v == '#' }
     end
+
+    def grouping
+      group_grid = Grid.new
+      counter = 1
+      @grid.cells.each do |cell, val|
+        if val == '.'
+          group_grid[cell] = '.'
+          next
+        end
+        next if group_grid[cell]
+
+        neighbors = {cell => val}
+        i = 0
+        until neighbors.empty? do
+          # puts "#{counter}: Neighbors: #{neighbors}" if @debug
+          new_neighbors = {}
+          neighbors.each do |n_cell, n_val|
+            next if n_val == '.'
+            next if group_grid[n_cell]
+
+            new_neighbors.merge! @grid.neighbors(n_cell)
+            group_grid[n_cell] = counter
+          end
+
+          neighbors = new_neighbors
+          i += 1
+          raise "Too many iterations!!! #{i}" if i > 1000
+        end
+
+        # puts "Group Grid:\n#{group_grid.render(0)}" if @debug
+        counter += 1
+        # break if counter > 2000
+      end
+
+      @grid = group_grid
+      counter - 1
+    end
   end
 end
