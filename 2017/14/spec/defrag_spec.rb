@@ -40,7 +40,7 @@ describe Advent do
     end
 
     describe "#fill_grid!" do
-      xit "populates the grid" do
+      it "populates the grid" do
         ad.fill_grid!
         rendering = ad.grid.render.lines.first(8).map {|l| l[0...8] }
         expect(rendering).to eq([
@@ -57,7 +57,7 @@ describe Advent do
     end
 
     describe "#used_squares" do
-      xit "returns the used squares in a filled grid" do
+      it "returns the used squares in a filled grid" do
         ad.fill_grid!
         expect(ad.used_squares).to eq(8108)
       end
