@@ -44,12 +44,39 @@ describe Advent do
       end
     end
 
+    describe "#fake_step!" do
+      it "doesn't add an element but does increment values" do
+        ad.fake_step!
+        expect(ad.length).to eq(2)
+        expect(ad.last_val).to eq(1)
+        expect(ad.pos).to eq(1)
+      end
+
+      it "keeps track of values next to zero" do
+        ad.fake_step!
+        expect(ad.val_next).to eq(1)
+        ad.fake_step!
+        expect(ad.val_next).to eq(2)
+        ad.fake_step!
+        ad.fake_step!
+        expect(ad.val_next).to eq(2)
+        ad.fake_step!
+        expect(ad.val_next).to eq(5)
+      end
+    end
+
     context "validation" do
       it "yields the proper value after 2017" do
         ad.debug!
         2016.times { ad.step! }
         node = ad.step!
         expect(node.next.val).to eq(638)
+      end
+
+      it "yields the proper next_val 2017" do
+        ad.debug!
+        2017.times { ad.fake_step! }
+        expect(ad.val_next).to eq(1226)
       end
     end
   end
