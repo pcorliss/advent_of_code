@@ -55,6 +55,28 @@ describe Advent do
         expect(ad.line.join).to eq("baedc")
       end
     end
+
+    describe "#find_cycle!" do
+      it "runs until the line returns to the first iteration" do
+        ad.find_cycle!
+        expect(ad.line).to eq(["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"])
+      end
+
+      it "returns the number of cycles" do
+        expect(ad.find_cycle!).to eq(30)
+      end
+    end
+
+    describe "#line_after" do
+      it "returns the state of the line after a given number of cycles" do
+        ad.line = ("a".."e").to_a
+        expect(ad.line_after(0  )).to eq("abcde")
+        expect(ad.line_after(300)).to eq("abcde")
+        expect(ad.line_after(301)).to eq("baedc")
+        expect(ad.line_after(302)).to eq("ceadb")
+      end
+    end
+
     context "validation" do
     end
   end

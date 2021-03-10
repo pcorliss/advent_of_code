@@ -57,5 +57,26 @@ module Advent
         self.__send__(*inst)
       end
     end
+
+    def find_cycle!
+      @states = {}
+      @state_lookup = {}
+      i = 0
+      loop do
+        if @states.has_key? @line.join
+          break
+        end
+        @states[@line.join] = i
+        @state_lookup[i] = @line.join
+        i += 1
+        run!
+      end
+      i
+    end
+
+    def line_after(n)
+      cycle = find_cycle!
+      @state_lookup[n % cycle]
+    end
   end
 end

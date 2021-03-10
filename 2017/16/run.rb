@@ -9,9 +9,23 @@ ad.run!
 puts "Line: #{ad.line.join}"
 
 ad = Advent::Dancing.new(input)
-require 'benchmark'
-b = Benchmark.measure do
-  1_000.times { ad.run! }
-end
-puts "B: #{b}"
-puts "Line: #{ad.line.join}"
+cycle = ad.find_cycle!
+puts "Cycle: #{cycle}"
+line = ad.line_after(1_000_000_000)
+puts "Line: #{line}"
+# require 'benchmark'
+# s = {}
+# b = Benchmark.measure do
+#   1_000.times do |i|
+#     if s.has_key? ad.line.join
+#       #puts "Dupe Found at #{i}"
+#     else
+#       s[ad.line.join] = i
+#     end
+#     ad.run!
+#   end
+# end
+# puts "B: #{b}"
+# puts "Line: #{ad.line.join}"
+# require 'pry'
+# binding.pry
