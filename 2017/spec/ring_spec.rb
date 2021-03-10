@@ -58,6 +58,17 @@ describe Advent do
       end
     end
 
+    describe "#add" do
+      it "adds a new node based on the passed start and value" do
+        list.add(node.next, 99)
+        expect(list.to_a).to eq([0, 1, 99, 2, 3, 4])
+        expect(list.length).to eq(6)
+        expect(node.next.next.val).to eq(99)
+        expect(node.next.next.next.val).to eq(2)
+        expect(node.next.next.next.prev.val).to eq(99)
+      end
+    end
+
     describe "#reverse" do
       it "reverses a section of the linked list" do
         list.reverse(node, 3) # Node 0 and 3 total elements (0, 1, 2)
