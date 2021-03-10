@@ -14,6 +14,9 @@ module Advent
       @ring = CircularLinkedList.new([0])
       @last_val = 0
       @current_node = @ring.first
+      @length ||= 1
+      @val_next ||= 0
+      @pos ||= 0
     end
 
     def debug!
@@ -29,16 +32,12 @@ module Advent
     end
 
     def fake_step!
-      @length ||= 1
-      @val_next ||= 0
       @last_val += 1
-      @pos ||= 0
-      #@skip.times { @current_node = @current_node.next }
-      @pos += @skip
-      @pos %= @length
+      # @pos += @skip
+      # @pos %= @length
+      @pos = (@pos + @skip) % @length
       puts "Inserting #{@last_val} after 0" if @debug && @pos == 0
       @val_next = @last_val if @pos == 0
-      #@ring.add(@current_node, @last_val)
       @length += 1
       @pos += 1
       @pos %= @length
