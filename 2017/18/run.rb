@@ -9,3 +9,6 @@ ad.debug!
 ad.run!
 puts "Last Sound: #{ad.last_sound}"
 puts "Registers: #{ad.registers}"
+
+counts = Advent::DuetPrime.run!(input, debug: false)
+puts "Counts: #{counts}"
