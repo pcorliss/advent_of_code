@@ -30,16 +30,16 @@ module Advent
       nil
     end
 
-    def follow
+    def follow(return: :letters)
       acc = []
       pos = start
       dir = [0, 1]
-      i = 0
+      i = 1
       loop do
         new_pos = [pos[0] + dir[0], pos[1] + dir[1]] 
         val = @grid[new_pos]
         # raise "Bad Value for #{val} #{new_pos}" if val.nil?
-        return acc if val.nil?
+        break if val.nil?
         if val == '+'
           cell, _ = @grid.neighbors(new_pos).find do |cell, val|
             cell != pos
@@ -53,7 +53,7 @@ module Advent
         i += 1
         raise "Too many iterations!!! #{i}" if i > 100000
       end
-      acc
+      {letters: acc, steps: i}
     end
   end
 end

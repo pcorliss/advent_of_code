@@ -37,11 +37,15 @@ describe Advent do
 
     describe "#follow" do
       it "follows the line" do
-        expect(ad.follow.join).to start_with('A')
+        expect(ad.follow[:letters].join).to start_with('A')
       end
 
       it "returns the letters it would collect along the path" do
-        expect(ad.follow.join).to eq("ABCDEF")
+        expect(ad.follow[:letters].join).to eq("ABCDEF")
+      end
+
+      it "returns the number of steps" do
+        expect(ad.follow[:steps]).to eq(38)
       end
     end
 

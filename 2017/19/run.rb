@@ -5,5 +5,8 @@ require_relative 'path'
 input = File.read('./input.txt')
 
 ad = Advent::Path.new(input)
-letters = ad.follow
+follow = ad.follow
+letters = follow[:letters]
+steps = follow[:steps]
 puts "Letters: #{letters.join}"
+puts "Steps: #{steps}"
