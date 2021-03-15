@@ -23,3 +23,12 @@ puts "After 5 iterations Lights On: #{g.find_all('#').count}"
 # 132 is too low
 # 256 is too high
 # 6x6 grids should be divided into 2x2 grids!!!
+#
+g = Grid.new(Advent::Fractal::STARTING_PATTERN)
+
+18.times do |i|
+  g = ad.fractalize!(g)
+  puts "Step: #{i + 1} Complete"
+end
+
+puts "After 18 iterations Lights On: #{g.find_all('#').count}"

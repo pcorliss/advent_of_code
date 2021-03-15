@@ -48,7 +48,7 @@ module Advent
       end
 
       dim = 3 if grid.width % 3 == 0
-      dim = 2 if grid.width % 2 == 0
+      dim = 2 if grid.width % 2 == 0 # divide by 2 if possible, otherwise divide by 3
 
       if dim
         fractured_grids = grid.split(dim).map { |g| fractalize!(g) }
