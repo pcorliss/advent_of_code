@@ -28,7 +28,7 @@ g = Grid.new(Advent::Fractal::STARTING_PATTERN)
 
 18.times do |i|
   g = ad.fractalize!(g)
-  puts "Step: #{i + 1} Complete"
+  puts "Step: #{i + 1} Complete Grid is #{g.width}x#{g.width}"
 end
 
 puts "After 18 iterations Lights On: #{g.find_all('#').count}"
