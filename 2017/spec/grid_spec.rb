@@ -32,6 +32,7 @@ describe Grid do
       EOS
 )
       expect(grid.width).to eq(4)
+      expect(grid.height).to eq(4)
       expect(grid.cells).to include({
         [0,0] => '1',
         [3,0] => '2',
@@ -241,6 +242,83 @@ describe Grid do
       grid[1,1] = '@'
       grid[2,2] = '@'
       expect(grid.find_all('@')).to contain_exactly([1,1], [2,2])
+    end
+  end
+
+  describe "#rotate" do
+    let(:grid) { Grid.new(9.times.to_a, 3, 3) }
+
+    it "rotates the grid 90 degrees" do
+      new_grid = grid.rotate
+      expect(new_grid.render).to eq("630\n741\n852")
+    end
+
+    it "rotates 360 degrees" do
+      new_grid = grid.rotate.rotate.rotate.rotate
+      expect(new_grid.cells).to eq(grid.cells)
+    end
+  end
+
+  describe "#flip" do
+    let(:grid) { Grid.new(9.times.to_a, 3, 3) }
+
+    it "flips the grid horizontally" do
+      new_grid = grid.flip
+      expect(new_grid.render).to eq("210\n543\n876")
+    end
+
+    it "reproduces the original grid after two flips" do
+      new_grid = grid.flip.flip
+      expect(new_grid.cells).to eq(grid.cells)
+    end
+
+    it "flips the grid vertically" do
+      new_grid = grid.flip(vertically: true)
+      expect(new_grid.render).to eq("678\n345\n012")
+    end
+
+    it "reproduces the original grid after two vertical flips" do
+      new_grid = grid.flip(vertically: true).flip(vertically: true)
+      expect(new_grid.cells).to eq(grid.cells)
+    end
+  end
+
+  describe "#split" do
+    it "returns 4 grids" do
+      grid = Grid.new(16.times.to_a, 4, 4)
+      expect(grid.split(2).count).to eq(4)
+      expect(grid.split(2).map(&:render)).to eq([
+        "01\n45",
+        "23\n67",
+        " 8 9\n1213",
+        "1011\n1415",
+      ])
+    end
+
+    it "returns 9 grids" do
+      grid = Grid.new(81.times.to_a, 9, 9)
+      expect(grid.split(3).count).to eq(9)
+      expect(grid.split(3).first.render).to eq(" 0 1 2\n 91011\n181920")
+    end
+  end
+
+  describe "#self.join" do
+    it "joins multiple grids" do
+      grid = Grid.new(81.times.to_a, 9, 9)
+      joined_grid = Grid.join(grid.split(3))
+      expect(joined_grid.cells).to eq(grid.cells)
+      expect(joined_grid.width).to eq(9)
+      expect(joined_grid.height).to eq(9)
+    end
+
+    it "handles non-perfect square dimensions" do
+      grid = Grid.new(36.times.to_a, 6, 6)
+      split_grid = grid.split(3)
+      expect(split_grid.count).to eq(4)
+      joined_grid = Grid.join(split_grid)
+      expect(joined_grid.cells).to eq(grid.cells)
+      expect(joined_grid.width).to eq(6)
+      expect(joined_grid.height).to eq(6)
     end
   end
 end

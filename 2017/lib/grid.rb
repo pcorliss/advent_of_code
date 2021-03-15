@@ -29,6 +29,7 @@ class Grid
         end
         y += 1
       end
+      @height = y
     end
   end
 
@@ -186,5 +187,85 @@ class Grid
       v == val
     end
     cells.map(&:first)
+  end
+
+  def rotate
+    grid = Grid.new
+    grid.height = @height
+    grid.width = @width
+    i = 0
+    @width.times do |x|
+      (@height - 1).downto(0) do |y|
+        grid[(i % @width),(i / @width)] = @cells[[x,y]]
+        i += 1
+      end
+    end
+    grid
+  end
+
+  def flip(vertically: false)
+    grid = Grid.new
+    grid.height = @height
+    grid.width = @width
+    i = 0
+    if vertically
+      (@height - 1).downto(0) do |y|
+        @width.times do |x|
+          grid[(i % @width),(i / @width)] = @cells[[x,y]]
+          i += 1
+        end
+      end
+    else
+      @height.times do |y|
+        (@width - 1).downto(0) do |x|
+          grid[(i % @width),(i / @width)] = @cells[[x,y]]
+          i += 1
+        end
+      end
+    end
+    grid
+  end
+
+  def split(dim)
+    grids = []
+    (@height / dim).times do |section_y|
+      (@width / dim).times do |section_x|
+        g = Grid.new
+        g.width = dim
+        g.height = dim
+        grids << g
+
+        min_x = section_x * dim
+        max_x = min_x + dim - 1
+        min_y = section_y * dim
+        max_y = min_y + dim - 1
+
+        i = 0
+        (min_y..max_y).each do |y|
+          (min_x..max_x).each do |x|
+            g[(i % dim),(i / dim)] = @cells[[x,y]]
+            i += 1
+          end
+        end
+      end
+    end
+    grids
+  end
+
+  def self.join(grids)
+    dim = Math.sqrt(grids.length).to_i
+    g = Grid.new
+    sub_grid_w = grids.first.width
+    g.width = dim * sub_grid_w
+    g.height = g.width
+    grids.each_with_index do |grid, idx|
+      x_offset = (idx % dim) * sub_grid_w
+      y_offset = (idx / dim) * sub_grid_w
+      grid.cells.each do |cell, val|
+        x, y = cell
+        g[x + x_offset, y + y_offset] = val
+      end
+    end
+    g
   end
 end
