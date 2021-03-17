@@ -10,23 +10,22 @@ export default class Advent {
   }
 
   first_dupe(): number {
-    const seen: number[] = [];
+    // const seen: number[] = [];
+    const seen = new Set();
     let sum = 0;
     let i = 0;
-    return 0;
-    // while (true) {
-    //   sum = this.frequencies.reduce((acc, n) => {
-    //     const new_sum = acc + n;
-    //     if (seen.includes(new_sum)) {
-    //       return new_sum;
-    //     }
-    //     seen.push(new_sum);
-    //     i += 1;
-    //     if (i > 10) {
-    //       throw 'Too many Iterations';
-    //     }
-    //     new_sum;
-    //   }, sum);
-    // }
+    while (true) {
+      for (const n of this.frequencies) {
+        i += 1;
+        sum += n;
+        if (seen.has(sum)) {
+          return sum;
+        }
+        seen.add(sum);
+        if (i > 10000000) {
+          throw 'Error: too many iterations!!!';
+        }
+      }
+    }
   }
 }
