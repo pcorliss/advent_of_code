@@ -14,3 +14,5 @@ build/
 
 # Misc
 .DS_Store
+
+input.txt
