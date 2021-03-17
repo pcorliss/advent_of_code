@@ -27,4 +27,10 @@ describe('Advent', () => {
       expect(ad.frequency()).to.eql(3);
     });
   });
+
+  describe('#first_dupe', () => {
+    it('returns the first frequency it sees twice', () => {
+      expect(ad.first_dupe()).to.eql(2);
+    });
+  });
 });
