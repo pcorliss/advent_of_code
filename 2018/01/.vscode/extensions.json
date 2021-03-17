@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "wallabyjs.quokka-vscode",
+    "esbenp.prettier-vscode"
+  ]
+}
