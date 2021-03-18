@@ -1,0 +1,9 @@
+{
+  "extends": ["prettier", "plugin:@typescript-eslint/recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"]
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {"ecmaVersion": 2020}
+}
