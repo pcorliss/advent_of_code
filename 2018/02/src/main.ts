@@ -34,4 +34,44 @@ export default class Advent {
     }
     return charCounts[2] * charCounts[3];
   }
+
+  levenshtein(strA: string, strB: string): number {
+    let charsA = strA.split('');
+    let charsB = strB.split('');
+    if (charsA.length < charsB.length) {
+      const tmp = charsB;
+      charsB = charsA;
+      charsA = tmp;
+    }
+
+    let distance = 0;
+    for (const i in charsA) {
+      if (charsA[i] != charsB[i]) {
+        distance++;
+      }
+    }
+
+    return distance;
+  }
+
+  mostSimilar(): string[] {
+    let minBoxId: string[] = [];
+    let minDistance = 999;
+
+    // Faster than the following
+    // for (const boxIdA of this.boxes) {
+    //   for (const boxIdB of this.boxes) {
+    for (let i = 0; i < this.boxes.length; i++) {
+      const boxIdA = this.boxes[i];
+      for (let j = i + 1; j < this.boxes.length; j++) {
+        const boxIdB = this.boxes[j];
+        const l = this.levenshtein(boxIdA, boxIdB);
+        if (minDistance > l) {
+          minDistance = l;
+          minBoxId = [boxIdA, boxIdB];
+        }
+      }
+    }
+    return minBoxId;
+  }
 }

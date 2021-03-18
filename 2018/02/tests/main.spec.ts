@@ -42,4 +42,37 @@ ababab
       expect(ad.checksum()).to.eql(12);
     });
   });
+
+  describe('#levenshtein', () => {
+    it('returns a distance of 0 if the strings are identical', () => {
+      expect(ad.levenshtein('kitten', 'kitten')).to.eql(0);
+    });
+
+    it('returns the distance for two different strings of the same size', () => {
+      expect(ad.levenshtein('kitten', 'sittin')).to.eql(2);
+    });
+
+    it('returns the distance for two strings of different sizes', () => {
+      expect(ad.levenshtein('kitten', 'sitting')).to.eql(3);
+    });
+  });
+
+  describe('#levenshtein', () => {
+    beforeEach(() => {
+      const input = `
+abcde
+fghij
+klmno
+pqrst
+fguij
+axcye
+wvxyz
+      `.trim();
+      ad = new Advent(input);
+    });
+
+    it('returns the two most similar strings', () => {
+      expect(ad.mostSimilar()).to.have.members(['fghij', 'fguij']);
+    });
+  });
 });
