@@ -36,7 +36,7 @@ export default class Advent {
   }
 
   levenshtein(strA: string, strB: string): number {
-    let charsA = strA.split('');
+    let charsA = strA.split(''); // Could also run [...strA] instead of split
     let charsB = strB.split('');
     if (charsA.length < charsB.length) {
       const tmp = charsB;
@@ -45,6 +45,7 @@ export default class Advent {
     }
 
     let distance = 0;
+    // FYI, this is bad, `for (x in arr)` uses strings as indexes
     for (const i in charsA) {
       if (charsA[i] != charsB[i]) {
         distance++;
