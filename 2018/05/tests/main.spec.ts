@@ -18,9 +18,9 @@ describe('Advent', () => {
   });
 
   describe('#reduce', () => {
-    it('reduces a polymer from left to right one step', () => {
-      expect(ad.reduce('dabAcCaCBAcCcaDA')).to.eql('dabAaCBAcCcaDA');
-      expect(ad.reduce('dabAaCBAcCcaDA')).to.eql('dabCBAcCcaDA');
+    it('reduces a polymer from left to right as many steps as possible', () => {
+      expect(ad.reduce('dabAcCaCBAcCcaDA')).to.eql('dabCBAcaDA');
+      expect(ad.reduce('dabAaCBAcCcaDA')).to.eql('dabCBAcaDA');
       expect(ad.reduce('dabCBAcCcaDA')).to.eql('dabCBAcaDA');
     });
 
@@ -34,6 +34,12 @@ describe('Advent', () => {
     it('reduces a polymer the maximum number of times', () => {
       expect(ad.reduceAll('dabAcCaCBAcCcaDA')).to.eql('dabCBAcaDA');
       expect(ad.reduce('dabCBAcaDA')).to.have.lengthOf(10);
+    });
+  });
+
+  describe('#optimisePoly', () => {
+    it('removes problematic char pairs from polymers and finds the optimized one', () => {
+      expect(ad.optimizePoly('dabAcCaCBAcCcaDA')).to.eql('daDA');
     });
   });
 });

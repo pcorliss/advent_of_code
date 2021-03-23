@@ -8,15 +8,13 @@ export default class Advent {
   reduce(poly: string): string {
     let lastChar = '';
     let newPoly = '';
-    let reduced = false;
     for (const curChar of poly.split('')) {
       if (
-        !reduced && // haven't already reduced
         lastChar.toUpperCase() === curChar.toUpperCase() && // chars are equivalent
         lastChar !== curChar // but different cases
       ) {
-        lastChar = '';
-        reduced = true;
+        lastChar = newPoly.slice(-1);
+        newPoly = newPoly.slice(0, -1);
       } else {
         newPoly += lastChar;
         lastChar = curChar;
@@ -32,5 +30,22 @@ export default class Advent {
       poly = this.reduce(poly);
     }
     return lastPoly;
+  }
+
+  optimizePoly(poly: string): string {
+    let shortest = poly;
+    for (let i = 0; i < 26; i++) {
+      const charToRemove = String.fromCharCode(97 + i);
+      const regex = new RegExp(`${charToRemove}`, 'ig');
+      const newPoly = poly.replace(regex, '');
+      const reduced = this.reduceAll(newPoly);
+      if (shortest.length > reduced.length) {
+        console.log(
+          `New Shortest: Removed ${charToRemove} - Length: ${reduced.length} - Previous Shortest: ${shortest.length}`,
+        );
+        shortest = reduced;
+      }
+    }
+    return shortest;
   }
 }
