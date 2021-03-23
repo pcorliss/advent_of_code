@@ -2,7 +2,7 @@ import Advent from '../src/main';
 import { expect } from 'chai';
 
 describe('Advent', () => {
-  const input: string = `
+  const input: string = `dabAcCaCBAcCcaDA
 `.trim();
 
   let ad;
@@ -12,11 +12,28 @@ describe('Advent', () => {
   });
 
   describe('#new', () => {
-    // it('inits a list of sorted events', () => {
-    //   expect(ad.guardEvents).to.have.lengthOf(17);
-    //   const [dt, action] = ad.guardEvents.entries().next()['value'];
-    //   expect(dt).to.eql(new Date('1518-11-01 00:00'));
-    //   expect(action).to.eql('Guard #10 begins shift');
-    // });
+    it('inits a polymer chain', () => {
+      expect(ad.polymer).to.eql('dabAcCaCBAcCcaDA');
+    });
+  });
+
+  describe('#reduce', () => {
+    it('reduces a polymer from left to right one step', () => {
+      expect(ad.reduce('dabAcCaCBAcCcaDA')).to.eql('dabAaCBAcCcaDA');
+      expect(ad.reduce('dabAaCBAcCcaDA')).to.eql('dabCBAcCcaDA');
+      expect(ad.reduce('dabCBAcCcaDA')).to.eql('dabCBAcaDA');
+    });
+
+    it("doesn't change the string if there's no reducing possible", () => {
+      expect(ad.reduce('dabCBAcaDA')).to.eql('dabCBAcaDA');
+      expect(ad.reduce('dabCBAcaDA')).to.have.lengthOf(10);
+    });
+  });
+
+  describe('#reduceAll', () => {
+    it('reduces a polymer the maximum number of times', () => {
+      expect(ad.reduceAll('dabAcCaCBAcCcaDA')).to.eql('dabCBAcaDA');
+      expect(ad.reduce('dabCBAcaDA')).to.have.lengthOf(10);
+    });
   });
 });
