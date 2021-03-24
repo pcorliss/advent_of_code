@@ -72,4 +72,16 @@ describe('Advent', () => {
       expect(ad.largestNonInfiniteArea()).to.eql(17);
     });
   });
+
+  describe('#sumDistance', () => {
+    it('returns the sum of all distances to particular point', () => {
+      expect(ad.sumDistance(4, 3)).to.eql(30);
+    });
+  });
+
+  describe('#safeArea', () => {
+    it('returns the safe cells with sumDistance of less than passed value', () => {
+      expect(ad.safeArea(32)).to.eql(16);
+    });
+  });
 });

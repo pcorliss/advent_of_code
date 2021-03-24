@@ -86,13 +86,36 @@ export default class Advent {
   largestNonInfiniteArea(): number {
     const areaCounts = this.gridCalc(0);
     let maxArea = 0;
-    let maxPoint = null;
     for (const pointIdx of this.findNonInfinitePoints()) {
       if (areaCounts.get(pointIdx) > maxArea) {
-        maxArea = areaCounts.get(pointIdx) ;
-        maxPoint = pointIdx;
+        maxArea = areaCounts.get(pointIdx);
       }
     }
     return maxArea;
+  }
+
+  sumDistance(x: number, y: number): number {
+    return this.points.reduce(
+      (sum: number, point: number[]) =>
+        sum + Math.abs(point[0] - x) + Math.abs(point[1] - y),
+      0,
+    );
+  }
+
+  safeArea(dist: number): number {
+    let count = 0;
+    const [cX, cY] = this.centerPoint();
+    // my calc of the bounding box isn't quite right, but the additional 1K seems to make it work out
+    const stretch = Math.ceil(Math.sqrt(dist)) + 1000;
+
+    for (let x = cX - stretch; x <= cX + stretch; x++) {
+      for (let y = cY - stretch; y <= cY + stretch; y++) {
+        if (this.sumDistance(x, y) < dist) {
+          count += 1;
+        }
+      }
+    }
+
+    return count;
   }
 }
