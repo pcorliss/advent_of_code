@@ -31,13 +31,6 @@ export default class Advent {
     ];
   }
 
-  centerPoint(): number[] {
-    const [[min_x, min_y], [max_x, max_y]] = this.boundingBox();
-    const med_x = Math.floor((max_x - min_x) / 2) + min_x;
-    const med_y = Math.floor((max_y - min_y) / 2) + min_y;
-    return [med_x, med_y];
-  }
-
   // TODO: Add caching if speed is a problem
   nearestPoint(x: number, y: number): number {
     let nearest = null;
@@ -104,12 +97,11 @@ export default class Advent {
 
   safeArea(dist: number): number {
     let count = 0;
-    const [cX, cY] = this.centerPoint();
-    // my calc of the bounding box isn't quite right, but the additional 1K seems to make it work out
-    const stretch = Math.ceil(Math.sqrt(dist)) + 1000;
+    const [[min_x, min_y], [max_x, max_y]] = this.boundingBox();
+    const growth = Math.ceil(Math.sqrt(dist));
 
-    for (let x = cX - stretch; x <= cX + stretch; x++) {
-      for (let y = cY - stretch; y <= cY + stretch; y++) {
+    for (let x = min_x - growth; x <= max_x + growth; x++) {
+      for (let y = min_y - growth; y <= max_y + growth; y++) {
         if (this.sumDistance(x, y) < dist) {
           count += 1;
         }

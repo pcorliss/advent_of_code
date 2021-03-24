@@ -33,12 +33,6 @@ describe('Advent', () => {
     });
   });
 
-  describe('#centerPoint', () => {
-    it('returns centerPoint of box', () => {
-      expect(ad.centerPoint()).to.eql([4, 5]);
-    });
-  });
-
   describe('#gridCalc', () => {
     it('takes an integer and returns the updated count of neighbors', () => {
       expect(ad.gridCalc(0).get(3)).to.eql(9);
