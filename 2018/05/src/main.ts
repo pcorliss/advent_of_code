@@ -13,6 +13,7 @@ export default class Advent {
         lastChar.toUpperCase() === curChar.toUpperCase() && // chars are equivalent
         lastChar !== curChar // but different cases
       ) {
+        // This isn't strictly necessary since we'll run this function multiple times, but it allows us to do more in a single pass
         lastChar = newPoly.slice(-1);
         newPoly = newPoly.slice(0, -1);
       } else {
