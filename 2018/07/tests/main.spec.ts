@@ -72,4 +72,36 @@ Step A must be finished before step Y can begin.
       expect(ad.calcOrder()).to.eql(['A', 'Y', 'Z', 'W', 'X']);
     });
   });
+
+  describe('#workOrder', () => {
+    it('with one worker it yields the same ordering results as calcOrder', () => {
+      expect(ad.workOrder(1, 0)[0]).to.eql(ad.calcOrder());
+    });
+
+    it('returns the total number of seconds to complete the steps', () => {
+      expect(ad.workOrder(1, 1)[1]).to.eql(21 + 6);
+    });
+
+    it('handles multiple workers', () => {
+      expect(ad.workOrder(2, 0)).to.eql(['CABFDE'.split(''), 15]);
+    });
+
+    // May need to account for workers waiting but ticking over to next seconds
+    // double loop
+    it('picks up available steps when a worker at the end of the list completes', () => {
+      const inp: string = `
+Step E must be finished before step D can begin.
+Step E must be finished before step C can begin.
+Step A must be finished before step D can begin.
+Step A must be finished before step C can begin.
+Step A must be finished before step B can begin.
+Step B must be finished before step D can begin.
+Step B must be finished before step C can begin.
+Step D must be finished before step F can begin.
+Step C must be finished before step F can begin.
+      `.trim();
+      ad = new Advent(inp);
+      expect(ad.workOrder(2, 0)).to.eql([['A', 'B', 'E', 'C', 'D', 'F'], 15]);
+    });
+  });
 });

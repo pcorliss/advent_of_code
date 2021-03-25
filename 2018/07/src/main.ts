@@ -1,3 +1,5 @@
+import { Worker } from 'node:cluster';
+
 export default class Advent {
   dependencies: Map<string, string[]>;
   reverseDep: Map<string, string[]>;
@@ -44,7 +46,7 @@ export default class Advent {
     for (const step of this.steps) {
       if (this.dependencies.get(step) === undefined) {
         available.push(step);
-        console.log(`First Step Found: ${step}`);
+        // console.log(`First Step Found: ${step}`);
       }
     }
 
@@ -62,7 +64,11 @@ export default class Advent {
       );
       available.push(...candidates);
       available.sort();
-      console.log(`${i}: Steps: ${orderedSteps} Available: ${available} Candidates: ${candidates} from ${this.reverseDep.get(lastStep)}`)
+      // console.log(
+      //   `${i}: Steps: ${orderedSteps} Available: ${available} Candidates: ${candidates} from ${this.reverseDep.get(
+      //     lastStep,
+      //   )}`,
+      // );
       if (available.length === 0) {
         throw 'No Available candidates!!!';
       }
@@ -73,5 +79,66 @@ export default class Advent {
       }
     }
     return orderedSteps;
+  }
+
+  workOrder(workers: number, seconds: number): [string[], number] {
+    const orderedSteps: string[] = [];
+    const available: string[] = [];
+
+    // find start
+    for (const step of this.steps) {
+      if (this.dependencies.get(step) === undefined) {
+        available.push(step);
+        console.log(`First Step Found: ${step}`);
+      }
+    }
+
+    available.sort();
+
+    //TODO: Typescript Q: Could we use a type here?
+    const working: Array<[string, number]> = [];
+
+    let t = 0;
+    while (orderedSteps.length < this.stepLength) {
+      for (let w = 0; w < workers; w++) {
+        if (working[w] && working[w][1] <= t) {
+          const step = working[w][0];
+          orderedSteps.push(step);
+          working[w] = null;
+
+          let candidates = this.reverseDep.get(step) || [];
+          candidates = candidates.filter((step) =>
+            this.dependencies
+              .get(step)
+              .every((depStep) => orderedSteps.includes(depStep)),
+          );
+          available.push(...candidates);
+          available.sort();
+
+          console.log(
+            `${t}:${w}: Completed! ${orderedSteps} Available: ${available} Candidates: ${candidates} from ${this.reverseDep.get(
+              step,
+            )}`,
+          );
+        }
+      }
+      for (let w = 0; w < workers; w++) {
+        if (working[w] == null && available.length > 0) {
+          const step = available.shift();
+          const completion = step.charCodeAt(0) + seconds - 64 + t;
+          working[w] = [step, completion];
+          console.log(
+            `${t}:${w}: Working on ${step} completing at ${completion}, Remaining: ${available}`,
+          );
+        }
+      }
+
+      t++;
+      if (t > 3000) {
+        throw 'Too many iterations!!!';
+      }
+    }
+
+    return [orderedSteps, t - 1];
   }
 }
