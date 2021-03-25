@@ -1,5 +1,3 @@
-import { Worker } from 'node:cluster';
-
 export default class Advent {
   dependencies: Map<string, string[]>;
   reverseDep: Map<string, string[]>;
@@ -95,16 +93,28 @@ export default class Advent {
 
     available.sort();
 
-    //TODO: Typescript Q: Could we use a type here?
-    const working: Array<[string, number]> = [];
+    type Worker = {
+      char: string;
+      completingAt: number;
+      done: boolean;
+    };
+
+    const working = new Array<Worker>(workers);
+    for (let w = 0; w < workers; w++) {
+      working[w] = {
+        char: null,
+        completingAt: 999,
+        done: true,
+      };
+    }
 
     let t = 0;
     while (orderedSteps.length < this.stepLength) {
       for (let w = 0; w < workers; w++) {
-        if (working[w] && working[w][1] <= t) {
-          const step = working[w][0];
+        if (working[w].completingAt <= t && !working[w].done) {
+          const step = working[w].char;
           orderedSteps.push(step);
-          working[w] = null;
+          working[w].done = true;
 
           let candidates = this.reverseDep.get(step) || [];
           candidates = candidates.filter((step) =>
@@ -123,10 +133,12 @@ export default class Advent {
         }
       }
       for (let w = 0; w < workers; w++) {
-        if (working[w] == null && available.length > 0) {
+        if (working[w].done && available.length > 0) {
           const step = available.shift();
           const completion = step.charCodeAt(0) + seconds - 64 + t;
-          working[w] = [step, completion];
+          working[w].char = step;
+          working[w].completingAt = completion;
+          working[w].done = false;
           console.log(
             `${t}:${w}: Working on ${step} completing at ${completion}, Remaining: ${available}`,
           );
