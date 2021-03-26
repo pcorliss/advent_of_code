@@ -4,8 +4,8 @@ class Node {
   parent: Node;
 
   constructor() {
-    this.children = null;
-    this.metadata = null;
+    this.children = [];
+    this.metadata = [];
     this.parent = null;
   }
 
@@ -40,8 +40,6 @@ export default class Advent {
 
   buildNode(nums: number[], idx: number): [Node, number] {
     const node = new Node();
-    node.children = [];
-    node.metadata = [];
     const children = nums[idx + 0];
     const metadata = nums[idx + 1];
 
