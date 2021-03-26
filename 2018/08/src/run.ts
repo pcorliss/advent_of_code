@@ -5,3 +5,4 @@ const input_str: string = fs.readFileSync('input.txt', 'utf8');
 
 const ad = new Advent(input_str);
 console.log(`Sum: ${ad.root.metadataSum()}`);
+console.log(`Val: ${ad.root.value()}`);

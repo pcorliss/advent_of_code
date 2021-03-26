@@ -5,7 +5,7 @@ describe('Node', () => {
   let ad;
 
   beforeEach(() => {
-    ad = new Advent("");
+    ad = new Advent('');
   });
 
   describe('#metadataSum', () => {
@@ -17,6 +17,39 @@ describe('Node', () => {
     it('sums up children metadata as well', () => {
       const node = ad.buildNode([2, 3, 0, 2, 4, 5, 0, 1, 6, 1, 2, 3], 0)[0];
       expect(node.metadataSum()).to.eql(21);
+    });
+  });
+
+  describe('#value', () => {
+    it('sums up the metadata if there are no children', () => {
+      const node = ad.buildNode([0, 3, 1, 2, 3], 0)[0];
+      expect(node.value()).to.eql(6);
+    });
+
+    it('if it has children metadata refers to their index - 1', () => {
+      const node = ad.buildNode([1, 1, 0, 2, 3, 4, 1], 0)[0];
+      expect(node.value()).to.eql(7);
+    });
+
+    it('handles multiple children', () => {
+      const node = ad.buildNode(
+        [3, 2, 0, 2, 3, 4, 0, 1, 1, 0, 1, 6, 2, 1],
+        0,
+      )[0];
+      expect(node.value()).to.eql(8);
+    });
+
+    it('handles non-existant indexes', () => {
+      const node = ad.buildNode([1, 2, 0, 2, 3, 4, 5, 0], 0)[0];
+      expect(node.value()).to.eql(0);
+    });
+
+    it('handles the sample input', () => {
+      const node = ad.buildNode(
+        [2, 3, 0, 3, 10, 11, 12, 1, 1, 0, 1, 99, 2, 1, 1, 2],
+        0,
+      )[0];
+      expect(node.value()).to.eql(66);
     });
   });
 });
@@ -102,6 +135,6 @@ describe('Advent', () => {
     it('handles empty metadata', () => {
       const node = ad.buildNode([1, 0, 0, 2, 3, 4], 0)[0];
       expect(node.children[0].metadata).to.eql([3, 4]);
-    })
+    });
   });
 });

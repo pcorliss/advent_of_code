@@ -1,5 +1,3 @@
-import { nextTick } from 'node:process';
-
 class Node {
   metadata: number[];
   children: Node[];
@@ -14,6 +12,20 @@ class Node {
   metadataSum(): number {
     const sum = this.metadata.reduce((acc, n) => acc + n);
     return this.children.reduce((acc, c) => acc + c.metadataSum(), sum);
+  }
+
+  value(): number {
+    if (this.children.length > 0) {
+      return this.metadata.reduce((acc, n) => {
+        if (n > 0 && n - 1 < this.children.length) {
+          return acc + this.children[n - 1].value();
+        } else {
+          return acc;
+        }
+      }, 0);
+    } else {
+      return this.metadata.reduce((acc, n) => acc + n);
+    }
   }
 }
 
