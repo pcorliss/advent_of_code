@@ -70,7 +70,7 @@ describe('Advent', () => {
       });
 
       it('accepts a size range', () => {
-        expect(ad.largestBlock(1, 20)).to.eql([90, 269, 16]);
+        expect(ad.largestBlock(15, 16)).to.eql([90, 269, 16]);
       });
     });
   });
