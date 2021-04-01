@@ -102,15 +102,37 @@ class Advent {
       }
 
       // Check for collision in this.carts && newCarts
+      let collision = false;
       for (const cart of this.carts.concat(newCarts)) {
         const [cartX, cartY] = cart;
         if (cartX == x && cartY == y) {
-          // console.log(`Collision!!! ${x}, ${y}`);
+          // console.log(`Collision!!! at ${x}, ${y}`);
+          console.log('Collision Involves', cart, 'and', [x, y, dir, turns]);
+          // console.log(this.carts);
+          // console.log(newCarts);
+
           this.collisions.push([x, y]);
+          let idx = newCarts.indexOf(cart);
+          if (idx >= 0) {
+            // console.log(`Splicing ${idx} of newCarts`);
+            newCarts.splice(idx, 1);
+          } else {
+            idx = this.carts.indexOf(cart);
+            // console.log(`Splicing ${idx} of carts`);
+            this.carts.splice(idx, 1);
+          }
+          collision = true;
+          break;
         }
       }
 
-      newCarts.push([x, y, dir, turns]);
+      if (!collision) {
+        newCarts.push([x, y, dir, turns]);
+      } else {
+        // console.log("Post Splice");
+        // console.log(this.carts);
+        // console.log(newCarts);
+      }
     }
     this.carts = newCarts;
   }

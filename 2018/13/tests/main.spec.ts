@@ -79,6 +79,7 @@ describe('Advent', () => {
         // console.log(ad.carts);
       }
       expect(ad.collisions).to.eql([[7, 3]]);
+      expect(ad.carts).to.be.empty;
     });
   });
 });
