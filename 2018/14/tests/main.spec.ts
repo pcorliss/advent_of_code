@@ -48,6 +48,29 @@ describe('Advent', () => {
     });
   });
 
+  describe('#indexOfSubArray', () => {
+    it('returns the index of a subArray', () => {
+      ad.scores = [1, 2, 3, 4, 5, 6];
+      expect(ad.indexOfSubArray([3, 4, 5, 6])).to.eql(2);
+    });
+
+    it("returns the index of things that aren't at the end either", () => {
+      ad.scores = [1, 2, 3, 4, 5, 6];
+      expect(ad.indexOfSubArray([3, 4, 5])).to.eql(2);
+    });
+
+    it("returns -1 for things that aren't at the end of the array", () => {
+      ad.scores = [1, 2, 3, 4, 5, 6];
+      expect(ad.indexOfSubArray([2, 3])).to.eql(-1);
+    });
+  });
+
+  describe('#createUntil', () => {
+    it('returns the number of steps until a list of numbers appears', () => {
+      expect(ad.createUntil([0, 1, 2, 4, 5])).to.eql(5);
+    });
+  });
+
   context('verification', () => {
     const cases: [number, string][] = [
       [9, '5158916779'],
@@ -65,6 +88,18 @@ describe('Advent', () => {
         expect(ad.scores.slice(creates, creates + 10).join('')).to.eql(
           expected,
         );
+      });
+    }
+
+    const createUntilCases: [number, number[]][] = [
+      [9, [5, 1, 5, 8, 9]],
+      [5, [0, 1, 2, 4, 5]],
+      [18, [9, 2, 5, 1, 0]],
+      [2018, [5, 9, 4, 1, 4]],
+    ];
+    for (const [expected, subArr] of createUntilCases) {
+      it(`yields ${expected} when looking for ${subArr}`, () => {
+        expect(ad.createUntil(subArr)).to.eql(expected);
       });
     }
   });
