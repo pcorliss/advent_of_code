@@ -1,4 +1,4 @@
-import { Advent, Point } from '../src/main';
+import { Advent } from '../src/main';
 import { expect } from 'chai';
 
 describe('Advent', () => {

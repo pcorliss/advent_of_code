@@ -1,11 +1,3 @@
-class Point {
-  constructor(public x: number, public y: number) {}
-
-  hash(): string {
-    return [this.x, this.y].toString();
-  }
-}
-
 class Advent {
   carts: [number, number, string, number][];
   path: string[][];
@@ -138,4 +130,4 @@ class Advent {
   }
 }
 
-export { Advent, Point };
+export { Advent };
