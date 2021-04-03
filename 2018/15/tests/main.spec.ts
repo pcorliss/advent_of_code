@@ -52,12 +52,112 @@ describe('Advent', () => {
       expect(elf.y).to.eql(2);
     });
 
-    it('moves one step', () => {
+    it('moves horizontally until next to an enemy', () => {
       const gob = ad.actors[0];
       expect(gob.goblin).to.be.true;
+      expect(gob.x).to.eql(2);
+      expect(gob.y).to.eql(1);
+      ad.move(gob);
+      expect(gob.x).to.eql(3);
+      expect(gob.y).to.eql(1);
+      ad.move(gob);
+      expect(gob.x).to.eql(4);
+      expect(gob.y).to.eql(1);
+      ad.move(gob);
+      expect(gob.x).to.eql(4);
+      expect(gob.y).to.eql(1);
+    });
+
+    it('moves vertically until next to an enemy', () => {
+      const gob = ad.actors[4];
+      expect(gob.goblin).to.be.true;
+      expect(gob.x).to.eql(3);
+      expect(gob.y).to.eql(4);
+      ad.move(gob);
+      expect(gob.x).to.eql(3);
+      expect(gob.y).to.eql(3);
       ad.move(gob);
       expect(gob.x).to.eql(3);
       expect(gob.y).to.eql(2);
+      ad.move(gob);
+      expect(gob.x).to.eql(3);
+      expect(gob.y).to.eql(2);
+    });
+
+    it('updates the grid with their movements', () => {
+      const gob = ad.actors[0];
+      expect(ad.grid[1][2]).to.eql(gob);
+      ad.move(gob);
+      expect(ad.grid[1][3]).to.eql(gob);
+      expect(ad.grid[1][2]).to.eql(true);
+    });
+
+    context('verification', () => {
+      const roundResults: string[] = [
+        `
+#########
+#G..G..G#
+#.......#
+#.......#
+#G..E..G#
+#.......#
+#.......#
+#G..G..G#
+#########
+`.trim(),
+        `
+#########
+#.G...G.#
+#...G...#
+#...E..G#
+#.G.....#
+#.......#
+#G..G..G#
+#.......#
+#########
+`.trim(),
+        `
+#########
+#..G.G..#
+#...G...#
+#.G.E.G.#
+#.......#
+#G..G..G#
+#.......#
+#.......#
+#########
+`.trim(),
+        `
+#########
+#.......#
+#..GGG..#
+#..GEG..#
+#G..G...#
+#......G#
+#.......#
+#.......#
+#########
+`.trim(),
+      ];
+
+      beforeEach(() => {
+        ad = new Advent(roundResults[0]);
+      });
+
+      it('yields the right result for no movement/initial state', () => {
+        expect(ad.render()).to.eql(roundResults[0]);
+      });
+
+      for (const [idx, expected] of roundResults.entries()) {
+        it(`yields the expected result for ${idx} steps`, () => {
+          for (let i = 0; i < idx; i++) {
+            for (const actor of ad.actors) {
+              ad.move(actor);
+            }
+          }
+          expect(ad.render()).to.eql(expected);
+        });
+      }
     });
   });
 
