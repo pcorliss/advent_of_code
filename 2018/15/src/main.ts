@@ -5,13 +5,14 @@ type Actor = {
   elf: boolean;
   goblin: boolean;
   t: string;
+  attack: number;
 };
 
 class Advent {
   grid: (boolean | Actor)[][];
   actors: Actor[];
 
-  constructor(input: string) {
+  constructor(input: string, elfAttack = 3) {
     this.actors = [];
     this.grid = input.split('\n').map((line, y) => {
       return line.split('').map((char, x) => {
@@ -23,6 +24,7 @@ class Advent {
             elf: char == 'E',
             goblin: char == 'G',
             t: char,
+            attack: char == 'E' ? elfAttack : 3,
           });
           return this.actors[this.actors.length - 1];
         }
@@ -136,7 +138,7 @@ class Advent {
     }
     nearbyEnemies.sort((a, b) => a.hp - b.hp);
     if (nearbyEnemies.length > 0) {
-      nearbyEnemies[0].hp -= 3;
+      nearbyEnemies[0].hp -= actor.attack;
       if (nearbyEnemies[0].hp <= 0) {
         // const idx = this.actors.indexOf(nearbyEnemies[0]);
         // this.actors.splice(idx,1);
@@ -182,6 +184,26 @@ class Advent {
       .reduce((acc, a) => (acc += a.hp), 0);
     // console.log(`Steps: ${steps}, HP: ${hp}`);
     return steps * hp;
+  }
+
+  lowestAttackPower(): number {
+    let i = 3;
+    const elfCount = this.actors.reduce((acc, a) => (acc += a.elf ? 1 : 0), 0);
+    while (true) {
+      const ad = new Advent(this.render(), i);
+      ad.runUntilFinished();
+      const survivingElves = ad.actors.reduce((acc, a) => {
+        if (a.elf && a.hp > 0) {
+          acc++;
+        }
+        return acc;
+      }, 0);
+      if (survivingElves == elfCount) {
+        return i;
+      }
+      i++;
+    }
+    return i;
   }
 }
 

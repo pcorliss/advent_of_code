@@ -39,7 +39,13 @@ describe('Advent', () => {
         t: 'G',
         elf: false,
         goblin: true,
+        attack: 3,
       });
+    });
+
+    it('takes an optional argument to describe elf attack power', () => {
+      ad = new Advent(input, 99);
+      expect(ad.actors[1].attack).to.eql(99);
     });
   });
 
@@ -500,6 +506,12 @@ describe('Advent', () => {
           });
         }
       });
+    });
+  });
+
+  describe('#lowestAttackPower', () => {
+    it('returns the lowest attack power for elves to experience no losses', () => {
+      expect(ad.lowestAttackPower()).to.eql(15);
     });
   });
 
