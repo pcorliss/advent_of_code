@@ -138,6 +138,17 @@ describe('Advent', () => {
 #.......#
 #########
 `.trim(),
+        `
+#########
+#.......#
+#..GGG..#
+#..GEG..#
+#G..G...#
+#......G#
+#.......#
+#.......#
+#########
+`.trim(),
       ];
 
       beforeEach(() => {
@@ -158,6 +169,337 @@ describe('Advent', () => {
           expect(ad.render()).to.eql(expected);
         });
       }
+    });
+  });
+
+  describe('#attack', () => {
+    it('does nothing if there is not an adjacent enemy', () => {
+      const gob = ad.actors[0];
+      ad.attack(gob);
+      expect(ad.actors.map((a) => a.hp)).to.eql([200, 200, 200, 200, 200, 200]);
+    });
+
+    it('reduces hp by 3 of an enemy', () => {
+      const elf = ad.actors[1];
+      const gob = ad.actors[2];
+      ad.attack(elf);
+      expect(gob.hp).to.eql(197);
+    });
+
+    it('selects a unit based on who has the fewest hp', () => {
+      const elf = ad.actors[1];
+      const gob1 = ad.actors[2];
+      const gob2 = ad.actors[0];
+      gob2.hp = 4;
+      ad.move(gob2);
+      ad.move(gob2);
+      ad.attack(elf);
+      expect(gob1.hp).to.eql(200);
+      expect(gob2.hp).to.eql(1);
+    });
+
+    it('selects a unit based on reading order if hp is the same', () => {
+      const elf = ad.actors[1];
+      const gob1 = ad.actors[2];
+      const gob2 = ad.actors[0];
+      ad.move(gob2);
+      ad.move(gob2);
+      ad.attack(elf);
+      expect(gob1.hp).to.eql(200);
+      expect(gob2.hp).to.eql(197);
+    });
+
+    it('removes an actor from the grid if it runs out of hp', () => {
+      const elf = ad.actors[1];
+      const gob = ad.actors[2];
+      for (let i = 0; i < 68; i++) {
+        ad.attack(elf);
+      }
+      expect(ad.grid[gob.y][gob.x]).to.eql(true);
+    });
+  });
+
+  describe('#round', () => {
+    it('does not process dead actors', () => {
+      const elf = ad.actors[1];
+      const gob = ad.actors[2];
+      gob.hp = 1;
+      ad.round();
+      expect(elf.hp).to.eql(200);
+    });
+
+    it('applies movement', () => {
+      const gob = ad.actors[0];
+      ad.round();
+      expect(gob.x).to.eql(3);
+      expect(gob.y).to.eql(1);
+    });
+
+    it('applies attack', () => {
+      const elf = ad.actors[1];
+      ad.round();
+      expect(elf.hp).to.eql(197);
+    });
+
+    it('returns true', () => {
+      expect(ad.round()).to.eql(true);
+    });
+
+    it('returns false if the round was not completed because there were no more enemies', () => {
+      const elf1 = ad.actors[1];
+      const elf2 = ad.actors[5];
+      elf1.hp = 1;
+      elf2.hp = 1;
+      expect(ad.round()).to.eql(false);
+    });
+
+    context('verification', () => {
+      const roundIdx = [0, 1, 2, 23, 24, 25, 26, 27, 28, 47];
+      const lowHp = [200, 197, 188, 131, 128, 125, 122, 119, 113, 59];
+      const roundResults = [
+        `
+#######
+#.G...#
+#...EG#
+#.#.#G#
+#..G#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#..G..#
+#...EG#
+#.#G#G#
+#...#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#...G.#
+#..GEG#
+#.#.#G#
+#...#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#...G.#
+#..G.G#
+#.#.#G#
+#...#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#..G..#
+#...G.#
+#.#G#G#
+#...#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#.G...#
+#..G..#
+#.#.#G#
+#..G#E#
+#.....#
+#######
+`.trim(),
+        `
+#######
+#G....#
+#.G...#
+#.#.#G#
+#...#E#
+#..G..#
+#######
+`.trim(),
+        `
+#######
+#G....#
+#.G...#
+#.#.#G#
+#...#E#
+#...G.#
+#######
+`.trim(),
+        `
+#######
+#G....#
+#.G...#
+#.#.#G#
+#...#E#
+#....G#
+#######
+`.trim(),
+        `
+#######
+#G....#
+#.G...#
+#.#.#G#
+#...#.#
+#....G#
+#######
+`.trim(),
+      ];
+      beforeEach(() => {
+        ad = new Advent(roundResults[0]);
+      });
+
+      for (const [idx, steps] of roundIdx.entries()) {
+        it(`yields the expected result for ${steps} steps`, () => {
+          for (let i = 0; i < steps; i++) {
+            ad.round();
+          }
+          // console.log(ad.render());
+          // console.log(ad.actors);
+          expect(ad.render()).to.eql(roundResults[idx]);
+          expect(ad.actors.map((a) => a.hp)).to.include(lowHp[idx]);
+        });
+      }
+
+      it('returns false on the 48th step', () => {
+        for (let i = 0; i < 45; i++) {
+          ad.round();
+        }
+        expect(ad.round()).to.eql(true); // 46
+        expect(ad.round()).to.eql(true); // 47
+        expect(ad.round()).to.eql(false); // 48
+      });
+
+      it('handles an ordering bug', () => {
+        // Need to ensure that each unit takes it's turn in readability order y then x
+        for (let i = 0; i < 23; i++) {
+          ad.round();
+        }
+        ad.round();
+        // console.log(ad.render());
+        // console.log(ad.actors);
+        expect(ad.render()).to.eql(roundResults[4]);
+      });
+    });
+
+    describe('#runUntilFinished', () => {
+      it('#returns the score for a sample game', () => {
+        expect(ad.runUntilFinished()).to.eql(27730);
+      });
+
+      context('verification', () => {
+        const scores = [36334, 39514, 27755, 28944, 18740];
+        const roundInit = [
+          `
+#######
+#G..#E#
+#E#E.E#
+#G.##.#
+#...#E#
+#...E.#
+#######
+`.trim(),
+          `
+#######
+#E..EG#
+#.#G.E#
+#E.##E#
+#G..#.#
+#..E#.#
+#######
+`.trim(),
+          `
+#######
+#E.G#.#
+#.#G..#
+#G.#.G#
+#G..#.#
+#...E.#
+#######
+`.trim(),
+          `
+#######
+#.E...#
+#.#..G#
+#.###.#
+#E#G#G#
+#...#G#
+#######
+`.trim(),
+          `
+#########
+#G......#
+#.E.#...#
+#..##..G#
+#...##..#
+#...#...#
+#.G...G.#
+#.....G.#
+#########
+`.trim(),
+        ];
+        const roundResults = [
+          `
+#######
+#...#E#
+#E#...#
+#.E##.#
+#E..#E#
+#.....#
+#######
+`.trim(),
+          `
+#######
+#.E.E.#
+#.#E..#
+#E.##.#
+#.E.#.#
+#...#.#
+#######
+`.trim(),
+          `
+#######
+#G.G#.#
+#.#G..#
+#..#..#
+#...#G#
+#...G.#
+#######
+`.trim(),
+          `
+#######
+#.....#
+#.#G..#
+#.###.#
+#.#.#.#
+#G.G#G#
+#######
+`.trim(),
+          `
+#########
+#.G.....#
+#G.G#...#
+#.G##...#
+#...##..#
+#.G.#...#
+#.......#
+#.......#
+#########
+`.trim(),
+        ];
+        for (const [idx, score] of scores.entries()) {
+          it(`yields the expected result for ${idx}`, () => {
+            ad = new Advent(roundInit[idx]);
+            expect(ad.runUntilFinished()).to.eql(score);
+            expect(ad.render()).to.eql(roundResults[idx]);
+            // console.log(ad.render());
+            // console.log(ad.actors);
+          });
+        }
+      });
     });
   });
 
