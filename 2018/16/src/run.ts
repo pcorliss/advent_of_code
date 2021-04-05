@@ -10,11 +10,11 @@ const threeOrMoreCount = ad.samples.reduce((acc: number, sample) => {
   return acc;
 }, 0);
 
-console.log("Samples with three or more possible opcodes: ", threeOrMoreCount);
+console.log('Samples with three or more possible opcodes: ', threeOrMoreCount);
 
 const deductions = ad.reduceDeduce(ad.deduce());
-console.log("Deductions:", deductions);
+console.log('Deductions:', deductions);
 
-ad.registers = [0,0,0,0];
+ad.registers = [0, 0, 0, 0];
 ad.runInst();
-console.log("Registers:", ad.registers);
+console.log('Registers:', ad.registers);
