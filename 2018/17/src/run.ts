@@ -11,3 +11,11 @@ console.log("Wet Tiles: ", ad.wetTiles());
 
 // That's not the right answer; your answer is too low. 37066
 // Output seems to show weird gaps on overflows `|||||.||||||`
+
+for (const [line, num] of ad.grid.render().split('\n')) {
+  if (line.includes('|||.|||')) {
+    console.log("Line: ", line);
+    console.log(num);
+    break;
+  }
+}
