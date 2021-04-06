@@ -79,6 +79,7 @@ class Grid {
 class Advent {
   spring: [number, number];
   grid: Grid;
+  minY: number;
 
   constructor(input: string) {
     this.grid = new Grid();
@@ -91,10 +92,15 @@ class Advent {
       const [bValsStart, bValsEnd] = bVal.split('..').map((n) => parseInt(n));
       for (let i = bValsStart; i <= bValsEnd; i++) {
         const aValInt = parseInt(aVal);
-        if (aId == 'x') {
-          this.grid.set(aValInt, i, '#');
-        } else {
-          this.grid.set(i, aValInt, '#');
+        let x = aValInt;
+        let y = i;
+        if (aId == 'y') {
+          y = aValInt;
+          x = i;
+        }
+        this.grid.set(x, y, '#');
+        if (this.minY == null || y < this.minY) {
+          this.minY = y;
         }
       }
     }
@@ -107,7 +113,7 @@ class Advent {
     let paths: [number, number][] = [this.spring];
     while (paths.length > 0) {
       // console.log(this.grid.render());
-      console.log('Paths:', paths);
+      // console.log('Paths:', paths);
       if (paths.length > 20) {
         throw 'Too many paths!!!';
       }
@@ -119,6 +125,9 @@ class Advent {
         let pos = this.grid.get(x, y);
         while (!this.impassable.includes(pos) && y <= minMax[1][1]) {
           this.grid.set(x, y, '|');
+          if (y == 33) {
+            // console.log(this.grid.render().split('\n').slice(30,45).join('\n'));
+          }
           y++;
           pos = this.grid.get(x, y);
         }
@@ -162,6 +171,9 @@ class Advent {
               this.grid.set(maxX + 1, y, '|');
               rightOpen = true;
             }
+            if (y == 33) {
+              // console.log(this.grid.render().split('\n').slice(30,45).join('\n'));
+            }
           }
 
           // if barriers, fill, newPath.push([x, y - 1])
@@ -169,6 +181,10 @@ class Advent {
             for (let j = minX; j <= maxX; j++) {
               this.grid.set(j, y, '~');
             }
+            if (y == 33) {
+              // console.log(this.grid.render().split('\n').slice(30,45).join('\n'));
+            }
+            this.grid.set(x, y - 1, '|');
             newPaths.push([x, y - 1]);
           }
 
@@ -196,8 +212,24 @@ class Advent {
   }
 
   wetTiles(): number {
-    return [...this.grid.map.values()].reduce((acc, v) => {
-      return (acc += v == '~' || v == '|' ? 1 : 0);
+    return [...this.grid.map.entries()].reduce((acc, kv) => {
+      const [pair, v] = kv;
+      const [x, y] = this.grid.elegantUnpair(pair);
+      if (v == '~' || v == '|' && y >= this.minY) {
+        acc++;
+      }
+      return acc;
+    }, 0);
+  }
+
+  waterTiles(): number {
+    return [...this.grid.map.entries()].reduce((acc, kv) => {
+      const [pair, v] = kv;
+      const [x, y] = this.grid.elegantUnpair(pair);
+      if (v == '~' && y >= this.minY) {
+        acc++;
+      }
+      return acc;
     }, 0);
   }
 
