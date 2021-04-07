@@ -7,8 +7,8 @@ const ad = new Advent(input_str);
 ad.pourPrime();
 console.log(ad.grid.render());
 
-console.log("Wet Tiles: ", ad.wetTiles());
-console.log("Water Tiles: ", ad.waterTiles());
+console.log('Wet Tiles: ', ad.wetTiles());
+console.log('Water Tiles: ', ad.waterTiles());
 
 // That's not the right answer; your answer is too low. 37066
 // Output seems to show weird gaps on overflows `|||||.||||||`

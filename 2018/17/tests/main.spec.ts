@@ -89,14 +89,14 @@ y=13, x=498..504
       expect(ad.grid.get(501, 2)).to.eql('|');
       expect(ad.grid.get(502, 2)).to.eql('|');
       expect(ad.grid.get(502, 3)).to.eql('|');
-      expect(ad.grid.get(502,12)).to.eql('~');
+      expect(ad.grid.get(502, 12)).to.eql('~');
     });
 
     it('water flows off ledges equally');
   });
 
   describe('#pourPrime', () => {
-  const expectedRender: string = `
+    const expectedRender: string = `
 .....+......
 .....|.....#
 #..#||||...#
