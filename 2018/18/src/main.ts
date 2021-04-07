@@ -155,6 +155,36 @@ class Advent {
     }
     return valCount;
   }
+
+  findWithCycle(n: number): number {
+    const vals: number[] = [];
+    const possible: number[] = [];
+
+    for (let i = 0; i <= 1000; i++) {
+      const val = [...this.valueCount().values()].reduce(
+        (acc, v) => acc * v,
+        1,
+      );
+      if (val == 1) {
+        throw 'Val of 1!!!';
+      }
+      const idx = vals.indexOf(val);
+      vals.push(val);
+      if (idx > 0) {
+        if ((n - i) % (i - idx) == 0) {
+          console.log('Possible cycle @', i + (i - idx), i, idx, val);
+          possible.push(i + (i - idx));
+          if (possible.includes(i)) {
+            console.log('Prediction Correct: ', possible, i, idx, val);
+            return val;
+          }
+        }
+      }
+      this.step();
+      // console.log(this.grid.render() + '\n\n');
+    }
+    return 0;
+  }
 }
 
 export { Advent };

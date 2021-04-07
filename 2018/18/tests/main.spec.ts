@@ -1,5 +1,6 @@
 import { Advent } from '../src/main';
 import { expect } from 'chai';
+import fs = require('fs');
 
 describe('Advent', () => {
   const input: string = `
@@ -119,6 +120,18 @@ describe('Advent', () => {
       }
       expect(ad.valueCount().get('|')).to.eql(37);
       expect(ad.valueCount().get('#')).to.eql(31);
+    });
+  });
+
+  describe('#findWithCycle', () => {
+    const input_str: string = fs.readFileSync('spec_input.txt', 'utf8');
+
+    beforeEach(() => {
+      ad = new Advent(input_str);
+    });
+
+    it('returns the value at a particular step count', () => {
+      expect(ad.findWithCycle(1000)).to.eql(233020);
     });
   });
 });
