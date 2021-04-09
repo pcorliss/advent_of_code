@@ -60,23 +60,41 @@ describe('Advent', () => {
 ###############
         `.trim();
 
-    it('fills out the grid', () => {
+    it('fills out a more complicated grid', () => {
       ad.fill(ad.pathRegex);
       expect(ad.grid.render()).to.eql(expectedRender2);
     });
 
+    const expectedRender3: string = `
+###########
+#.|.#.|.#.#
+#-###-#-#-#
+#.|.|.#.#.#
+#-#####-#-#
+#.#.#X|.#.#
+#-#-#####-#
+#.#.|.|.|.#
+#-###-###-#
+#.|.|.#.|.#
+###########
+        `.trim();
+
+    it('handles dead-end paths', () => {
+      ad.fill('^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$');
+      expect(ad.grid.render()).to.eql(expectedRender3);
+    });
+
     const directionStep = {
-      // '^WNE$': 3,
-      // '^(EN|WS)$': 2,
-      // '^N(E|W)N$': 3,
-      // '^ENWWW(NEEE|SSE(EE|N))$': 10,
-      // '^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$': 18,
-      // '^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$': 23,
-      // '^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$': 31,
+      '^WNE$': 3,
+      '^(EN|WS)$': 2,
+      '^N(E|W)N$': 3,
+      '^ENWWW(NEEE|SSE(EE|N))$': 10,
+      '^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$': 18,
+      '^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$': 23,
+      '^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$': 31,
     };
     for (const [inp, steps] of Object.entries(directionStep)) {
       it(`returns the max steps ${steps} required for ${inp}`, () => {
-        console.log(ad.grid.render());
         expect(ad.fill(inp)).to.eql(steps);
       });
     }

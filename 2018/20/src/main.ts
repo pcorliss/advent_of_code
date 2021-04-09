@@ -107,10 +107,22 @@ class Advent {
   }
 
   fill(path: string): number {
-    const stack: Array<any> = [];
-    let branches: Array<any> = [[0, 0]];
-    let newBranches: Array<any> = [];
+    const stack: [number, number][] = [];
+    let branches: [number, number][] = [[0, 0]];
+    let newBranches: [number, number][] = [];
+    const stepGrid = new Grid<number>();
+    let points = new Set<string>();
+
     for (const [idx, char] of path.split('').entries()) {
+      console.log(
+        char,
+        idx,
+        '/',
+        path.length,
+        stack.length,
+        branches.length,
+        this.grid.minMax()
+      );
       switch (char) {
         case '^':
         case '(':
@@ -120,30 +132,55 @@ class Advent {
         case ')':
         case '$':
           stack.pop();
-          newBranches.concat(branches);
-          branches = newBranches;
+          newBranches = newBranches.concat(branches);
+          // console.log(char, ...branches, 'New Branches:', ...newBranches);
+          points = new Set<string>();
+          for (let i = 0; i < newBranches.length; i++) {
+            points.add(newBranches[i].toString());
+          }
+          branches = [];
+          for (const point of points.keys()) {
+            const [x, y] = point.split(',', 2).map((n) => parseInt(n));
+            branches.push([x, y]);
+          }
+          newBranches = branches;
           break;
         case '|':
-          newBranches.concat(branches);
+          // console.log('NB', newBranches);
+          // console.log('B', branches);
+          // console.log('S', stack);
+          newBranches = newBranches.concat(branches);
           branches = this.deepCopy(stack[stack.length - 1]);
+          // console.log(char, ...branches, 'New Branches:', ...newBranches);
+          // console.log('NB', newBranches);
+          // console.log('B', branches);
+          // console.log('S', stack);
+          // throw "Fubar";
           break;
         default:
           for (let i = 0; i < branches.length; i++) {
             let [x, y] = branches[i];
+            const currentSteps = stepGrid.get(x, y) || 0;
             const [xD, yD] = this.directionMap[char];
             const dirBit = this.directionBitMap[char];
             const revBit = this.reverseDirectionBitMap[char];
-            this.grid.set(x, y, (this.grid.get(x, y) || 0) + dirBit);
+            this.grid.set(x, y, (this.grid.get(x, y) || 0) | dirBit);
             x += xD;
             y += yD;
             branches[i] = [x, y];
-            this.grid.set(x, y, (this.grid.get(x, y) || 0) + revBit);
-            console.log(char, ...stack);
-            console.log(this.grid.render());
+            this.grid.set(x, y, (this.grid.get(x, y) || 0) | revBit);
+            if (stepGrid.get(x, y) == null) {
+              stepGrid.set(x, y, currentSteps + 1);
+            }
+            // console.log(char, ...stack);
+            // console.log(this.grid.render());
+            // console.log(`Vals:`, stepGrid.entries());
           }
       }
     }
-    return 0;
+    // console.log(this.grid.render());
+    // console.log(stepGrid.entries());
+    return Math.max(...stepGrid.map.values());
   }
 
   // fill(path: string): number {
