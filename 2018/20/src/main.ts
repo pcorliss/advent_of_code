@@ -75,6 +75,7 @@ class Grid<T> {
 class Advent {
   pathRegex: string;
   grid: Grid<number>;
+  stepGrid: Grid<number>;
 
   constructor(input: string) {
     this.pathRegex = input;
@@ -110,7 +111,7 @@ class Advent {
     const stack: [number, number][] = [];
     let branches: [number, number][] = [[0, 0]];
     let newBranches: [number, number][] = [];
-    const stepGrid = new Grid<number>();
+    this.stepGrid = new Grid<number>();
     let points = new Set<string>();
 
     for (const [idx, char] of path.split('').entries()) {
@@ -160,7 +161,7 @@ class Advent {
         default:
           for (let i = 0; i < branches.length; i++) {
             let [x, y] = branches[i];
-            const currentSteps = stepGrid.get(x, y) || 0;
+            const currentSteps = this.stepGrid.get(x, y) || 0;
             const [xD, yD] = this.directionMap[char];
             const dirBit = this.directionBitMap[char];
             const revBit = this.reverseDirectionBitMap[char];
@@ -169,8 +170,8 @@ class Advent {
             y += yD;
             branches[i] = [x, y];
             this.grid.set(x, y, (this.grid.get(x, y) || 0) | revBit);
-            if (stepGrid.get(x, y) == null) {
-              stepGrid.set(x, y, currentSteps + 1);
+            if (this.stepGrid.get(x, y) == null) {
+              this.stepGrid.set(x, y, currentSteps + 1);
             }
             // console.log(char, ...stack);
             // console.log(this.grid.render());
@@ -180,7 +181,7 @@ class Advent {
     }
     // console.log(this.grid.render());
     // console.log(stepGrid.entries());
-    return Math.max(...stepGrid.map.values());
+    return Math.max(...this.stepGrid.map.values());
   }
 
   // fill(path: string): number {
