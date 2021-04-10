@@ -76,9 +76,9 @@ class Advent {
   step(bug = false): void {
     const instructionPointer = this.registers[this.instructionPointerRegister];
     const instruction = this.instructions[instructionPointer];
-    const startingRegister = this.registers.slice();
-    this.process(...instruction);
     if (bug) {
+      const startingRegister = this.registers.slice();
+      this.process(...instruction);
       console.log(
         'ip=',
         instructionPointer,
@@ -86,6 +86,8 @@ class Advent {
         instruction,
         this.registers,
       );
+    } else {
+      this.process(...instruction);
     }
     this.registers[this.instructionPointerRegister]++;
   }
@@ -97,8 +99,28 @@ class Advent {
 
   run(bug = false, max = Infinity): void {
     let i = 0;
+    const seen = new Set<number>();
+
+    let pow = 10000;
+    let previousVal = 0;
     while (i < max && !this.halt()) {
       this.step(bug);
+      if (this.registers[2] == 30) { 
+        if (seen.has(this.registers[5])) {
+          console.log(
+            `Cycle Detected after ${i} steps`,
+            this.registers,
+            previousVal,
+          );
+          return;
+        }
+        seen.add(this.registers[5]);
+        previousVal = this.registers[5];
+      }
+      if (i == pow) {
+        console.log(`Steps: ${i}, Set Size: ${seen.size}`);
+        pow *= 10;
+      }
       i++;
     }
   }
