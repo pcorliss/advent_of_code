@@ -105,7 +105,7 @@ class Advent {
     let previousVal = 0;
     while (i < max && !this.halt()) {
       this.step(bug);
-      if (this.registers[2] == 30) { 
+      if (this.registers[2] == 30) {
         if (seen.has(this.registers[5])) {
           console.log(
             `Cycle Detected after ${i} steps`,
@@ -115,6 +115,7 @@ class Advent {
           return;
         }
         seen.add(this.registers[5]);
+        console.log(`Added ${this.registers[5]}`);
         previousVal = this.registers[5];
       }
       if (i == pow) {
