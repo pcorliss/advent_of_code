@@ -175,29 +175,38 @@ class Advent {
     const paths: [number, number, number][][] = [[[0, 0, 1]]];
     // visited[x][y][equip] == true
     const visited: boolean[][][] = [[[]]];
+    for (let y = 0; y <= yDest + 1000; y++) {
+      for (let x = 0; x <= xDest + 1000; x++) {
+        visited[x] ||= [];
+        visited[x][y] ||= [];
+      }
+    }
 
     while (true) {
-      paths[minutes] ||= [];
-      if (minutes > 1000) {
+      if (minutes > 10000) {
         console.log(paths);
         // console.log(visited);
         throw 'Minutes Exceeded!!!';
       }
-      console.log('Paths: ', minutes, 'Num Paths:', paths[minutes].length);
+      console.log('Mins: ', minutes, 'Num Paths:', paths[minutes].length);
+      paths[minutes] ||= [];
+      paths[1 + minutes] ||= [];
+      paths[8 + minutes] ||= [];
+      paths[15 + minutes] ||= [];
       for (const [x, y, e] of paths[minutes]) {
         if (x == xDest && y == yDest) return minutes;
-        visited[x] ||= [];
-        visited[x][y] ||= [];
-        if (true || !visited[x][y][e]) {
+        if (!visited[x][y][e]) {
           visited[x][y][e] = true;
           for (const [xD, yD] of this.adjacent) {
             const [newX, newY] = [x + xD, y + yD];
-            if (newX >= 0 && newY >= 0) {
+            if (
+              newX >= 0 &&
+              newY >= 0 // &&
+              // newX < xDest + 10 &&
+              // newY < yDest + 10
+            ) {
               const [min, newE] = this.move(x, y, e, newX, newY);
-              visited[newX] ||= [];
-              visited[newX][newY] ||= [];
               if (!visited[newX][newY][newE]) {
-                paths[min + minutes] ||= [];
                 paths[min + minutes].push([newX, newY, newE]);
                 // console.log('Move and Push:', newX, newY, newE, min + minutes);
               }
