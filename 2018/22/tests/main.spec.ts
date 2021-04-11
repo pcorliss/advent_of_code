@@ -98,4 +98,55 @@ target: 10,10
       expect(ad.risk()).to.eql(114);
     });
   });
+
+  describe('#move', () => {
+    // Neither == 0
+    // Torch == 1
+    // Climbing == 2
+    it('returns 1 minute if the terrain does not require a tool change', () => {
+      expect(ad.move(0, 0, 1, 0, 1)[0]).to.eql(1);
+      expect(ad.move(0, 1, 1, 1, 1)[0]).to.eql(1);
+    });
+
+    it('returns the same tool if the terrain does not require a tool change', () => {
+      expect(ad.move(0, 0, 1, 0, 1)[1]).to.eql(1);
+      expect(ad.move(0, 1, 1, 1, 1)[1]).to.eql(1);
+    });
+
+    it('returns 7 minutes if it requires a tool change', () => {
+      expect(ad.move(1, 1, 1, 1, 0)[0]).to.eql(8);
+    });
+
+    it('returns the new tool if it requires a tool change', () => {
+      expect(ad.move(1, 1, 1, 1, 0)[1]).to.eql(0);
+    });
+
+    it('Finally, once you reach the target, you need the torch equipped before you can find him in the dark', () => {
+      expect(ad.move(10, 11, 1, 10, 10)).to.eql([1, 1]); // Rocky -> Rocky
+      expect(ad.move(10, 11, 2, 10, 10)).to.eql([8, 1]); // Rocky -> Rocky -> Torch
+      expect(ad.move(10, 9, 2, 10, 10)).to.eql([15, 1]); // Wet -> Rocky -> Torch
+    });
+  });
+
+  describe('#findPath', () => {
+    it('returns 1 for a single move with no tool changes', () => {
+      expect(ad.findPath(0, 1)).to.eql(1);
+    });
+
+    it('returns 8 for a single move with one tool change', () => {
+      expect(ad.findPath(1, 0)).to.eql(8);
+    });
+
+    it('returns 2 for a 2 moves with no tool changes', () => {
+      expect(ad.findPath(1, 1)).to.eql(2);
+    });
+
+    it('returns 12 for 5 moves with one tool changes', () => {
+      expect(ad.findPath(4, 1)).to.eql(12);
+    });
+
+    it('returns 45 for 24 moves with three tool changes', () => {
+      expect(ad.findPath(10, 10)).to.eql(45);
+    });
+  });
 });

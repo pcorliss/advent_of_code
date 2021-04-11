@@ -5,4 +5,4 @@ const input_str: string = fs.readFileSync('input.txt', 'utf8');
 
 const ad = new Advent(input_str);
 const risk = ad.risk();
-console.log("Risk", risk);
+console.log('Risk', risk);

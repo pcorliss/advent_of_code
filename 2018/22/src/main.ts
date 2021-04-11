@@ -117,6 +117,99 @@ class Advent {
     }
     return sum;
   }
+
+  // This would be more efficient as a bit set
+  allowedEquip = [
+    new Set([2, 1]), // Rocky - Climbing, Torch
+    new Set([2, 0]), // Wet - Climbing, Neither
+    new Set([1, 0]), // Narrow - Torch, Neither
+  ];
+
+  move(
+    xStart: number,
+    yStart: number,
+    equip: number,
+    xDest: number,
+    yDest: number,
+  ): [number, number] {
+    // In rocky regions, you can use the climbing gear or the torch.
+    // In wet regions, you can use the climbing gear or neither tool.
+    // In narrow regions, you can use the torch or neither tool.
+    // rocky == '.' == 0 == [2, 1]
+    // wet == '=' == 1 == [2, 0]
+    // narrow == '|' == 2 == [1, 0]
+
+    const curCon = this.conditionLevel(xStart, yStart);
+    const destCon = this.conditionLevel(xDest, yDest);
+
+    if (xDest == this.target[0] && yDest == this.target[1]) {
+      if (equip == 1) {
+        return [1, 1];
+      }
+      const newEquip = [...this.allowedEquip[curCon]].find((n) => n != equip);
+      if (newEquip == 1) {
+        return [8, 1];
+      } else {
+        return [15, 1];
+      }
+    }
+
+    if (curCon == destCon) return [1, equip];
+    if (this.allowedEquip[destCon].has(equip)) return [1, equip];
+
+    const newEquip = [...this.allowedEquip[curCon]].find((n) => n != equip);
+    return [8, newEquip];
+  }
+
+  adjacent = [
+    [-1, 0],
+    [1, 0],
+    [0, 1],
+    [0, -1],
+  ];
+
+  findPath(xDest: number, yDest: number): number {
+    // You start at 0,0 (the mouth of the cave) with the torch equipped
+    let minutes = 0;
+    // [x, y, equip]
+    const paths: [number, number, number][][] = [[[0, 0, 1]]];
+    // visited[x][y][equip] == true
+    const visited: boolean[][][] = [[[]]];
+
+    while (true) {
+      paths[minutes] ||= [];
+      if (minutes > 1000) {
+        console.log(paths);
+        // console.log(visited);
+        throw 'Minutes Exceeded!!!';
+      }
+      console.log('Paths: ', minutes, 'Num Paths:', paths[minutes].length);
+      for (const [x, y, e] of paths[minutes]) {
+        if (x == xDest && y == yDest) return minutes;
+        visited[x] ||= [];
+        visited[x][y] ||= [];
+        if (true || !visited[x][y][e]) {
+          visited[x][y][e] = true;
+          for (const [xD, yD] of this.adjacent) {
+            const [newX, newY] = [x + xD, y + yD];
+            if (newX >= 0 && newY >= 0) {
+              const [min, newE] = this.move(x, y, e, newX, newY);
+              visited[newX] ||= [];
+              visited[newX][newY] ||= [];
+              if (!visited[newX][newY][newE]) {
+                paths[min + minutes] ||= [];
+                paths[min + minutes].push([newX, newY, newE]);
+                // console.log('Move and Push:', newX, newY, newE, min + minutes);
+              }
+            }
+          }
+        }
+      }
+      minutes++;
+    }
+
+    return minutes;
+  }
 }
 
 export { Advent };
