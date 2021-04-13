@@ -32,6 +32,37 @@ Infection:
         t: 'Immune',
       });
     });
+
+    it('handles differently ordered immunities and weaknesses', () => {
+      const orderedInput: string = `
+Immune System:
+7501 units each with 6943 hit points (weak to cold; immune to slashing) with an attack that does 1 radiation damage at initiative 8
+2907 units each with 51667 hit points (weak to slashing; immune to bludgeoning) with an attack that does 32 fire damage at initiative 1
+    `.trim();
+      ad = new Advent(orderedInput);
+      expect(ad.groups).to.have.lengthOf(2);
+      expect(ad.groups[0].weak).to.eql(['cold']);
+      expect(ad.groups[1].weak).to.eql(['slashing']);
+      expect(ad.groups[0].immune).to.eql(['slashing']);
+      expect(ad.groups[1].immune).to.eql(['bludgeoning']);
+    });
+
+    it('handles no weaknesses or immunities', () => {
+      const orderedInput: string = `
+Immune System:
+4391 units each with 3250 hit points with an attack that does 7 cold damage at initiative 19
+1383 units each with 3687 hit points with an attack that does 26 radiation damage at initiative 15
+2412 units each with 2787 hit points with an attack that does 9 bludgeoning damage at initiative 20
+    `.trim();
+      ad = new Advent(orderedInput);
+      expect(ad.groups).to.have.lengthOf(3);
+      expect(ad.groups[0].weak).to.have.lengthOf(0);
+      expect(ad.groups[1].weak).to.have.lengthOf(0);
+      expect(ad.groups[2].weak).to.have.lengthOf(0);
+      expect(ad.groups[0].immune).to.have.lengthOf(0);
+      expect(ad.groups[1].immune).to.have.lengthOf(0);
+      expect(ad.groups[2].immune).to.have.lengthOf(0);
+    });
   });
 
   describe('#effectivePower', () => {
@@ -136,6 +167,13 @@ Infection:
       const [a, b, , d] = ad.groups;
       ad.groups = [a, b, d];
       expect(ad.targetSelection().get(b)).to.be.undefined;
+    });
+
+    it('does not select dead targets', () => {
+      const [a, b, c, d] = ad.groups;
+      a.count = 0;
+      expect(ad.targetSelection().get(c)).to.eql(b);
+      expect(ad.targetSelection().get(d)).to.be.undefined;
     });
   });
 

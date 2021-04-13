@@ -14,7 +14,8 @@ class Advent {
 
   constructor(input: string) {
     this.groups = [];
-    const reGroup = /^(\d+) units each with (\d+) hit points \((immune to ([\w, ]*)){0,1}.*?(weak to ([\w, ]*)){0,1}\) with an attack that does (\d+) (\w+) damage at initiative (\d+)$/;
+    // const reGroup = /^(\d+) units each with (\d+) hit points \((immune to ([\w, ]*)){0,1}.*?(weak to ([\w, ]*)){0,1}\) with an attack that does (\d+) (\w+) damage at initiative (\d+)$/;
+    const reGroup = /^(\d+) units each with (\d+) hit points\s*\(*(.*?)\)*\s*with an attack that does (\d+) (\w+) damage at initiative (\d+)$/;
     let t = '';
     for (const line of input.split('\n')) {
       if (line.startsWith('Immune System')) {
@@ -26,15 +27,24 @@ class Advent {
         const g: Group = {
           count: parseInt(m[1]),
           hp: parseInt(m[2]),
-          dps: parseInt(m[7]),
-          dmgT: m[8],
-          init: parseInt(m[9]),
+          dps: parseInt(m[4]),
+          dmgT: m[5],
+          init: parseInt(m[6]),
           t: t,
           immune: [],
           weak: [],
         };
-        if (m[4]) g.immune = m[4].split(', ');
-        if (m[6]) g.weak = m[6].split(', ');
+        if (m[3]) {
+          for (const s of m[3].split('; ')) {
+            const [type, itemsStr] = s.split(' to ');
+            const items = itemsStr.split(', ');
+            if (type == 'weak') {
+              g.weak = items;
+            } else {
+              g.immune = items;
+            }
+          }
+        }
         this.groups.push(g);
       }
     }
@@ -63,7 +73,7 @@ class Advent {
 
     for (const g of groups) {
       const target = targets
-        .filter((t) => t.t != g.t)
+        .filter((t) => t.t != g.t && t.count > 0)
         .sort((a, b) => {
           return (
             this.damage(g, b) * 1000 +
@@ -83,16 +93,16 @@ class Advent {
     return m;
   }
 
-  attack(targetMap: Map<Group, Group>): void {
+  attack(targetMap: Map<Group, Group>, bug = false): void {
     for (const attacker of this.groups.sort((a, b) => b.init - a.init)) {
-      // console.log('Attacker: ', attacker.count);
       if (attacker.count > 0) {
+        if (bug) console.log(attacker.t, ': ', attacker.count);
         const defender = targetMap.get(attacker);
         if (defender) {
-          // console.log ('\tDefender: ', defender.count);
+          const initCount = defender.count;
           const damage = this.damage(attacker, defender);
           this.applyDamage(damage, defender);
-          // console.log ('\tDefender: ', defender.count, damage);
+          if (bug) console.log ('\t', defender.t, ': ', 'Starting Count:', initCount, 'Dmg:', damage, 'Killed:', initCount - defender.count);
         }
       }
     }
@@ -117,10 +127,13 @@ class Advent {
     return [...count.values()].includes(0);
   }
 
-  combat(): void {
+  combat(bug = false): void {
+    let i = 1;
     while (!this.halt()) {
+      if (bug) console.log('\nRound: ', i);
       const targets = this.targetSelection();
-      this.attack(targets);
+      this.attack(targets, bug);
+      i++;
     }
   }
 }
