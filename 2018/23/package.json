@@ -17,6 +17,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "mocha": "^8.3.2",
     "prettier": "^2.2.1",
+    "prioqueue": "^1.0.0",
     "rimraf": "^3.0.2",
     "ts-mocha": "^8.0.0",
     "ts-node": "^9.1.1",
