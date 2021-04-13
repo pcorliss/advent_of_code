@@ -102,7 +102,18 @@ class Advent {
           const initCount = defender.count;
           const damage = this.damage(attacker, defender);
           this.applyDamage(damage, defender);
-          if (bug) console.log ('\t', defender.t, ': ', 'Starting Count:', initCount, 'Dmg:', damage, 'Killed:', initCount - defender.count);
+          if (bug)
+            console.log(
+              '\t',
+              defender.t,
+              ': ',
+              'Starting Count:',
+              initCount,
+              'Dmg:',
+              damage,
+              'Killed:',
+              initCount - defender.count,
+            );
         }
       }
     }
@@ -118,22 +129,41 @@ class Advent {
     );
   }
 
-  halt(): boolean {
+  unitCount(): Map<string, number> {
     const count = new Map<string, number>();
     for (const g of this.groups) {
       const unitCount = (count.get(g.t) || 0) + g.count;
       count.set(g.t, unitCount);
     }
-    return [...count.values()].includes(0);
+    return count;
+  }
+
+  deadlock(prev: Map<string, number>): boolean {
+    return [...this.unitCount().entries()].reduce((acc, kv) => {
+      const [t, count] = kv;
+      return acc && count == prev.get(t);
+    }, true);
+  }
+
+  halt(): boolean {
+    return [...this.unitCount().values()].includes(0);
   }
 
   combat(bug = false): void {
     let i = 1;
-    while (!this.halt()) {
+    let prev = new Map<string, number>();
+    while (!this.halt() && !this.deadlock(prev)) {
+      prev = this.unitCount();
       if (bug) console.log('\nRound: ', i);
       const targets = this.targetSelection();
       this.attack(targets, bug);
       i++;
+    }
+  }
+
+  boost(n: number): void {
+    for (const g of this.groups.filter((t) => t.t == 'Immune')) {
+      g.dps += n;
     }
   }
 }

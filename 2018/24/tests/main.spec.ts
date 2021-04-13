@@ -207,5 +207,33 @@ Immune System:
       ad.combat();
       expect(ad.groups.reduce((acc, g) => acc + g.count, 0)).to.eql(5216);
     });
+
+    it('boosted combat has a different result', () => {
+      ad.boost(1570);
+      ad.combat();
+      expect(ad.groups.reduce((acc, g) => acc + g.count, 0)).to.eql(51);
+    });
+  });
+
+  describe('#boost', () => {
+    it('boosts the immune system dps', () => {
+      ad.boost(1570);
+      expect(ad.groups[0].dps).to.eql(6077);
+      expect(ad.groups[1].dps).to.eql(1595);
+    });
+  });
+
+  describe('#deadlock', () => {
+    it('returns false', () => {
+      const prev = ad.unitCount();
+      const targets = ad.targetSelection();
+      ad.attack(targets);
+      expect(ad.deadlock(prev)).to.be.false;
+    });
+
+    it('returns true if the state has not changed', () => {
+      const prev = ad.unitCount();
+      expect(ad.deadlock(prev)).to.be.true;
+    });
   });
 });
