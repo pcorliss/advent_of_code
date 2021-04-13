@@ -113,16 +113,6 @@ class Advent {
 
   cubeIntersections(x: number, y: number, z: number, d: number): number {
     const dim = d - 1;
-    const points = [
-      [x, y, z],
-      [x + dim, y, z],
-      [x, y + dim, z],
-      [x, y, z + dim],
-      [x + dim, y + dim, z],
-      [x + dim, y, z + dim],
-      [x, y + dim, z + dim],
-      [x + dim, y + dim, z + dim],
-    ];
     const [xC, yC, zC] = [
       x + Math.floor(dim / 2),
       y + Math.floor(dim / 2),
@@ -149,7 +139,7 @@ class Advent {
 
       const distToCenter =
         Math.abs(xC - xB) + Math.abs(yC - yB) + Math.abs(zC - zB);
-      if (distToCenter - (dim * 3) <= r) {
+      if (distToCenter - dim * 3 <= r) {
         if (bug) {
           console.log(
             'distCenter:',
@@ -170,16 +160,8 @@ class Advent {
 
       if (bug) {
         console.log('NoMatch:', xB, yB, zB, r, distToCenter - dim);
-        }
+      }
       return count;
-
-      // within range of a point
-      // notably this is not a plane intersection, which could be a problem with large boxes
-      // const pointWithinRange = points.some((p) => {
-      //   const [xP, yP, zP] = p;
-      //   return Math.abs(xP - xB) + Math.abs(yP - yB) + Math.abs(zP - zB) <= r;
-      // });
-      // return count + (pointWithinRange ? 1 : 0);
     }, 0);
   }
 
@@ -215,12 +197,7 @@ class Advent {
     );
     // We're not going to worry that for now we rely on regular sized cubes
     const initScore = this.cubeIntersections(minX, minY, minZ, maxDim);
-    // const initScore = this.cubeIntersections(58376721, 24011800, 22112521, 10);
-    // const initScore = this.scoreTinyCube(58376721, 24011800, 22112521);
-    // return initScore;
     q.enqueue(initScore, [minX, minY, minZ, maxDim]);
-    // q.enqueue(initScore, [58376711, 24011790, 22112501, 10000000]);
-    // console.log(q); console.log(q.peek());
 
     const candidates: [number, number, number, number][] = [];
     let bestScore = 0;
@@ -234,8 +211,8 @@ class Advent {
         item,
         'Candidates:',
         candidates.length,
+        'Best:',
         bestScore,
-        candidates[0],
       );
       const o = item.value;
 
