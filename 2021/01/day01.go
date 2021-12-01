@@ -52,7 +52,7 @@ func Part2(input string) int {
 	depths := StringToNums(input)
 	prev := 0
 	count := 0
-	for i, _ := range depths {
+	for i := range depths {
 		if i > len(depths)-3 {
 			break
 		}
