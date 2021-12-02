@@ -6,6 +6,9 @@ jobs:
     container:
       image: blacktop/httpie
     steps:
-    - name: HTTP Pie Works
-      run: "http -v GET pie.dev/get"
-
+    #- name: HTTP Pie Works
+    #  run: "http -v GET pie.dev/get"
+    - name: Set env
+      run: echo "HELLO=world" >> $GITHUB_ENV
+    - name: Test
+      run: echo $HELLO
