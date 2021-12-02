@@ -1,5 +1,5 @@
 # Advent of Code Solutions
-![](https://img.shields.io/badge/Stars%20⭐-0-yellow)
+![](https://img.shields.io/badge/Stars%20⭐-2-yellow)
 
 My solutions to https://adventofcode.com/
 
