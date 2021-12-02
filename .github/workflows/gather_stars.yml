@@ -5,8 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: blacktop/httpie
-
-          
+    env:
+      SESSION: ${{ secrets.AOC_SESSION }} 
+      USERID: 1063637
     steps:
     #- name: HTTP Pie Works
     #  run: "http -v GET pie.dev/get"
@@ -16,5 +17,12 @@ jobs:
       run: echo $HELLO
     - name: Echo
       run: "echo $SESSION | tr '0-9' '.'"
-      env:
-        SESSION: ${{ secrets.AOC_SESSION }}
+    - name: Download Leaderboards
+      run: 'for YEAR in `seq 2020 2021`; do http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION; done'
+    - name: Sum Stars
+      run: |
+        echo STARS=$(cat $USERID.json* | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
+    - name: Test
+      run: echo $STARS
+      
+
