@@ -17,5 +17,14 @@ jobs:
         echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
     - name: Test
       run: echo $STARS
+    - name: Create Awesome Badge
+      uses: schneegans/dynamic-badges-action@v1.1.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 2cc2a13636cb044176c0fa1e7bcf7ec2
+        filename: test.json
+        label: Cake
+        message: Pie
+        color: orange
       
 
