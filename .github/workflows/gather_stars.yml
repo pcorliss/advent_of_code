@@ -5,6 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: blacktop/httpie
+
+          
     steps:
     #- name: HTTP Pie Works
     #  run: "http -v GET pie.dev/get"
@@ -12,3 +14,7 @@ jobs:
       run: echo "HELLO=world" >> $GITHUB_ENV
     - name: Test
       run: echo $HELLO
+    - name: Echo
+      run: "echo $SESSION | tr '0-9' '.'"
+      env:
+        SESSION: ${{ secrets.AOC_SESSION }}
