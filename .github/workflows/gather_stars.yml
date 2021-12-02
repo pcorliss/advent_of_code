@@ -7,5 +7,5 @@ jobs:
       image: blacktop/httpie
     steps:
     - name: HTTP Pie Works
-      run: 'http -v pie.dev/get'
+      run: "http -v GET pie.dev/get"
 
