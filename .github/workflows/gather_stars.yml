@@ -1,0 +1,13 @@
+name: GitHub Actions Demo
+on: [push]
+jobs:
+  gather-stars:
+    runs-on: ubuntu-latest
+    container:
+      image: blacktop/httpie
+    with:
+      entrypoint: sh
+    steps:
+    - name: HTTP Pie Works
+      run: 'http -v pie.dev/get'
+
