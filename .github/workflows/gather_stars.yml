@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Download Leaderboards
       run: |
-        for YEAR in `seq 2020 2021`; do
+        for YEAR in `seq 2015 2021`; do
           http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION >> $YEAR.json
         done
         echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
@@ -22,9 +22,9 @@ jobs:
       with:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 2cc2a13636cb044176c0fa1e7bcf7ec2
-        filename: test.json
-        label: Cake
-        message: Pie
-        color: orange
+        filename: aoc_stars.json
+        label: $STARS
+        message: ${{ env.STARS }}
+        color: yellow
       
 
