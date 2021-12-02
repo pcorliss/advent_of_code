@@ -1,18 +1,11 @@
-# Advent of Code 2020
+# Advent of Code Solutions
 
-My solutions to https://adventofcode.com/2020
+My solutions to https://adventofcode.com/
 
-## Templates
+* 2015-2017, 2019-2020 Written in Ruby
+* 2018 Written in Typescript
+* 2021 Written in Go
 
-```
-./daily.sh <ChallengeName>
-```
+All solutions were test-driven and yield the correct answers for my input.
 
-```
-cp -pr blank 06
-cd 06
-find . | grep rb | xargs sed -i 's/blank/<challenge>/g'
-find . | grep rb | xargs sed -i 's/Blank/<day>/g'
-mv blank.rb customs.rb
-mv spec/blank_spec.rb spec/customs_spec.rb
-```
+![](https://img.shields.io/badge/stars%20⭐-0-yellow)
