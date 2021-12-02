@@ -5,8 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: blacktop/httpie
-      options: '--entrypoint=sh'
     steps:
     - name: HTTP Pie Works
-      run: 'http -v pie.dev/get'
+      run: '-v pie.dev/get'
 
