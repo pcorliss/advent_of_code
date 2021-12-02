@@ -1,4 +1,5 @@
 # Advent of Code Solutions
+![](https://img.shields.io/badge/Stars%20⭐-0-yellow)
 
 My solutions to https://adventofcode.com/
 
@@ -8,4 +9,3 @@ My solutions to https://adventofcode.com/
 
 All solutions were test-driven and yield the correct answers for my input.
 
-![](https://img.shields.io/badge/stars%20⭐-0-yellow)
