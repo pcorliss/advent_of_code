@@ -60,5 +60,21 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	return 0
+	directions := StringToDirs(input)
+	depth := 0
+	pos := 0
+	aim := 0
+	for _, direction := range directions {
+		switch direction.dir {
+		case "up":
+			aim -= direction.mag
+		case "down":
+			aim += direction.mag
+		case "forward":
+			pos += direction.mag
+			depth += direction.mag * aim
+		}
+	}
+	fmt.Println("Pos: ", pos, "Depth: ", depth, "Aim: ", aim)
+	return depth * pos
 }
