@@ -23,7 +23,7 @@ jobs:
         auth: ${{ secrets.GIST_SECRET }}
         gistID: 2cc2a13636cb044176c0fa1e7bcf7ec2
         filename: aoc_stars.json
-        label: Stars
+        label: "Stars%20⭐"
         message: ${{ env.STARS }}
         color: yellow
       
