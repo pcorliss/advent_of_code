@@ -12,9 +12,9 @@ jobs:
     - name: Download Leaderboards
       run: |
         for YEAR in `seq 2020 2021`; do
-          http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION >> out.json
+          http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION >> $YEAR.json
         done
-        echo STARS=$(cat out.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
+        echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
     - name: Test
       run: echo $STARS
       
