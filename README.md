@@ -1,7 +1,5 @@
 # Advent of Code Solutions
-![](https://img.shields.io/badge/Stars%20⭐-2-yellow)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/pcorliss/2cc2a13636cb044176c0fa1e7bcf7ec2/raw/8ddfb3e3909424df03fe4f13a2ec4369b2904051/aoc_stars.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/pcorliss/2cc2a13636cb044176c0fa1e7bcf7ec2/raw/8c9dc172a94f516a0d678cdcef8241efff5d6cb8/test.json)
+![badge](https://img.shields.io/endpoint?label=Stars%20%E2%AD%90&url=https%3A%2F%2Fgist.githubusercontent.com%2Fpcorliss%2F2cc2a13636cb044176c0fa1e7bcf7ec2%2Fraw%2Faoc_stars.json)
 
 My solutions to https://adventofcode.com/
 
