@@ -1,0 +1,28 @@
+name: Gather AOC Stars
+on: [push]
+jobs:
+  gather-stars:
+    runs-on: ubuntu-latest
+    container:
+      image: blacktop/httpie
+    env:
+      SESSION: ${{ secrets.AOC_SESSION }} 
+      USERID: 1063637
+    steps:
+    - name: Download Leaderboards
+      run: |
+        for YEAR in `seq 2015 2021`; do
+          http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION >> $YEAR.json
+        done
+        echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
+    - name: Show Stars
+      run: echo $STARS
+    - name: Create Awesome Badge
+      uses: schneegans/dynamic-badges-action@v1.1.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: 2cc2a13636cb044176c0fa1e7bcf7ec2
+        filename: aoc_stars.json
+        label: 'Stars'
+        message: ${{ env.STARS }}
+        color: yellow
