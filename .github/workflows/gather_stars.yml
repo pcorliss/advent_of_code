@@ -1,3 +1,4 @@
+# Inspired By https://github.com/J0B10/aoc-badges-action#sample-workflow
 name: Gather AOC Stars
 on: [push]
 jobs:
