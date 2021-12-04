@@ -28,6 +28,8 @@ func TestPart1(t *testing.T) {
 	assert.Equal(t, Part1(inputStr)[2], 198, "they should be equal")
 }
 
-// func TestPart2(t *testing.T) {
-// 	assert.Equal(t, Part2(inputStr), 241861950, "they should be equal")
-// }
+func TestPart2(t *testing.T) {
+	assert.Equal(t, Part2(inputStr)[0], 23, "they should be equal")
+	assert.Equal(t, Part2(inputStr)[1], 10, "they should be equal")
+	assert.Equal(t, Part2(inputStr)[2], 230, "they should be equal")
+}
