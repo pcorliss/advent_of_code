@@ -66,10 +66,91 @@ func StringToBoards(input string) [][5][5]int {
 	return boards
 }
 
-func Part1(input string) int {
-	return 0
+// set := make(map[string]bool)
+func WinningBoard(called map[int]bool, board [5][5]int) bool {
+	matchesVertical := [5]int{}
+	matchesDiag := [2]int{}
+	for y, line := range board {
+		matches := 0
+		for x, val := range line {
+			if called[val] {
+				matches++
+				matchesVertical[x]++
+				if x == y {
+					matchesDiag[0]++
+				}
+				if len(line)-1-x == y {
+					matchesDiag[1]++
+				}
+				// fmt.Println(x, y, matchesDiag)
+			}
+			if matchesVertical[x] == len(line) {
+				return true
+			}
+		}
+		if matches == len(line) {
+			return true
+		}
+	}
+	// return matchesDiag[0] == len(board) || matchesDiag[1] == len(board)
+	return false
 }
 
-func Part2(input string) int {
-	return 0
+func SumUnmarked(called map[int]bool, board [5][5]int) int {
+	sum := 0
+	for _, row := range board {
+		for _, val := range row {
+			if !called[val] {
+				sum += val
+			}
+		}
+	}
+	return sum
+}
+
+func Part1(input string) []int {
+	boards := StringToBoards(input)
+	numsToCall := StringToBingo(input)
+	calledNums := map[int]bool{}
+
+	for _, num := range numsToCall {
+		calledNums[num] = true
+		for _, board := range boards {
+			if WinningBoard(calledNums, board) {
+				// fmt.Println("BINGO!", num, calledNums, board)
+				sum := SumUnmarked(calledNums, board)
+				// fmt.Println("Sum: ", sum, sum*num)
+				return []int{sum, sum * num}
+			}
+		}
+	}
+	return []int{0, 0}
+}
+
+func Part2(input string) []int {
+	boards := StringToBoards(input)
+	numsToCall := StringToBingo(input)
+	calledNums := map[int]bool{}
+	winningBoards := map[int]bool{}
+
+	for _, num := range numsToCall {
+		calledNums[num] = true
+		for i, board := range boards {
+			if winningBoards[i] {
+				continue
+			}
+			if WinningBoard(calledNums, board) {
+				// fmt.Println("BINGO!", i, calledNums, board)
+				winningBoards[i] = true
+				// fmt.Println("Winning Boards: ", winningBoards)
+				// fmt.Println("Lengths: ", len(winningBoards), len(boards)-1)
+				if len(winningBoards) >= len(boards) {
+					sum := SumUnmarked(calledNums, board)
+					// fmt.Println("Sum: ", sum, num, sum*num)
+					return []int{sum, sum * num}
+				}
+			}
+		}
+	}
+	return []int{0, 0}
 }

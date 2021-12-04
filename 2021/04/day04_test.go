@@ -41,10 +41,43 @@ func TestIngestBoards(t *testing.T) {
 	assert.Equal(t, expectedLastLine, StringToBoards(inputStr)[2][4], "they should be equal")
 }
 
+func TestWinningBoardsHorizontal(t *testing.T) {
+	board := StringToBoards(inputStr)[0]
+	calledNums := map[int]bool{8: true, 2: true, 23: true, 4: true, 24: true}
+	assert.Equal(t, true, WinningBoard(calledNums, board), "they should be equal")
+}
+
+func TestWinningBoardsVertical(t *testing.T) {
+	board := StringToBoards(inputStr)[0]
+	calledNums := map[int]bool{17: true, 23: true, 14: true, 3: true, 20: true}
+	assert.Equal(t, true, WinningBoard(calledNums, board), "they should be equal")
+}
+
+func TestWinningBoardsDiagonal(t *testing.T) {
+	// Diagonals don't count
+	board := StringToBoards(inputStr)[0]
+	calledNums := map[int]bool{1: true, 10: true, 14: true, 4: true, 0: true}
+	assert.Equal(t, false, WinningBoard(calledNums, board), "they should be equal")
+}
+
+func TestLosingBoards(t *testing.T) {
+	board := StringToBoards(inputStr)[0]
+	calledNums := map[int]bool{2: true, 23: true, 4: true, 24: true}
+	assert.Equal(t, false, WinningBoard(calledNums, board), "they should be equal")
+}
+
+func TestSumUnmarked(t *testing.T) {
+	board := StringToBoards(inputStr)[0]
+	calledNums := map[int]bool{1: true, 10: true, 14: true, 4: true, 0: true}
+	assert.Equal(t, 271, SumUnmarked(calledNums, board), "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
-	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
+	assert.Equal(t, 188, Part1(inputStr)[0], "they should be equal")
+	assert.Equal(t, 4512, Part1(inputStr)[1], "they should be equal")
 }
 
 func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 148, Part2(inputStr)[0], "they should be equal")
+	assert.Equal(t, 1924, Part2(inputStr)[1], "they should be equal")
 }
