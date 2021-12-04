@@ -17,9 +17,9 @@ var inputStr = strings.TrimSpace(`
 `)
 
 func TestPart1(t *testing.T) {
-	assert.Equal(t, Part1(inputStr), 514579, "they should be equal")
+	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
 }
 
 func TestPart2(t *testing.T) {
-	assert.Equal(t, Part2(inputStr), 241861950, "they should be equal")
+	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
 }
