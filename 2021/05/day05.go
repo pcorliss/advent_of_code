@@ -95,7 +95,8 @@ func Part2(input string) int {
 	pointCount := make(map[Point]int)
 
 	for _, line := range lines {
-		if line.a.x == line.b.x {
+		switch {
+		case line.a.x == line.b.x:
 			yA := line.a.y
 			yB := line.b.y
 			if yA > yB {
@@ -104,7 +105,7 @@ func Part2(input string) int {
 			for y := yA; y <= yB; y++ {
 				pointCount[Point{line.a.x, y}]++
 			}
-		} else if line.a.y == line.b.y {
+		case line.a.y == line.b.y:
 			xA := line.a.x
 			xB := line.b.x
 			if xA > xB {
@@ -113,7 +114,7 @@ func Part2(input string) int {
 			for x := xA; x <= xB; x++ {
 				pointCount[Point{x, line.a.y}]++
 			}
-		} else {
+		default:
 			// fmt.Println("Diag:", line)
 			xA := line.a.x
 			xB := line.b.x

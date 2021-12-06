@@ -53,9 +53,9 @@ func Part1(input string) [3]int {
 		exp := int(math.Pow(2, float64(length-1-i)))
 		if cnt >= input_length/2 {
 			// 1 is the most common bit
-			gamma = gamma | exp
+			gamma |= exp
 		} else {
-			episolon = episolon | exp
+			episolon |= exp
 		}
 		// fmt.Println("Bit:", i, "Exp:", exp, "Count:", cnt, "Length:", input_length/2)
 		// fmt.Println("Gamma:", gamma, "Episolon:", episolon)
