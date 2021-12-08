@@ -49,6 +49,30 @@ func CalcMedian(nums []int) int {
 	return (nums[mNumber-1] + nums[mNumber]) / 2
 }
 
+func CalcAvg(nums []int) int {
+	sum := 0
+	for _, val := range nums {
+		sum += val
+	}
+	return sum/len(nums) + 1
+}
+
+func MinMax(nums []int) []int {
+	min := 0
+	max := 0
+
+	for i, n := range nums {
+		if n < min || i == 0 {
+			min = n
+		}
+		if n > max || i == 0 {
+			max = n
+		}
+	}
+
+	return []int{min, max}
+}
+
 func Part1(input string) []int {
 	nums := StringToNums(input)
 	med := CalcMedian(nums)
@@ -65,6 +89,44 @@ func Part1(input string) []int {
 	return []int{med, fuel}
 }
 
-func Part2(input string) int {
-	return 0
+func FuelCost(n int) int {
+	if n <= 1 {
+		return n
+	}
+	return FuelCost(n-1) + n
+}
+
+// Answer is too high
+// Result:  [448 88612611]
+func Part2(input string) []int {
+	nums := StringToNums(input)
+	avg := CalcAvg(nums)
+	minMax := MinMax(nums)
+	min, max := minMax[0], minMax[1]
+
+	minFuel := -1
+	minPoint := -1
+
+	for point := min; point <= max; point++ {
+		fuel := 0
+		for _, n := range nums {
+			diff := n - point
+			if diff < 0 {
+				diff *= -1
+			}
+			// 1, 2, 3, 4, 5
+			// 1, 3, 6, 10, 15
+			fuel += FuelCost(diff)
+		}
+		if minFuel == -1 || fuel < minFuel {
+			minFuel = fuel
+			minPoint = point
+			fmt.Println("New Min: ", minFuel, point)
+		} else {
+			fmt.Println("Fuel is increasing:", point)
+			return []int{minPoint, minFuel}
+		}
+	}
+
+	return []int{avg, minFuel}
 }
