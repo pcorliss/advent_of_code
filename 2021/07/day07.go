@@ -96,9 +96,43 @@ func FuelCost(n int) int {
 	return FuelCost(n-1) + n
 }
 
+func PointFuelCost(point int, nums []int) int {
+	fuel := 0
+	for _, n := range nums {
+		diff := n - point
+		if diff < 0 {
+			diff *= -1
+		}
+		fuel += FuelCost(diff)
+	}
+	return fuel
+}
+
 // Answer is too high
 // Result:  [448 88612611]
-func Part2(input string) []int {
+func Part2FirstAttempt(input string) []int {
+	nums := StringToNums(input)
+	avg := CalcAvg(nums)
+
+	fuel := 0
+	for _, n := range nums {
+		diff := n - avg
+		if diff < 0 {
+			diff *= -1
+		}
+		// 1, 2, 3, 4, 5
+		// 1, 3, 6, 10, 15
+		fuel += FuelCost(diff)
+	}
+
+	return []int{avg, fuel}
+}
+
+// Answer is too high
+// Result:  [448 88612611]
+// Correct Answer
+// Result: [447 88612508]
+func Part2SlowButWorkingAttempt(input string) []int {
 	nums := StringToNums(input)
 	avg := CalcAvg(nums)
 	minMax := MinMax(nums)
@@ -121,12 +155,45 @@ func Part2(input string) []int {
 		if minFuel == -1 || fuel < minFuel {
 			minFuel = fuel
 			minPoint = point
-			fmt.Println("New Min: ", minFuel, point)
+			// fmt.Println("New Min: ", minFuel, point)
 		} else {
-			fmt.Println("Fuel is increasing:", point)
+			// fmt.Println("Fuel is increasing:", point)
 			return []int{minPoint, minFuel}
 		}
 	}
 
 	return []int{avg, minFuel}
+}
+
+// Fast Attempt
+// Could add some memoization here as well
+func Part2(input string) []int {
+	nums := StringToNums(input)
+	start := CalcAvg(nums)
+
+	minFuel := PointFuelCost(start, nums)
+	minPoint := start
+	// lastFuel := start
+
+	for {
+		// fmt.Println("Min:", minPoint, minFuel)
+		cost_low := PointFuelCost(minPoint-1, nums)
+		cost_high := PointFuelCost(minPoint+1, nums)
+		if cost_low >= minFuel && cost_high >= minFuel {
+			break
+		}
+		if cost_low < minFuel {
+			// fmt.Println("Low:", minPoint-1, cost_low)
+			minFuel = cost_low
+			minPoint--
+		}
+		if cost_high < minFuel {
+			// fmt.Println("High:", minPoint+1, cost_high)
+			minFuel = cost_high
+			minPoint++
+		}
+
+	}
+
+	return []int{minPoint, minFuel}
 }
