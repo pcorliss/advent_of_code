@@ -90,10 +90,7 @@ func Part1(input string) []int {
 }
 
 func FuelCost(n int) int {
-	if n <= 1 {
-		return n
-	}
-	return FuelCost(n-1) + n
+	return n * (n + 1) / 2
 }
 
 func PointFuelCost(point int, nums []int) int {
@@ -167,7 +164,7 @@ func Part2SlowButWorkingAttempt(input string) []int {
 
 // Fast Attempt
 // Could add some memoization here as well
-func Part2(input string) []int {
+func Part2Fast(input string) []int {
 	nums := StringToNums(input)
 	start := CalcAvg(nums)
 
@@ -196,4 +193,19 @@ func Part2(input string) []int {
 	}
 
 	return []int{minPoint, minFuel}
+}
+
+// Use the average properly
+// This should be the fastest
+func Part2(input string) []int {
+	nums := StringToNums(input)
+	avg := CalcAvg(nums)
+
+	aFuel := PointFuelCost(avg, nums)
+	bFuel := PointFuelCost(avg-1, nums)
+
+	if aFuel > bFuel {
+		return []int{avg - 1, bFuel}
+	}
+	return []int{avg, aFuel}
 }
