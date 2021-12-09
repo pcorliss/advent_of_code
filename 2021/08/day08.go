@@ -170,7 +170,7 @@ func Part2(input string) int {
 		mult := 10000
 		for _, out := range s.outs {
 			sorted := SortString(out)
-			mult = mult / 10
+			mult /= 10
 			sum += mult * mapping[sorted]
 		}
 	}
