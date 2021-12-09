@@ -92,66 +92,64 @@ func matchingChars(a map[string]bool, b map[string]bool) int {
 	return count
 }
 
-type charSet struct {
-	set map[string]bool
+type lup struct {
+	length int
+	one    int
+	four   int
+	seven  int
+}
+
+// Length, matching segments for one digit, four, and seven
+var NumLookup = map[lup]int{
+	{5, 1, 2, 2}: 2,
+	{5, 2, 3, 3}: 3,
+	{5, 1, 3, 2}: 5,
+	{6, 2, 2, 2}: 0,
+	{6, 1, 3, 2}: 6,
+	{6, 2, 4, 3}: 9,
+}
+
+// character length matcher
+var LengthLookup = map[int]int{
+	2: 1,
+	3: 7,
+	4: 4,
+	7: 8,
 }
 
 func Deduce(s signal) map[string]int {
 	out := make(map[string]int)
 	lookup := [10]map[string]bool{}
-	// 	sigs := []string{}
-	// 	sigs = append(sigs, s.sigs...)
-	// 	sigs = append(sigs, s.outs...)
+	seen := make(map[string]bool)
 
-	// 	// We should skip duplicates
 	for _, s := range s.all {
 		l := len(s)
 		str := SetToString(s)
-		switch l {
-		case 2:
-			out[str] = 1
-			lookup[1] = s
-		case 3:
-			out[str] = 7
-			lookup[7] = s
-		case 4:
-			out[str] = 4
-			lookup[4] = s
-		case 7:
-			out[str] = 8
-			lookup[8] = s
+		if seen[str] {
+			continue
+		}
+		match := LengthLookup[l]
+		if match != 0 {
+			out[str] = match
+			lookup[match] = s
+			seen[str] = true
 		}
 	}
 
-	// 1,4,7 matching chars * 100, 10, and 1 and summed
-	l5Lookup := make(map[int]int)
-	l5Lookup[122] = 2
-	l5Lookup[233] = 3
-	l5Lookup[132] = 5
-	l6Lookup := make(map[int]int)
-	l6Lookup[222] = 0
-	l6Lookup[132] = 6
-	l6Lookup[243] = 9
-
-	// 	// We should skip lines we already have
 	for _, s := range s.all {
 		l := len(s)
 		str := SetToString(s)
-		switch l {
-		case 5:
-			sum := 100 * matchingChars(lookup[1], s)
-			sum += 10 * matchingChars(lookup[4], s)
-			sum += matchingChars(lookup[7], s)
-			out[str] = l5Lookup[sum]
-			// fmt.Println("Sorted:", sorted, "Sum: ", sum, "Lookup:", l5Lookup[sum])
-		case 6:
-			sum := 100 * matchingChars(lookup[1], s)
-			sum += 10 * matchingChars(lookup[4], s)
-			sum += matchingChars(lookup[7], s)
-			out[str] = l6Lookup[sum]
-			// if sorted == "abcdef" {
-			// 	fmt.Println("Sorted:", sorted, "Sum: ", sum, "Lookup:", l6Lookup[sum])
-			// }
+		if seen[str] {
+			continue
+		}
+		if l == 5 || l == 6 {
+			out[str] = NumLookup[lup{
+				l,
+				matchingChars(lookup[1], s),
+				matchingChars(lookup[4], s),
+				matchingChars(lookup[7], s),
+			}]
+			seen[str] = true
 		}
 	}
 
@@ -163,11 +161,11 @@ func Part2(input string) int {
 	sum := 0
 	for _, s := range signals {
 		mapping := Deduce(s)
-		mult := 10000
+		mult := 1000
 		for _, out := range s.outs {
 			sorted := SetToString(out)
-			mult /= 10
 			sum += mult * mapping[sorted]
+			mult /= 10
 		}
 	}
 	return sum
