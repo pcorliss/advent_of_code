@@ -24,8 +24,35 @@ func main() {
 }
 
 type signal struct {
-	sigs []string
-	outs []string
+	sigs []map[string]bool
+	outs []map[string]bool
+	all  []map[string]bool
+}
+
+func StringsToSets(strings []string) []map[string]bool {
+	sets := []map[string]bool{}
+	for _, s := range strings {
+		set := StringToSet(s)
+		sets = append(sets, set)
+	}
+	return sets
+}
+
+func SetToString(set map[string]bool) string {
+	keys := make([]string, 0, len(set))
+	for k := range set {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return strings.Join(keys, "")
+}
+
+func StringToSet(s string) map[string]bool {
+	set := map[string]bool{}
+	for _, char := range strings.Split(s, "") {
+		set[char] = true
+	}
+	return set
 }
 
 func StringToSignals(input string) []signal {
@@ -33,9 +60,9 @@ func StringToSignals(input string) []signal {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 		parts := strings.Split(line, " | ")
-		signals_slice := strings.Split(parts[0], " ")
-		output_slice := strings.Split(parts[1], " ")
-		s := signal{signals_slice, output_slice}
+		signals_slice := StringsToSets(strings.Split(parts[0], " "))
+		output_slice := StringsToSets(strings.Split(parts[1], " "))
+		s := signal{signals_slice, output_slice, append(signals_slice, output_slice...)}
 		signals = append(signals, s)
 	}
 	return signals
@@ -55,75 +82,44 @@ func Part1(input string) int {
 	return count
 }
 
-func Info(input string) {
-	signals := StringToSignals(input)
-	match := [8]bool{}
-	for _, s := range signals {
-		for _, out := range s.sigs {
-			l := len(out)
-			switch l {
-			case 2, 3, 4, 7:
-				match[l] = true
-			}
-		}
-		for _, out := range s.outs {
-			l := len(out)
-			switch l {
-			case 2, 3, 4, 7:
-				match[l] = true
-			}
-		}
-		fmt.Print(match[2] && match[3] && match[4] && match[7])
-		fmt.Print(" - ")
-		fmt.Println(s)
-	}
-}
-
-// https://stackoverflow.com/questions/22688651/golang-how-to-sort-string-or-byte
-func SortString(w string) string {
-	s := strings.Split(w, "")
-	sort.Strings(s)
-	return strings.Join(s, "")
-}
-
-func matchingChars(a string, b string) int {
-	m := make(map[string]bool)
+func matchingChars(a map[string]bool, b map[string]bool) int {
 	count := 0
-	for _, char := range strings.Split(a, "") {
-		m[char] = true
-	}
-	for _, char := range strings.Split(b, "") {
-		if m[char] {
+	for char, _ := range b {
+		if a[char] {
 			count++
 		}
 	}
 	return count
 }
 
+type charSet struct {
+	set map[string]bool
+}
+
 func Deduce(s signal) map[string]int {
 	out := make(map[string]int)
-	lookup := [10]string{}
-	sigs := []string{}
-	sigs = append(sigs, s.sigs...)
-	sigs = append(sigs, s.outs...)
+	lookup := [10]map[string]bool{}
+	// 	sigs := []string{}
+	// 	sigs = append(sigs, s.sigs...)
+	// 	sigs = append(sigs, s.outs...)
 
-	// We should skip duplicates
-	for _, s := range sigs {
-		sorted := SortString(s)
+	// 	// We should skip duplicates
+	for _, s := range s.all {
 		l := len(s)
+		str := SetToString(s)
 		switch l {
 		case 2:
-			out[sorted] = 1
-			lookup[1] = sorted
+			out[str] = 1
+			lookup[1] = s
 		case 3:
-			out[sorted] = 7
-			lookup[7] = sorted
+			out[str] = 7
+			lookup[7] = s
 		case 4:
-			out[sorted] = 4
-			lookup[4] = sorted
+			out[str] = 4
+			lookup[4] = s
 		case 7:
-			out[sorted] = 8
-			lookup[8] = sorted
+			out[str] = 8
+			lookup[8] = s
 		}
 	}
 
@@ -137,22 +133,22 @@ func Deduce(s signal) map[string]int {
 	l6Lookup[132] = 6
 	l6Lookup[243] = 9
 
-	// We should skip lines we already have
-	for _, s := range sigs {
-		sorted := SortString(s)
+	// 	// We should skip lines we already have
+	for _, s := range s.all {
 		l := len(s)
+		str := SetToString(s)
 		switch l {
 		case 5:
-			sum := 100 * matchingChars(lookup[1], sorted)
-			sum += 10 * matchingChars(lookup[4], sorted)
-			sum += matchingChars(lookup[7], sorted)
-			out[sorted] = l5Lookup[sum]
+			sum := 100 * matchingChars(lookup[1], s)
+			sum += 10 * matchingChars(lookup[4], s)
+			sum += matchingChars(lookup[7], s)
+			out[str] = l5Lookup[sum]
 			// fmt.Println("Sorted:", sorted, "Sum: ", sum, "Lookup:", l5Lookup[sum])
 		case 6:
-			sum := 100 * matchingChars(lookup[1], sorted)
-			sum += 10 * matchingChars(lookup[4], sorted)
-			sum += matchingChars(lookup[7], sorted)
-			out[sorted] = l6Lookup[sum]
+			sum := 100 * matchingChars(lookup[1], s)
+			sum += 10 * matchingChars(lookup[4], s)
+			sum += matchingChars(lookup[7], s)
+			out[str] = l6Lookup[sum]
 			// if sorted == "abcdef" {
 			// 	fmt.Println("Sorted:", sorted, "Sum: ", sum, "Lookup:", l6Lookup[sum])
 			// }
@@ -169,7 +165,7 @@ func Part2(input string) int {
 		mapping := Deduce(s)
 		mult := 10000
 		for _, out := range s.outs {
-			sorted := SortString(out)
+			sorted := SetToString(out)
 			mult /= 10
 			sum += mult * mapping[sorted]
 		}
