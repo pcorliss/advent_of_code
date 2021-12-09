@@ -96,17 +96,16 @@ type lup struct {
 	length int
 	one    int
 	four   int
-	seven  int
 }
 
 // Length, matching segments for one digit, four, and seven
 var NumLookup = map[lup]int{
-	{5, 1, 2, 2}: 2,
-	{5, 2, 3, 3}: 3,
-	{5, 1, 3, 2}: 5,
-	{6, 2, 2, 2}: 0,
-	{6, 1, 3, 2}: 6,
-	{6, 2, 4, 3}: 9,
+	{5, 1, 2}: 2,
+	{5, 2, 3}: 3,
+	{5, 1, 3}: 5,
+	{6, 2, 2}: 0,
+	{6, 1, 3}: 6,
+	{6, 2, 4}: 9,
 }
 
 // character length matcher
@@ -147,7 +146,6 @@ func Deduce(s signal) map[string]int {
 				l,
 				matchingChars(lookup[1], s),
 				matchingChars(lookup[4], s),
-				matchingChars(lookup[7], s),
 			}]
 			seen[str] = true
 		}
