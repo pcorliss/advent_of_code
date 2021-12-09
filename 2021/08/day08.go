@@ -86,21 +86,6 @@ func SortString(w string) string {
 	return strings.Join(s, "")
 }
 
-func CombineChars(a string, b string) string {
-	m := make(map[string]bool)
-	for _, char := range strings.Split(a, "") {
-		m[char] = true
-	}
-	for _, char := range strings.Split(b, "") {
-		m[char] = true
-	}
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	return strings.Join(keys, "")
-}
-
 func matchingChars(a string, b string) int {
 	m := make(map[string]bool)
 	count := 0
