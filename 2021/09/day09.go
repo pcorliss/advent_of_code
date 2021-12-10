@@ -57,14 +57,15 @@ func StringToGrid(input string) Grid {
 	return grid
 }
 
+var diffs = []Point{
+	{0, -1}, // North
+	{1, 0},  // West
+	{0, 1},  // South
+	{-1, 0}, // East
+}
+
 func Neighbors(p Point, w int, h int) []Point {
 	points := []Point{}
-	diffs := []Point{
-		{0, -1}, // North
-		{1, 0},  // West
-		{0, 1},  // South
-		{-1, 0}, // East
-	}
 	for _, diff := range diffs {
 		if p.x+diff.x >= w || p.x+diff.x < 0 {
 			continue
