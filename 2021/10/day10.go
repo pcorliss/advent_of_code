@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -84,6 +85,76 @@ func Part1(input string) int {
 	return score
 }
 
+// Totally uneccessary
+func ReverseStack(stack []string) []string {
+	l := len(stack)
+	for i := 0; i < l/2; i++ {
+		stack[i], stack[l-i-1] = stack[l-i-1], stack[i]
+	}
+	return stack
+}
+
+func FinishLine(line []string) []string {
+	stack := []string{}
+	for _, char := range line {
+		switch char {
+		case "[", "(", "{", "<":
+			stack = append(stack, char)
+		case "]", ")", "}", ">":
+			last_idx := len(stack) - 1
+			// fmt.Println("Stack: ", stack, "Char: ", char)
+			if stack[last_idx] == pair[char] {
+				stack = stack[:last_idx]
+				// fmt.Println("Popped Stack: ", stack)
+			} else {
+				// fmt.Println("Wrong Char, expected:", pair[stack[last_idx]], "Got: ", pair[char], char)
+				panic("Corrupted Line")
+			}
+		default:
+			panic("Unhandled char")
+		}
+	}
+	closingStack := []string{}
+	l := len(stack)
+	for i := l - 1; i >= 0; i-- {
+		closingStack = append(closingStack, pair[stack[i]])
+	}
+	return closingStack
+}
+
+var stackScoreLookup = map[string]int{
+	"]": 2,
+	")": 1,
+	">": 4,
+	"}": 3,
+}
+
+func StackScore(stack []string) int {
+	score := 0
+	for _, char := range stack {
+		score *= 5
+		score += stackScoreLookup[char]
+	}
+	return score
+}
+
 func Part2(input string) int {
-	return 0
+	// Discard Corrupt Lines
+	scores := []int{}
+	for _, chars := range LinesToChars(input) {
+		char := Corrupt(chars)
+		if len(char) == 0 {
+			stack := FinishLine(chars)
+			score := StackScore(stack)
+			scores = append(scores, score)
+		}
+	}
+
+	l := len(scores)
+	sort.Slice(scores, func(i, j int) bool {
+		return scores[i] > scores[j]
+	})
+	mid := scores[l/2]
+
+	return mid
 }
