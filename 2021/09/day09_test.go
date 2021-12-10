@@ -43,13 +43,30 @@ func TestNeighborsOnEdge(t *testing.T) {
 func TestLowPOints(t *testing.T) {
 	g := StringToGrid(inputStr)
 	low := LowPoints(g)
+	// fmt.Println(low)
 	assert.Equal(t, 4, len(low), "They should be equal")
+	// Order is non-determinant
+	// assert.Equal(t, Point{1, 0}, low[0], "They should be equal")
+	// assert.Equal(t, Point{9, 0}, low[1], "They should be equal")
+	// assert.Equal(t, Point{2, 2}, low[2], "They should be equal")
+	// assert.Equal(t, Point{6, 4}, low[3], "They should be equal")
 }
 
 func TestPart1(t *testing.T) {
 	assert.Equal(t, 15, Part1(inputStr), "they should be equal")
 }
 
+func TestBasinSize(t *testing.T) {
+	g := StringToGrid(inputStr)
+	p := Point{1, 0}
+	assert.Equal(t, 3, BasinSize(p, g), "They should be equal")
+}
+func TestBasinBigSize(t *testing.T) {
+	g := StringToGrid(inputStr)
+	p := Point{2, 2}
+	assert.Equal(t, 14, BasinSize(p, g), "They should be equal")
+}
+
 func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 1134, Part2(inputStr), "they should be equal")
 }

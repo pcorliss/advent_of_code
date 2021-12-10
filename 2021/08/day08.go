@@ -84,7 +84,7 @@ func Part1(input string) int {
 
 func matchingChars(a map[string]bool, b map[string]bool) int {
 	count := 0
-	for char, _ := range b {
+	for char := range b {
 		if a[char] {
 			count++
 		}

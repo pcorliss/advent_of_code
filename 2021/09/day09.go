@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -104,6 +105,51 @@ func Part1(input string) int {
 	return risk
 }
 
+func BasinSize(p Point, g Grid) int {
+	size := 1
+	candidates := Neighbors(p, g.width, g.height)
+	seen := make(map[Point]bool)
+	seen[p] = true
+	for {
+		last := len(candidates) - 1
+		if last < 0 {
+			return size
+		}
+		candidate := candidates[last]
+		candidates = candidates[:last] // check this slice behavior
+		if seen[candidate] {
+			continue
+		}
+		seen[candidate] = true
+		if g.points[candidate] == 9 {
+			continue
+		}
+		size++
+		// append neighbors to candidate list
+		for _, neighbor := range Neighbors(candidate, g.width, g.height) {
+			if !seen[neighbor] {
+				candidates = append(candidates, neighbor)
+			}
+		}
+	}
+}
+
 func Part2(input string) int {
-	return 0
+	g := StringToGrid(input)
+	low := LowPoints(g)
+	basinSizes := []int{}
+	for _, l := range low {
+		basinSizes = append(basinSizes, BasinSize(l, g))
+	}
+
+	// fmt.Println(basinSizes)
+	sort.Ints(basinSizes)
+	// fmt.Println(basinSizes)
+	// fmt.Println(basinSizes[len(basinSizes)-3:])
+	score := 1
+	for _, size := range basinSizes[len(basinSizes)-3:] {
+		score *= size
+	}
+
+	return score
 }
