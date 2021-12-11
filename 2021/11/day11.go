@@ -127,5 +127,16 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
+	grid := StringToGrid(input)
+	for i := 0; true; i++ {
+		lastFlash := grid.flashes
+		grid = Step(grid)
+		if (grid.flashes - lastFlash) == len(grid.points) {
+			return i + 1
+		}
+		if i > 1000 {
+			panic("Too many iterations!!!")
+		}
+	}
 	return 0
 }
