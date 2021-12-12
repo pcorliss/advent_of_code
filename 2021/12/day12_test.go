@@ -78,10 +78,53 @@ func TestStringToGraphStartUnidirectional(t *testing.T) {
 	assert.Equal(t, false, graph.edges[Edge{"end", "A"}], "they should be equal")
 }
 
+func TestStringToGraphLookup(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	destinations := graph.lookup["A"]
+	assert.Equal(t, []string{"c", "b", "end"}, destinations, "they should be equal")
+}
+
+func TestStringToGraphLookupOpposites(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	destinations := graph.lookup["c"]
+	assert.Equal(t, []string{"A"}, destinations, "they should be equal")
+}
+
+func TestStringToGraphLookupStart(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	destinations := graph.lookup["start"]
+	assert.Equal(t, []string{"A", "b"}, destinations, "they should be equal")
+}
+func TestStringToGraphLookupEnd(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	_, ok := graph.lookup["end"]
+	assert.Equal(t, false, ok, "they should be equal")
+}
+
+func TestFindPathsDirect(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	paths := FindPaths(graph)
+	assert.Equal(t, true, paths["start,b,end"], "they should be equal")
+	assert.Equal(t, true, paths["start,A,end"], "they should be equal")
+}
+
+func TestFindPathsLong(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	paths := FindPaths(graph)
+	assert.Equal(t, true, paths["start,A,c,A,b,A,end"], "they should be equal")
+	assert.Equal(t, true, paths["start,A,b,A,c,A,end"], "they should be equal")
+}
+
+func TestFindAllPaths(t *testing.T) {
+	graph := StringToGraph(inputStr)
+	paths := FindPaths(graph)
+	assert.Equal(t, 10, len(paths), "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
-	// assert.Equal(t, 10, Part1(inputStr), "they should be equal")
-	// assert.Equal(t, 19, Part1(medEx), "they should be equal")
-	// assert.Equal(t, 226, Part1(largeEx), "they should be equal")
+	assert.Equal(t, 10, Part1(inputStr), "they should be equal")
+	assert.Equal(t, 19, Part1(medEx), "they should be equal")
+	assert.Equal(t, 226, Part1(largeEx), "they should be equal")
 }
 
 func TestPart2(t *testing.T) {
