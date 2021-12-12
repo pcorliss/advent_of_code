@@ -46,6 +46,12 @@ func StringToGraph(input string) Graph {
 	for _, line := range lines {
 		parts := strings.Split(line, "-")
 		a, b := parts[0], parts[1]
+		if b == "start" || a == "end" {
+			a, b = b, a
+		}
+		// if line == "end-zg" {
+		// 	fmt.Println(a, b)
+		// }
 		graph.edges[Edge{a, b}] = true
 		graph.lookup[a] = append(graph.lookup[a], b)
 		if a != "start" && b != "end" {
@@ -61,7 +67,7 @@ func FindPaths(g Graph) map[string]bool {
 	startingPath := []string{"start"}
 	workingPaths := [][]string{startingPath}
 
-	for i := 0; i < 8; i++ {
+	for i := 0; i < 20; i++ {
 		if len(workingPaths) == 0 {
 			return paths
 		}
@@ -75,7 +81,7 @@ func FindPaths(g Graph) map[string]bool {
 				continue
 			}
 			for _, opt := range options {
-				// fmt.Println("  Opts: ", opt)
+				// fmt.Println("  ", path, "Opts: ", opt)
 				dupe := false
 				// if small cave - check if visited twice
 				if opt != "end" && smallCave(opt) {
@@ -106,9 +112,10 @@ func FindPaths(g Graph) map[string]bool {
 		// fmt.Println("Paths:", workingPaths)
 		// fmt.Println("Finished Paths: ", paths)
 	}
-	return paths
+	panic("Too many interations!")
 }
 
+// That's not the right answer; your answer is too low. (1258)
 func Part1(input string) int {
 	graph := StringToGraph(input)
 	return len(FindPaths(graph))

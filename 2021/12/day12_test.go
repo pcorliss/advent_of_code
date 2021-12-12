@@ -73,8 +73,14 @@ func TestStringToGraphOpposites(t *testing.T) {
 }
 
 func TestStringToGraphStartUnidirectional(t *testing.T) {
-	graph := StringToGraph(inputStr)
-	assert.Equal(t, false, graph.edges[Edge{"A", "start"}], "they should be equal")
+	graph := StringToGraph(largeEx)
+	assert.Equal(t, false, graph.edges[Edge{"end", "zg"}], "they should be equal")
+	_, ok := graph.lookup["end"]
+	assert.Equal(t, false, ok, "they should be equal")
+}
+
+func TestStringToGraphEndHandled(t *testing.T) {
+	graph := StringToGraph(largeEx)
 	assert.Equal(t, false, graph.edges[Edge{"end", "A"}], "they should be equal")
 }
 
