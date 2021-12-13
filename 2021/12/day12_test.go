@@ -109,21 +109,21 @@ func TestStringToGraphLookupEnd(t *testing.T) {
 
 func TestFindPathsDirect(t *testing.T) {
 	graph := StringToGraph(inputStr)
-	paths := FindPaths(graph)
+	paths := FindPaths(graph, false)
 	assert.Equal(t, true, paths["start,b,end"], "they should be equal")
 	assert.Equal(t, true, paths["start,A,end"], "they should be equal")
 }
 
 func TestFindPathsLong(t *testing.T) {
 	graph := StringToGraph(inputStr)
-	paths := FindPaths(graph)
+	paths := FindPaths(graph, false)
 	assert.Equal(t, true, paths["start,A,c,A,b,A,end"], "they should be equal")
 	assert.Equal(t, true, paths["start,A,b,A,c,A,end"], "they should be equal")
 }
 
 func TestFindAllPaths(t *testing.T) {
 	graph := StringToGraph(inputStr)
-	paths := FindPaths(graph)
+	paths := FindPaths(graph, false)
 	assert.Equal(t, 10, len(paths), "they should be equal")
 }
 
@@ -134,5 +134,7 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 36, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 103, Part2(medEx), "they should be equal")
+	assert.Equal(t, 3509, Part2(largeEx), "they should be equal")
 }

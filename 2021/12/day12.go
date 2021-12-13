@@ -62,7 +62,7 @@ func StringToGraph(input string) Graph {
 	return graph
 }
 
-func FindPaths(g Graph) map[string]bool {
+func FindPaths(g Graph, single bool) map[string]bool {
 	paths := make(map[string]bool)
 	startingPath := []string{"start"}
 	workingPaths := [][]string{startingPath}
@@ -75,24 +75,44 @@ func FindPaths(g Graph) map[string]bool {
 		newWorkingPaths := [][]string{}
 		for _, path := range workingPaths {
 			last := path[len(path)-1]
-			options, ok := g.lookup[last]
+			options, exists := g.lookup[last]
 			// if dead end - continue
-			if !ok {
+			if !exists {
 				continue
 			}
+			smallCaves := make(map[string]bool)
+			dupeCave := false
+			// dupeCaveName := ""
+			for _, cave := range path {
+				if !smallCave(cave) {
+					continue
+				}
+				if _, exists := smallCaves[cave]; exists {
+					dupeCave = true
+					// dupeCaveName = cave
+				} else {
+					smallCaves[cave] = true
+				}
+			}
+			// if dupeCave {
+			// 	fmt.Println("Dupe Cave: ", dupeCave, dupeCaveName)
+			// }
 			for _, opt := range options {
 				// fmt.Println("  ", path, "Opts: ", opt)
-				dupe := false
 				// if small cave - check if visited twice
 				if opt != "end" && smallCave(opt) {
-					for _, cave := range path {
-						if cave == opt {
-							dupe = true
-							break
+					// allow one small cave dupe per path
+					if single {
+						if _, exists := smallCaves[opt]; exists && dupeCave {
+							// fmt.Println("    Pruning opt, ", opt, ", already exists, and dupe")
+							continue
 						}
-					}
-					if dupe {
-						continue
+						// Allow no small cave dupes
+					} else {
+						if _, exists := smallCaves[opt]; exists {
+							// fmt.Println("    Pruning opt, ", opt, ", already exists")
+							continue
+						}
 					}
 				}
 				pathCopy := make([]string, len(path)+1)
@@ -118,9 +138,10 @@ func FindPaths(g Graph) map[string]bool {
 // That's not the right answer; your answer is too low. (1258)
 func Part1(input string) int {
 	graph := StringToGraph(input)
-	return len(FindPaths(graph))
+	return len(FindPaths(graph, false))
 }
 
 func Part2(input string) int {
-	return 0
+	graph := StringToGraph(input)
+	return len(FindPaths(graph, true))
 }
