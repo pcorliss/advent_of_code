@@ -51,15 +51,8 @@ func Expand(in string, instructions map[string]string) string {
 }
 
 func ExpandCommon(input string, steps int) int {
-	s, instructions := StringToInstructions(input)
-	for i := 0; i < steps; i++ {
-		s = Expand(s, instructions)
-	}
+	charCount := ExpandCount(input, steps)
 
-	charCount := make(map[string]int)
-	for i := 0; i < len(s); i++ {
-		charCount[s[i:i+1]]++
-	}
 	min := 0
 	minChar := ""
 	max := 0
@@ -82,11 +75,54 @@ func ExpandCommon(input string, steps int) int {
 	return max - min
 }
 
+func ExpandCountOrig(input string, steps int) map[string]int {
+	s, instructions := StringToInstructions(input)
+	for i := 0; i < steps; i++ {
+		s = Expand(s, instructions)
+	}
+
+	charCount := make(map[string]int)
+	for i := 0; i < len(s); i++ {
+		charCount[s[i:i+1]]++
+	}
+	return charCount
+}
+
+func ExpandCount(input string, steps int) map[string]int {
+	s, instructions := StringToInstructions(input)
+
+	charCount := make(map[string]int)
+	pairCount := make(map[string]int)
+
+	for i := 0; i < len(s)-1; i++ {
+		key := s[i : i+2]
+		pairCount[key]++
+	}
+	for i := 0; i < len(s); i++ {
+		charCount[s[i:i+1]]++
+	}
+
+	for i := 0; i < steps; i++ {
+		// fmt.Println("Step: ", i, pairCount)
+		newPairCount := make(map[string]int)
+		for k, v := range pairCount {
+			a, b := k[0:1], k[1:2]
+			mid := instructions[k]
+			// fmt.Println("Step:", i, k, v, a, mid, b)
+			charCount[mid] += v
+			newPairCount[a+mid] += v
+			newPairCount[mid+b] += v
+		}
+		pairCount = newPairCount
+	}
+
+	return charCount
+}
+
 func Part1(input string) int {
 	return ExpandCommon(input, 10)
 }
 
 func Part2(input string) int {
-	return 0
-	// return ExpandCommon(input, 40)
+	return ExpandCommon(input, 40)
 }

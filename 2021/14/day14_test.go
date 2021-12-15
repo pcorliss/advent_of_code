@@ -56,6 +56,13 @@ func TestExpandMult(t *testing.T) {
 	assert.Equal(t, "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB", s, "they should be equal")
 }
 
+func TestExpandCount(t *testing.T) {
+	assert.Equal(t, ExpandCountOrig(inputStr, 0), ExpandCount(inputStr, 0), "they should be equal")
+	assert.Equal(t, ExpandCountOrig(inputStr, 1), ExpandCount(inputStr, 1), "they should be equal")
+	assert.Equal(t, ExpandCountOrig(inputStr, 2), ExpandCount(inputStr, 2), "they should be equal")
+	assert.Equal(t, ExpandCountOrig(inputStr, 3), ExpandCount(inputStr, 3), "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
 	assert.Equal(t, 1588, Part1(inputStr), "they should be equal")
 }
