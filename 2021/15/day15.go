@@ -57,6 +57,40 @@ func StringToGrid(input string) Grid {
 	return grid
 }
 
+func StringToGridFive(input string, width, height int) Grid {
+	points := make(map[Point]int)
+	grid := Grid{points, 0, 0}
+	lines := strings.Split(input, "\n")
+	lastX := 0
+	lastY := 0
+	for y, line := range lines {
+		for x, val := range strings.Split(line, "") {
+			n, err := strconv.Atoi(val)
+			if err != nil {
+				panic(err)
+			}
+			for y_diff := 0; y_diff < 5; y_diff++ {
+				for x_diff := 0; x_diff < 5; x_diff++ {
+					p := Point{x + x_diff*width, y + y_diff*height}
+					grid.points[p] = (n + x_diff + y_diff)
+					if grid.points[p] > 9 {
+						grid.points[p] -= 9
+					}
+					if grid.points[p] > 9 {
+						fmt.Println("Point:", p, grid.points[p])
+						panic("Something is wrong! point is not valid")
+					}
+				}
+			}
+			lastX = x
+		}
+		lastY = y
+	}
+	grid.width = (lastX + 1) * 5
+	grid.height = (lastY + 1) * 5
+	return grid
+}
+
 var diffs = []Point{
 	{0, -1}, // North
 	{1, 0},  // West
@@ -141,24 +175,25 @@ func FindPathRisk(g Grid, start Point, end Point) int {
 
 	for pq.Len() > 0 {
 		candidate := heap.Pop(&pq).(*Item)
-		fmt.Println("Candidate:", candidate, "Queue:", pq.Len())
+		// fmt.Println("Candidate:", candidate, "Queue:", pq.Len())
 
 		if candidate.position == end {
 			if candidate.priority < bestRisk || bestRisk == 0 {
-				fmt.Println("  New Best:", bestRisk, candidate.priority)
+				// fmt.Println("  New Best:", bestRisk, candidate.priority)
 				bestRisk = candidate.priority
+				return bestRisk
 			}
-			fmt.Println("  Pruning, reached end")
+			// fmt.Println("  Pruning, reached end")
 			continue
 		}
 
 		if candidate.priority > bestRisk && bestRisk != 0 {
-			fmt.Println("  Pruning, high risk")
+			// fmt.Println("  Pruning, high risk")
 			continue
 		}
 
 		if seen[candidate.position] {
-			fmt.Println("  Pruning, been here before")
+			// fmt.Println("  Pruning, been here before")
 			continue
 		}
 		seen[candidate.position] = true
@@ -179,9 +214,15 @@ func FindPathRisk(g Grid, start Point, end Point) int {
 }
 func Part1(input string) int {
 	g := StringToGrid(input)
+	fmt.Println("Width & Height:", g.width, g.height)
 	return FindPathRisk(g, Point{0, 0}, Point{g.width - 1, g.height - 1})
 }
 
+// 393 is too low
 func Part2(input string) int {
-	return 0
+	ogg := StringToGrid(input)
+	g := StringToGridFive(input, ogg.width, ogg.height)
+	fmt.Println("Width & Height:", g.width, g.height)
+	fmt.Println("End Point:", g.points[Point{g.width - 1, g.height - 1}])
+	return FindPathRisk(g, Point{0, 0}, Point{g.width - 1, g.height - 1})
 }
