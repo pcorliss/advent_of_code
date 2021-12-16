@@ -218,7 +218,8 @@ func Part1(input string) int {
 	return FindPathRisk(g, Point{0, 0}, Point{g.width - 1, g.height - 1})
 }
 
-// 393 is too low
+// 393 is too low and also impossible
+// Original Grid Construction Code stopped after 50x50 because of hardcoded dimensions
 func Part2(input string) int {
 	ogg := StringToGrid(input)
 	g := StringToGridFive(input, ogg.width, ogg.height)
