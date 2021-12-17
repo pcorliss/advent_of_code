@@ -139,9 +139,9 @@ func TestVersionSumSuperNested(t *testing.T) {
 	assert.Equal(t, 31, VersionSum(packet), "they should be equal")
 }
 
-// func TestPart1(t *testing.T) {
-// 	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
-// }
+func TestPart1(t *testing.T) {
+	assert.Equal(t, 31, Part1(nestedOperator), "they should be equal")
+}
 
 // func TestPart2(t *testing.T) {
 // 	assert.Equal(t, 0, Part2(inputStr), "they should be equal")

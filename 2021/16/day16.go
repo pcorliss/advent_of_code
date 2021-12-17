@@ -152,7 +152,7 @@ func PacketDecoder(data []bool, limit int) ([]Packet, int) {
 		}
 		packets = append(packets, packet)
 		// fmt.Println("Packets:", packets, pos)
-		if len(packets) > 20 {
+		if len(packets) > 500 {
 			panic("Loop cycle control Too many packets!!")
 		}
 	}
@@ -175,7 +175,8 @@ func VersionSum(packet Packet) int {
 }
 
 func Part1(input string) int {
-	return 0
+	packet := PacketDecode(input)
+	return VersionSum(packet)
 }
 
 func Part2(input string) int {
