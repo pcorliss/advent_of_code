@@ -105,22 +105,23 @@ func PacketDecodeLiteralValue(data []bool) (int, int) {
 }
 
 func PacketDecodeNested(packet Packet, data []bool) Packet {
-	if GetBits(data, 6, 1) == 0 {
+	nestingType := GetBits(data, 6, 1)
+	if nestingType == 0 {
 		packet.length = GetBits(data, 7, 15)
 		// fmt.Println("Length: ", packet.length, 22, 22+packet.length)
-		packet.sub = PacketDecoder(data[22 : 22+packet.length])
-		// packet.sub = PacketDecoder(data[8 : 8+packet.length])
+		packet.sub = PacketDecoder(data[22:22+packet.length], 0)
 	} else {
-		// packet.sublength = ... // next 11 bits is the number of sub-packets
+		packet.length = GetBits(data, 7, 11)
+		packet.sub = PacketDecoder(data[18:], packet.length)
 	}
 	return packet
 }
 
 // PacketDecode -> PacketDecodeNested(data, container)
-func PacketDecoder(data []bool) []Packet {
+func PacketDecoder(data []bool, limit int) []Packet {
 	pos := 0
 	packets := []Packet{}
-	for len(data)-pos > 10 {
+	for len(data)-pos >= 11 && (len(packets) < limit || limit == 0) {
 		packet := Packet{}
 		packet.version = GetBits(data, 0+pos, 3)
 		packet.typ = GetBits(data, 3+pos, 3)
@@ -145,7 +146,7 @@ func PacketDecoder(data []bool) []Packet {
 
 func PacketDecode(in string) Packet {
 	data := HexToBitArray(in)
-	return PacketDecoder(data)[0]
+	return PacketDecoder(data, 0)[0]
 }
 
 func Part1(input string) int {
