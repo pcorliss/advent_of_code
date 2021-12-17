@@ -80,7 +80,7 @@ func HexToBitArray(in string) []bool {
 	return out
 }
 
-func PacketDecodeLiteral(packet Packet, data []bool) Packet {
+func PacketDecodeLiteralValue(data []bool) (int, int) {
 	// Read value
 	val := 0
 	pos := 6
@@ -101,15 +101,15 @@ func PacketDecodeLiteral(packet Packet, data []bool) Packet {
 			panic("Too many cycles!!!")
 		}
 	}
-	packet.val = val
-	return packet
+	return val, pos
 }
 
 func PacketDecodeNested(packet Packet, data []bool) Packet {
 	if GetBits(data, 6, 1) == 0 {
 		packet.length = GetBits(data, 7, 15)
-		// PacketDecode(data[8:8 + packet.length])
-		// DecodeLiterals
+		// fmt.Println("Length: ", packet.length, 22, 22+packet.length)
+		packet.sub = PacketDecoder(data[22 : 22+packet.length])
+		// packet.sub = PacketDecoder(data[8 : 8+packet.length])
 	} else {
 		// packet.sublength = ... // next 11 bits is the number of sub-packets
 	}
@@ -117,16 +117,35 @@ func PacketDecodeNested(packet Packet, data []bool) Packet {
 }
 
 // PacketDecode -> PacketDecodeNested(data, container)
+func PacketDecoder(data []bool) []Packet {
+	pos := 0
+	packets := []Packet{}
+	for len(data)-pos > 10 {
+		packet := Packet{}
+		packet.version = GetBits(data, 0+pos, 3)
+		packet.typ = GetBits(data, 3+pos, 3)
+		if packet.typ == 4 {
+			val, newPos := PacketDecodeLiteralValue(data[pos:])
+			packet.val = val
+			pos += newPos
+		} else {
+			packet = PacketDecodeNested(packet, data[pos:])
+			packets = append(packets, packet)
+			return packets
+			// pos = len(data)
+		}
+		packets = append(packets, packet)
+		// fmt.Println("Packets:", packets, pos)
+		if len(packets) > 4 {
+			panic("Too many packets!!")
+		}
+	}
+	return packets
+}
 
 func PacketDecode(in string) Packet {
 	data := HexToBitArray(in)
-	packet := Packet{}
-	packet.version = GetBits(data, 0, 3)
-	packet.typ = GetBits(data, 3, 3)
-	if packet.typ == 4 {
-		return PacketDecodeLiteral(packet, data)
-	}
-	return PacketDecodeNested(packet, data)
+	return PacketDecoder(data)[0]
 }
 
 func Part1(input string) int {
