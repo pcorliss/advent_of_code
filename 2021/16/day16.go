@@ -24,31 +24,12 @@ func main() {
 type Packet struct {
 	version int
 	typ     int
-	// val     int
+	val     int
+	length  int
+	sub     []Packet
 }
 
 func GetBits(data []bool, position int, length int) int {
-	// out := 0
-	// for i := position; i < position+length; i++ {
-	// 	// This is wrong...
-	// 	// byt := position / 8
-	// 	byt := 0
-	// 	bytInt := int(data[byt])
-	// 	out |= ((bytInt >> i) << (length - 1))
-	// }
-	// // for _, byt := range data {
-	// // 	for bit := 0; bit < 8; bit++ {
-	// // 		// Is the bit on?
-	// // 		out = append(out, (byt>>bit)&1)
-	// // 	}
-	// // }
-
-	// Get bits 3,4,5
-	// (last bit is 5 so shift 8 - 5 - 1)    (select by using 1000 - 1 == 111)
-	// int(data[0]) >> (8 - position - length) & ((1 << (length + 1)) - 1)
-
-	// return int(data[0]) >> (8 - length)
-	// return int(data[0]) >> (8 - position - length) & ((1 << (length + 1)) - 1)
 	out := 0
 	for i := position; i < position+length; i++ {
 		out <<= 1
@@ -58,11 +39,6 @@ func GetBits(data []bool, position int, length int) int {
 		// fmt.Println("Out:", out)
 	}
 	return out
-	// return out
-
-	// Convert byte to binary string
-	// fmt.Sprintf("%0b", bytInt)
-
 }
 
 func PrintBitsAndHex(in string, bits []bool) {
@@ -104,13 +80,53 @@ func HexToBitArray(in string) []bool {
 	return out
 }
 
+func PacketDecodeLiteral(packet Packet, data []bool) Packet {
+	// Read value
+	val := 0
+	pos := 6
+	cycle := 0
+	for {
+		finished := GetBits(data, pos, 1) == 0
+		// fmt.Println("LastSet?", finished)
+		pos++
+		val <<= 4
+		val |= GetBits(data, pos, 4)
+		// fmt.Println("Val:", val)
+		pos += 4
+		cycle++
+		if finished {
+			break
+		}
+		if cycle > 10 {
+			panic("Too many cycles!!!")
+		}
+	}
+	packet.val = val
+	return packet
+}
+
+func PacketDecodeNested(packet Packet, data []bool) Packet {
+	if GetBits(data, 6, 1) == 0 {
+		packet.length = GetBits(data, 7, 15)
+		// PacketDecode(data[8:8 + packet.length])
+		// DecodeLiterals
+	} else {
+		// packet.sublength = ... // next 11 bits is the number of sub-packets
+	}
+	return packet
+}
+
+// PacketDecode -> PacketDecodeNested(data, container)
+
 func PacketDecode(in string) Packet {
-	// data, _ := hex.DecodeString(in)
 	data := HexToBitArray(in)
 	packet := Packet{}
 	packet.version = GetBits(data, 0, 3)
 	packet.typ = GetBits(data, 3, 3)
-	return packet
+	if packet.typ == 4 {
+		return PacketDecodeLiteral(packet, data)
+	}
+	return PacketDecodeNested(packet, data)
 }
 
 func Part1(input string) int {
