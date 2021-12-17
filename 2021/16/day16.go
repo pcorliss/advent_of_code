@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
+	"math"
 	"os"
 )
 
@@ -174,11 +175,68 @@ func VersionSum(packet Packet) int {
 	return sum
 }
 
+func Calc(packet Packet) int {
+	sum := 0
+	// fmt.Println("Packet:", packet.typ, packet)
+	switch packet.typ {
+	case 0: // are sum packets - their value is the sum of the values of their sub-packets. If they only have a single sub-packet, their value is the value of the sub-packet.
+		for _, p := range packet.sub {
+			sum += Calc(p)
+		}
+	case 1: // are product packets - their value is the result of multiplying together the values of their sub-packets. If they only have a single sub-packet, their value is the value of the sub-packet.
+		sum = 1
+		for _, p := range packet.sub {
+			sum *= Calc(p)
+		}
+	case 2: // are minimum packets - their value is the minimum of the values of their sub-packets.
+		sum = math.MaxInt
+		for _, p := range packet.sub {
+			v := Calc(p)
+			if v < sum {
+				sum = v
+			}
+		}
+	case 3: // are maximum packets - their value is the maximum of the values of their sub-packets.
+		sum = math.MinInt
+		for _, p := range packet.sub {
+			v := Calc(p)
+			if v > sum {
+				sum = v
+			}
+		}
+	case 4: // Literals
+		return packet.val
+	case 5: // are greater than packets - their value is 1 if the value of the first sub-packet is greater than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+		a := Calc(packet.sub[0])
+		b := Calc(packet.sub[1])
+		// fmt.Println("A", a, "> B", b, packet)
+		if a > b {
+			sum = 1
+		}
+	case 6: // are less than packets - their value is 1 if the value of the first sub-packet is less than the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+		a := Calc(packet.sub[0])
+		b := Calc(packet.sub[1])
+		// fmt.Println("A", a, "< B", b, packet)
+		if a < b {
+			sum = 1
+		}
+	case 7: // are equal to packets - their value is 1 if the value of the first sub-packet is equal to the value of the second sub-packet; otherwise, their value is 0. These packets always have exactly two sub-packets.
+		a := Calc(packet.sub[0])
+		b := Calc(packet.sub[1])
+		// fmt.Println("A", a, "< B", b, packet)
+		if a == b {
+			sum = 1
+		}
+	}
+	return sum
+}
+
 func Part1(input string) int {
 	packet := PacketDecode(input)
 	return VersionSum(packet)
 }
 
 func Part2(input string) int {
-	return 0
+	packet := PacketDecode(input)
+	return Calc(packet)
 }

@@ -139,10 +139,36 @@ func TestVersionSumSuperNested(t *testing.T) {
 	assert.Equal(t, 31, VersionSum(packet), "they should be equal")
 }
 
+var tests = []struct {
+	input       string
+	expected    int
+	description string
+}{
+	{"C200B40A82", 3, "finds the sum of 1 and 2, resulting in the value 3."},
+	{"04005AC33890", 54, "finds the product of 6 and 9, resulting in the value 54."},
+	{"880086C3E88112", 7, "finds the minimum of 7, 8, and 9, resulting in the value 7."},
+	{"CE00C43D881120", 9, "finds the maximum of 7, 8, and 9, resulting in the value 9."},
+	{"D8005AC2A8F0", 1, "produces 1, because 5 is less than 15."},
+	{"F600BC2D8F", 0, "produces 0, because 5 is not greater than 15."},
+	{"9C005AC2F8F0", 0, "produces 0, because 5 is not equal to 15."},
+	{"9C0141080250320F1802104A08", 1, "produces 1, because 1 + 3 = 2 * 2."},
+}
+
+func TestCalc(t *testing.T) {
+	for _, tt := range tests {
+		t.Run(tt.description, func(t *testing.T) {
+			got := Calc(PacketDecode(tt.input))
+			if got != tt.expected {
+				t.Errorf("Calc(%s) got %d, want %d", tt.input, got, tt.expected)
+			}
+		})
+	}
+}
+
 func TestPart1(t *testing.T) {
 	assert.Equal(t, 31, Part1(nestedOperator), "they should be equal")
 }
 
-// func TestPart2(t *testing.T) {
-// 	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
-// }
+func TestPart2(t *testing.T) {
+	assert.Equal(t, 1, Part2("9C0141080250320F1802104A08"), "they should be equal")
+}
