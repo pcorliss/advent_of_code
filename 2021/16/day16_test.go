@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -90,22 +89,35 @@ var v3Packet = "620080001611562C8802118E34"
 
 func TestPacketDecodeV3Packet(t *testing.T) {
 	packet := PacketDecode(v3Packet)
-	fmt.Println("Packet:", packet)
+	// fmt.Println("Packet:", packet)
 	assert.Equal(t, 3, packet.version, "they should be equal")
 	assert.Equal(t, 2, len(packet.sub), "they should be equal")
-	// assert.Equal(t, 2, len(packet.sub[0].sub), "they should be equal")
-	// assert.Equal(t, 2, len(packet.sub[1].sub), "they should be equal")
+	assert.Equal(t, 2, len(packet.sub[0].sub), "they should be equal")
+	assert.Equal(t, 2, len(packet.sub[1].sub), "they should be equal")
 }
 
-// func TestVersionSum(t *testing.T) {
-// 	packet := PacketDecode(v3Packet)
-// 	assert.Equal(t, 12, VersionSum(packet), "they should be equal")
-// }
+func TestVersionSum(t *testing.T) {
+	packet := PacketDecode(v3Packet)
+	assert.Equal(t, 12, VersionSum(packet), "they should be equal")
+}
 
 // has the same structure as the previous example,
 // but the outermost packet uses a different length type ID.
 // This packet has a version sum of 23.
 var v3Packet2 = "C0015000016115A2E0802F182340"
+
+func TestPacketDecodeV3Packet2(t *testing.T) {
+	packet := PacketDecode(v3Packet2)
+	// fmt.Println("Packet:", packet)
+	assert.Equal(t, 2, len(packet.sub), "they should be equal")
+	assert.Equal(t, 2, len(packet.sub[0].sub), "they should be equal")
+	assert.Equal(t, 2, len(packet.sub[1].sub), "they should be equal")
+}
+
+func TestVersionSum2(t *testing.T) {
+	packet := PacketDecode(v3Packet2)
+	assert.Equal(t, 23, VersionSum(packet), "they should be equal")
+}
 
 // is an operator packet
 // that contains an operator packet
@@ -113,6 +125,19 @@ var v3Packet2 = "C0015000016115A2E0802F182340"
 // that contains five literal values;
 // it has a version sum of 31.
 var nestedOperator = "A0016C880162017C3686B18A3D4780"
+
+func TestPacketDecodeSuperNested(t *testing.T) {
+	packet := PacketDecode(nestedOperator)
+	// fmt.Println("Packet:", packet)
+	assert.Equal(t, 1, len(packet.sub), "they should be equal")
+	assert.Equal(t, 1, len(packet.sub[0].sub), "they should be equal")
+	assert.Equal(t, 5, len(packet.sub[0].sub[0].sub), "they should be equal")
+}
+
+func TestVersionSumSuperNested(t *testing.T) {
+	packet := PacketDecode(nestedOperator)
+	assert.Equal(t, 31, VersionSum(packet), "they should be equal")
+}
 
 // func TestPart1(t *testing.T) {
 // 	assert.Equal(t, 0, Part1(inputStr), "they should be equal")

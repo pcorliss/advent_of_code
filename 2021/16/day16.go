@@ -104,21 +104,33 @@ func PacketDecodeLiteralValue(data []bool) (int, int) {
 	return val, pos
 }
 
-func PacketDecodeNested(packet Packet, data []bool) Packet {
+func PacketDecodeNested(packet Packet, data []bool) (Packet, int) {
 	nestingType := GetBits(data, 6, 1)
+	// fmt.Println("Nest:", nestingType, len(data))
+	pos := 0
 	if nestingType == 0 {
 		packet.length = GetBits(data, 7, 15)
 		// fmt.Println("Length: ", packet.length, 22, 22+packet.length)
-		packet.sub = PacketDecoder(data[22:22+packet.length], 0)
+		subPackets, _ := PacketDecoder(data[22:22+packet.length], 0)
+		packet.sub = subPackets
+		pos = 22 + packet.length
 	} else {
 		packet.length = GetBits(data, 7, 11)
-		packet.sub = PacketDecoder(data[18:], packet.length)
+		// fmt.Println("Anticipated Length: ", packet.length)
+		subPackets, newPos := PacketDecoder(data[18:], packet.length)
+		packet.sub = subPackets
+		pos += 18 + newPos
+		if len(packet.sub) != packet.length {
+			fmt.Println("Got:", len(packet.sub), "Anticipated:", packet.length)
+			panic("Got unexpected length of packets back")
+		}
+
 	}
-	return packet
+	return packet, pos
 }
 
 // PacketDecode -> PacketDecodeNested(data, container)
-func PacketDecoder(data []bool, limit int) []Packet {
+func PacketDecoder(data []bool, limit int) ([]Packet, int) {
 	pos := 0
 	packets := []Packet{}
 	for len(data)-pos >= 11 && (len(packets) < limit || limit == 0) {
@@ -130,23 +142,36 @@ func PacketDecoder(data []bool, limit int) []Packet {
 			packet.val = val
 			pos += newPos
 		} else {
-			packet = PacketDecodeNested(packet, data[pos:])
-			packets = append(packets, packet)
-			return packets
-			// pos = len(data)
+			// fmt.Println("Pre Nested:", packet, pos, len(data))
+			newPacket, newPos := PacketDecodeNested(packet, data[pos:])
+			packet = newPacket
+			pos += newPos
+			// fmt.Println("Post Nested:", packet, pos, len(data))
+			// packets = append(packets, packet)
+			// return packets, pos
 		}
 		packets = append(packets, packet)
 		// fmt.Println("Packets:", packets, pos)
-		if len(packets) > 4 {
-			panic("Too many packets!!")
+		if len(packets) > 20 {
+			panic("Loop cycle control Too many packets!!")
 		}
 	}
-	return packets
+	return packets, pos
 }
 
 func PacketDecode(in string) Packet {
 	data := HexToBitArray(in)
-	return PacketDecoder(data, 0)[0]
+	packets, _ := PacketDecoder(data, 0)
+	return packets[0]
+}
+
+func VersionSum(packet Packet) int {
+	sum := 0
+	sum += packet.version
+	for _, p := range packet.sub {
+		sum += VersionSum(p)
+	}
+	return sum
 }
 
 func Part1(input string) int {
