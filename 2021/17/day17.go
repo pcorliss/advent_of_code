@@ -94,12 +94,13 @@ func IntersectsTarget(vel Point, t Target) (bool, int) {
 	}
 }
 
-func MaxVel(t Target) (Point, int) {
+func MaxVel(t Target) (Point, int, int) {
 	maxPoint := Point{}
 	minX, maxX := 0, 0
 	minY, maxYY := 0, 0
 	maxY := 0
-	fmt.Println(t.x_end, -t.y_start, t)
+	count := 0
+	// fmt.Println(t.x_end, -t.y_start, t)
 	for x := 0; x <= t.x_end; x++ {
 		for y := t.y_start; y <= -t.y_start; y++ {
 			boo, max := IntersectsTarget(Point{x, y}, t)
@@ -118,6 +119,9 @@ func MaxVel(t Target) (Point, int) {
 					maxYY = y
 				}
 			}
+			if boo {
+				count++
+			}
 			if boo && max > maxY {
 				maxY = max
 				maxPoint = Point{x, y}
@@ -125,15 +129,17 @@ func MaxVel(t Target) (Point, int) {
 		}
 	}
 	// fmt.Println(minX, maxX, minY, maxYY)
-	return maxPoint, maxY
+	return maxPoint, maxY, count
 }
 
 func Part1(input string) int {
 	target := StringToTarget(input)
-	_, maxY := MaxVel(target)
+	_, maxY, _ := MaxVel(target)
 	return maxY
 }
 
 func Part2(input string) int {
-	return 0
+	target := StringToTarget(input)
+	_, _, count := MaxVel(target)
+	return count
 }

@@ -45,7 +45,7 @@ func TestMaxVel(t *testing.T) {
 	target := StringToTarget(inputStr)
 	// boo, max := IntersectsTarget(Point{6, 9}, target)
 	// fmt.Println("Boo:", boo, "Max:", max)
-	p, maxY := MaxVel(target)
+	p, maxY, _ := MaxVel(target)
 	assert.Equal(t, Point{6, 9}, p, "they should be equal")
 	assert.Equal(t, 45, maxY, "they should be equal")
 }
@@ -55,5 +55,5 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 112, Part2(inputStr), "they should be equal")
 }
