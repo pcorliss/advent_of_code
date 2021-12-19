@@ -164,22 +164,78 @@ func TreeSplit(t BinaryNode) BinaryNode {
 	return t
 }
 
-func TreeReduce(t BinaryNode) BinaryNode {
-	return BinaryNode{}
+func TreeAdd(trees []*BinaryNode) BinaryNode {
+	tree := trees[0]
+	for i := 1; i < len(trees); i++ {
+		tree = &BinaryNode{tree, trees[i], -1}
+	}
+	return *tree
 }
 
-func TreeAdd(a BinaryNode, b BinaryNode) BinaryNode {
-	return BinaryNode{}
+func TreeAddAndReduce(trees []*BinaryNode) BinaryNode {
+	tree := trees[0]
+	for i := 1; i < len(trees); i++ {
+		tree = &BinaryNode{tree, trees[i], -1}
+		TreeReduce(*tree)
+	}
+	return *tree
+}
+
+func TreeReduce(t BinaryNode) BinaryNode {
+	for {
+		previous := TreeToString(t)
+		t = TreeExplode(t)
+		new := TreeToString(t)
+		if previous != new {
+			continue
+		}
+		t = TreeSplit(t)
+		new = TreeToString(t)
+		if previous != new {
+			continue
+		}
+
+		break
+	}
+
+	return t
 }
 
 func TreeMagnitude(t BinaryNode) int {
-	return 0
+	if t.data > -1 {
+		return t.data
+	}
+	return 3*TreeMagnitude(*t.left) + 2*TreeMagnitude(*t.right)
 }
 
 func Part1(input string) int {
-	return 0
+	trees := TreeAddAndReduce(StringToTree(input))
+	return TreeMagnitude(trees)
 }
 
+// 4543 is too low
 func Part2(input string) int {
-	return 0
+	max := 0
+	trees := StringToTree(input)
+	for a := 0; a < len(trees); a++ {
+		for b := 0; b < len(trees); b++ {
+			if a == b {
+				continue
+			}
+			trees = StringToTree(input)
+			compTrees := []*BinaryNode{trees[a], trees[b]}
+			tree := TreeAddAndReduce(compTrees)
+			mag := TreeMagnitude(tree)
+			// if mag > max || (a == 8 && b == 0) {
+			// 	fmt.Println("A:", a, TreeToString(*trees[a]))
+			// 	fmt.Println("B:", b, TreeToString(*trees[b]))
+			// 	fmt.Println("R:", TreeToString(tree))
+			// 	fmt.Println("New Max: ", mag)
+			// }
+			if mag > max {
+				max = mag
+			}
+		}
+	}
+	return max
 }
