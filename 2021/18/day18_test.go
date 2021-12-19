@@ -97,6 +97,62 @@ func TestStringToTreeComplex(t *testing.T) {
 }
 
 func TestTreeToString(t *testing.T) {
+	trees := StringToTree(inputStr)
+	tree := trees[5]
+	expected := "[[[9,[3,8]],[[0,9],6]],[[[3,7],[4,9]],3]]"
+	assert.Equal(t, expected, TreeToString(*tree), "they should be equal")
+}
+
+var explodeTests = []struct {
+	input       string
+	expected    string
+	description string
+}{
+	{"[[[[[9,8],1],2],3],4]", "[[[[0,9],2],3],4]", "(the 9 has no regular number to its left, so it is not added to any regular number)."},
+	{"[7,[6,[5,[4,[3,2]]]]]", "[7,[6,[5,[7,0]]]]", "(the 2 has no regular number to its right, and so it is not added to any regular number)."},
+	{"[[6,[5,[4,[3,2]]]],1]", "[[6,[5,[7,0]]],3]", ""},
+	{"[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", "(the pair [3,2] is unaffected because the pair [7,3] is further to the left; [3,2] would explode on the next action)."},
+	{"[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", "[[3,[2,[8,0]]],[9,[5,[7,0]]]]", ""},
+	{"[[[[0,7],4],[7,[[8,4],9]]],[1,1]]", "[[[[0,7],4],[15,[0,13]]],[1,1]]", "complex explode"},
+}
+
+func TestTreeExplode(t *testing.T) {
+	for _, tt := range explodeTests {
+		t.Run(tt.description, func(t *testing.T) {
+			trees := StringToTree(tt.input)
+			tree := trees[0]
+			actual := TreeToString(TreeExplode(*tree))
+			if actual != tt.expected {
+				t.Errorf("TreeExplode(%s) got %s, want %s", tt.input, actual, tt.expected)
+			}
+		})
+	}
+}
+
+var splitTests = []struct {
+	input       string
+	expected    string
+	description string
+}{
+	{"[[[[[0,9],9],0],0],0]", "[[[[0,[9,9]],0],0],0]", "Even Numbers"},
+	{"[[[[[0,8],9],0],0],0]", "[[[[0,[8,9]],0],0],0]", "Odd Numbers"},
+}
+
+func TestTreeSplit(t *testing.T) {
+	for _, tt := range splitTests {
+		t.Run(tt.description, func(t *testing.T) {
+			trees := StringToTree(tt.input)
+			tree := trees[0]
+			explodedTree := TreeExplode(*tree)
+			actual := TreeToString(TreeSplit(explodedTree))
+			if actual != tt.expected {
+				t.Errorf("TreeSplit(%s) got %s, want %s", tt.input, actual, tt.expected)
+			}
+		})
+	}
+}
+
+func TestTreeReduce(t *testing.T) {
 
 }
 
