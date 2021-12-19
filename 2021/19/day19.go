@@ -101,29 +101,19 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 		distances = append(distances, distance)
 	}
 
-	seen := make(map[int]bool)
 	i := 0
-	// for i := range sensors {
-	seen[i] = true
-	for j := range sensors {
-		match := 0
-		if i == j || seen[j] {
-			continue
-		}
+	// for j := range sensors {
+	j := 1
+	match := 0
 
-		// pointSet := make(map[Point]bool)
-		for dist, _ := range distances[i] {
-			if _, exists := distances[j][dist]; exists {
-				match++
-				// pointSet[distances[i][dist][0]] = true
-				// pointSet[distances[i][dist][1]] = true
-				// pointSet[distances[j][dist][0]] = true
-				// pointSet[distances[j][dist][1]] = true
-			}
+	for dist := range distances[i] {
+		if _, exists := distances[j][dist]; exists {
+			match++
+			fmt.Println(distances[i][dist], distances[j][dist])
 		}
-
-		fmt.Println("Found ", match, "matches between", i, "and", j)
 	}
+
+	fmt.Println("Found ", match, "matches between", i, "and", j)
 	// }
 }
 

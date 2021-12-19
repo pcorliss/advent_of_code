@@ -164,8 +164,8 @@ func TestCalcBeaconToBeaconDistance(t *testing.T) {
 }
 
 func TestPart1(t *testing.T) {
-	sensors := StringToSensors(inputStr)
-	CompareDistancesBetweenSensors(sensors)
+	// sensors := StringToSensors(inputStr)
+	// CompareDistancesBetweenSensors(sensors)
 	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
 }
 
