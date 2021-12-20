@@ -150,7 +150,7 @@ func TestStringToSensors(t *testing.T) {
 	sensors := StringToSensors(inputStr)
 	assert.Equal(t, 5, len(sensors), "they should be equal")
 	assert.Equal(t, 25, len(sensors[0].readings), "they should be equal")
-	assert.Equal(t, Point{404, -588, -901}, sensors[0].readings[0], "they should be equal")
+	assert.Equal(t, true, sensors[0].readings[Point{404, -588, -901}], "they should be equal")
 }
 
 func TestCalcBeaconToBeaconDistance(t *testing.T) {
@@ -158,6 +158,10 @@ func TestCalcBeaconToBeaconDistance(t *testing.T) {
 	distances := CalcBeaconToBeaconDistance(sensors[0].readings)
 	assert.Equal(t, 275, len(distances), "they should be equal")
 	points := distances[4224]
+	// Point order is non-determinate
+	if points[0].x != -838 {
+		points[0], points[1] = points[1], points[0]
+	}
 	assert.Equal(t, 2, len(points), "they should be equal")
 	assert.Equal(t, Point{-838, 591, 734}, points[0], "they should be equal")
 	assert.Equal(t, Point{544, -627, -890}, points[1], "they should be equal")
@@ -177,8 +181,19 @@ func TestApplyTransform(t *testing.T) {
 	vectorWU := Point{-1618, -92, 1303}
 
 	matrix, transform := VectorsToTransform(vectorAB, vectorWU)
-	actual := ApplyTransform(vectorWU, matrix, transform)
+	actual := ApplyTransform(vectorWU, matrix, transform, Point{})
 	assert.Equal(t, vectorAB, actual, "they should be equal")
+}
+
+func TestApplyTransformWithShift(t *testing.T) {
+	vectorAB := Point{-92, -1618, -1303}
+	vectorWU := Point{-1618, -92, 1303}
+	shift := Point{92, 1618, 1303}
+	expected := Point{}
+
+	matrix, transform := VectorsToTransform(vectorAB, vectorWU)
+	actual := ApplyTransform(vectorWU, matrix, transform, shift)
+	assert.Equal(t, expected, actual, "they should be equal")
 }
 
 func TestCalcShift(t *testing.T) {
@@ -194,10 +209,21 @@ func TestCalcShift(t *testing.T) {
 	assert.Equal(t, Point{-1047, 149, 1069}, shift, "they should be equal")
 }
 
+func TestBuildTransformMap(t *testing.T) {
+	sensors := StringToSensors(inputStr)
+	transformMap := BuildTransformMap(sensors)
+	// for _, t := range transformMap {
+	// 	fmt.Println(t)
+	// }
+	assert.Equal(t, 0, transformMap[0].sensorTo, "they should be equal")
+	assert.Equal(t, 1, transformMap[0].sensorFrom, "they should be equal")
+	assert.Equal(t, Point{-1, 1, -1}, transformMap[0].matrix, "they should be equal")
+	assert.Equal(t, Point{-68, 1246, 43}, transformMap[0].shift, "they should be equal")
+	assert.Equal(t, [][]int{{0, 1}, {1, 2}, {2, 0}}, transformMap[1].transforms, "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
-	// sensors := StringToSensors(inputStr)
-	// CompareDistancesBetweenSensors(sensors)
-	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
+	assert.Equal(t, 79, Part1(inputStr), "they should be equal")
 }
 
 func TestPart2(t *testing.T) {

@@ -30,7 +30,7 @@ type Point struct {
 }
 
 type Sensor struct {
-	readings []Point
+	readings map[Point]bool
 }
 
 func StringToSensors(input string) []Sensor {
@@ -45,7 +45,7 @@ func StringToSensors(input string) []Sensor {
 			if j > 0 {
 				sensors = append(sensors, curSensor)
 			}
-			curSensor = Sensor{[]Point{}}
+			curSensor = Sensor{make(map[Point]bool)}
 			continue
 		}
 		point := Point{}
@@ -65,7 +65,7 @@ func StringToSensors(input string) []Sensor {
 				panic("Too many entries in line")
 			}
 		}
-		curSensor.readings = append(curSensor.readings, point)
+		curSensor.readings[point] = true
 	}
 	sensors = append(sensors, curSensor)
 	return sensors
@@ -75,12 +75,12 @@ func SameOct(a, b Point) bool {
 	return math.Signbit(float64(a.x)) == math.Signbit(float64(b.x)) && math.Signbit(float64(a.y)) == math.Signbit(float64(b.y)) && math.Signbit(float64(a.z)) == math.Signbit(float64(b.z))
 }
 
-func CalcBeaconToBeaconDistance(readings []Point) map[int][]Point {
+func CalcBeaconToBeaconDistance(readings map[Point]bool) map[int][]Point {
 	distance := make(map[int][]Point)
 	calculated := make(map[Point]bool)
-	for _, a := range readings {
+	for a, _ := range readings {
 		calculated[a] = true
-		for _, b := range readings {
+		for b, _ := range readings {
 			if a == b {
 				continue
 			}
@@ -94,8 +94,17 @@ func CalcBeaconToBeaconDistance(readings []Point) map[int][]Point {
 	return distance
 }
 
-func CompareDistancesBetweenSensors(sensors []Sensor) {
+type Transform struct {
+	matrix     Point
+	transforms [][]int
+	shift      Point
+	sensorTo   int
+	sensorFrom int
+}
+
+func BuildTransformMap(sensors []Sensor) []Transform {
 	distances := []map[int][]Point{}
+	out := []Transform{}
 	for _, s := range sensors {
 		distance := CalcBeaconToBeaconDistance(s.readings)
 		distances = append(distances, distance)
@@ -148,14 +157,14 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 			}
 
 			// Not sure if 12 is meaningful here or not...
-			if len(pointMatches) >= 12 {
+			if len(pointMatches) >= 5 {
 				// fmt.Println("Found ", match, "matches between", i, "and", j)
 				// fmt.Println("Found point matches: ", len(pointMatches))
 			} else {
 				continue
 			}
 
-			fmt.Println("Sensors:", i, j)
+			// fmt.Println("Sensors:", i, j)
 			var matrix Point
 			var shift Point
 			var transforms [][]int
@@ -178,7 +187,7 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 						pointW, pointU = pointU, pointW
 					}
 					if pointMatches[pointA] == pointW && pointMatches[pointB] == pointU {
-						fmt.Println(pointA, pointB, pointU, pointW)
+						// fmt.Println(pointA, pointB, pointU, pointW)
 						vectorAB := Point{pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z}
 						vectorWU := Point{pointU.x - pointW.x, pointU.y - pointW.y, pointU.z - pointW.z}
 
@@ -192,6 +201,7 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 							if s != shift {
 								panic("Found Shift mismatch")
 							}
+							out = append(out, Transform{matrix, transforms, shift, i, j})
 							break
 						} else {
 							// Get vector transition
@@ -199,17 +209,18 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 							shift = CalcShift(pointA, pointW, matrix, transforms)
 							found = true
 						}
-						fmt.Println("  Vectors:", vectorAB, vectorWU)
-						fmt.Println("  Matrix: ", matrix, "Transforms:", transforms, "Shift:", shift)
+						// fmt.Println("  Vectors:", vectorAB, vectorWU)
+						// fmt.Println("  Matrix: ", matrix, "Transforms:", transforms, "Shift:", shift)
 					}
 				}
 			}
 		}
 	}
+	return out
 }
 
 func CalcShift(a Point, b Point, matrix Point, transform [][]int) Point {
-	t := ApplyTransform(b, matrix, transform)
+	t := ApplyTransform(b, matrix, transform, Point{})
 	return Point{
 		t.x - a.x,
 		t.y - a.y,
@@ -217,7 +228,7 @@ func CalcShift(a Point, b Point, matrix Point, transform [][]int) Point {
 	}
 }
 
-func ApplyTransform(p Point, matrix Point, transforms [][]int) Point {
+func ApplyTransform(p Point, matrix Point, transforms [][]int, shift Point) Point {
 	transformed := p
 	for _, transform := range transforms {
 		val := 0
@@ -245,6 +256,10 @@ func ApplyTransform(p Point, matrix Point, transforms [][]int) Point {
 	transformed.x *= matrix.x
 	transformed.y *= matrix.y
 	transformed.z *= matrix.z
+
+	transformed.x += shift.x
+	transformed.y += shift.y
+	transformed.z += shift.z
 	return transformed
 }
 
@@ -278,7 +293,7 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 		}
 	}
 
-	transformed := ApplyTransform(w, Point{1, 1, 1}, transforms)
+	transformed := ApplyTransform(w, Point{1, 1, 1}, transforms, Point{})
 
 	if math.Abs(float64(a.x)) != math.Abs(float64(transformed.x)) || math.Abs(float64(a.y)) != math.Abs(float64(transformed.y)) || math.Abs(float64(a.z)) != math.Abs(float64(transformed.z)) {
 		fmt.Println("Mismatch between a and tranformed", a, transformed)
@@ -299,10 +314,31 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 	return matrix, transforms
 }
 
+func ReduceSensors(sensors []Sensor) []Sensor {
+	transformMap := BuildTransformMap(sensors)
+
+	for i := 0; true; i++ {
+		for _, transform := range transformMap {
+			for p, _ := range sensors[transform.sensorFrom].readings {
+				t := ApplyTransform(p, transform.matrix, transform.transforms, transform.shift)
+				sensors[transform.sensorTo].readings[t] = true
+			}
+			fmt.Println("Transformed ", transform.sensorFrom, "->", transform.sensorTo, "Points:", len(sensors[transform.sensorTo].readings))
+		}
+
+		fmt.Println("Sensor L:", len(sensors[0].readings))
+		if i > 5 {
+			panic("Too many iterations!")
+		}
+	}
+
+	return sensors
+}
+
 func Part1(input string) int {
 	sensors := StringToSensors(input)
-	CompareDistancesBetweenSensors(sensors)
-	return 0
+	sensors = ReduceSensors(sensors)
+	return len(sensors[0].readings)
 }
 
 func Part2(input string) int {
