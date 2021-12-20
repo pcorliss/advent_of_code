@@ -101,20 +101,209 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 		distances = append(distances, distance)
 	}
 
-	i := 0
-	// for j := range sensors {
-	j := 1
-	match := 0
+	for i := range sensors {
+		for j := range sensors {
+			match := 0
+			if j <= i {
+				continue
+			}
 
-	for dist := range distances[i] {
-		if _, exists := distances[j][dist]; exists {
-			match++
-			fmt.Println(distances[i][dist], distances[j][dist])
+			candidates := make(map[Point]map[Point]int)
+			for dist := range distances[i] {
+				if _, exists := distances[j][dist]; exists {
+					match++
+					if candidates[distances[i][dist][0]] == nil {
+						candidates[distances[i][dist][0]] = make(map[Point]int)
+					}
+					if candidates[distances[i][dist][1]] == nil {
+						candidates[distances[i][dist][1]] = make(map[Point]int)
+					}
+					candidates[distances[i][dist][0]][distances[j][dist][0]]++
+					candidates[distances[i][dist][0]][distances[j][dist][1]]++
+					candidates[distances[i][dist][1]][distances[j][dist][0]]++
+					candidates[distances[i][dist][1]][distances[j][dist][1]]++
+
+					// fmt.Println(distances[i][dist], distances[j][dist])
+					// Looks feasible to match points given there are so many matches
+					// Example: 459, -707.. matches to -391, 539...
+					// [{390 -675 -793} {459 -707 401}] [{-322 571 750} {-391 539 -444}]
+					// [{-485 -357 347} {459 -707 401}] [{-391 539 -444} {553 889 -390}]
+
+					// {459 -707 401} == {-391 539 -444}
+					// {390 -675 -793} == {-322 571 750}
+					// {-485 -357 347} == {553 889 -390}
+
+					// 0 sensor | 1 sensor
+					// vec({ 69, -32, 1194}) == vec({-69, -32, -1194})
+					// transform({-1,1,-1})
+					// vec({944 , -350, 54}) == vec({ -944, -350, -54})
+					// transform({-1,1,-1})
+
+					// Now how do I figure orientation of sensor?
+					// If a sensor is at 0,0 another sensor should be able to calc the diff
+					// And then validate using a second point
+					// check all 24 rotations/transformations until a match is found
+
+					// Need to write a function
+				}
+			}
+			pointMatches := make(map[Point]Point)
+			for pointA, potentials := range candidates {
+				maxPoint := Point{}
+				maxCount := 0
+				for pointB, count := range potentials {
+					if count == maxCount {
+						maxCount = 0
+						continue
+					}
+					if maxCount == 0 || count > maxCount {
+						maxPoint = pointB
+						maxCount = count
+					}
+				}
+				// Not sure if this is significant
+				// Found some dupe matche vals
+				// But there should only be one????
+				if maxCount > 2 {
+					pointMatches[pointA] = maxPoint
+					// fmt.Println("Matched:", pointA, maxPoint, maxCount, potentials)
+				}
+			}
+
+			// Not sure if 12 is meaningful here or not...
+			if len(pointMatches) >= 12 {
+				// fmt.Println("Found ", match, "matches between", i, "and", j)
+				// fmt.Println("Found point matches: ", len(pointMatches))
+			} else {
+				continue
+			}
+
+			fmt.Println("Sensors:", i, j)
+			var matrix Point
+			var transforms [][]int
+			found := false
+			for dist := range distances[i] {
+				if _, exists := distances[j][dist]; exists {
+					pointA := distances[i][dist][0]
+					pointB := distances[i][dist][1]
+
+					pointW := distances[j][dist][0]
+					pointU := distances[j][dist][1]
+
+					if _, exists := pointMatches[pointA]; !exists {
+						continue
+					}
+					if _, exists := pointMatches[pointB]; !exists {
+						continue
+					}
+					if !(pointMatches[pointA] == pointW && pointMatches[pointB] == pointU) {
+						pointW, pointU = pointU, pointW
+					}
+					if pointMatches[pointA] == pointW && pointMatches[pointB] == pointU {
+						vectorAB := Point{pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z}
+						vectorWU := Point{pointU.x - pointW.x, pointU.y - pointW.y, pointU.z - pointW.z}
+
+						if found {
+							m, t := VectorsToTransform(vectorAB, vectorWU)
+							if m != matrix || len(t) != len(transforms) {
+								panic("Found Matrix and Transform mismatch")
+							}
+						} else {
+							matrix, transforms = VectorsToTransform(vectorAB, vectorWU)
+							found = true
+						}
+						// fmt.Println("  Vectors:", vectorAB, vectorWU)
+						// fmt.Println("  Matrix: ", matrix, "Transforms:", transforms)
+
+						// Get vector transition
+						// Confirm once and break
+					}
+				}
+			}
+		}
+	}
+}
+
+func ApplyTransform(p Point, matrix Point, transforms [][]int) Point {
+	transformed := p
+	for _, transform := range transforms {
+		val := 0
+		switch transform[1] {
+		case 0:
+			val = p.x
+		case 1:
+			val = p.y
+		case 2:
+			val = p.z
+		default:
+			panic("Switch Failure on Transform")
+		}
+		switch transform[0] {
+		case 0:
+			transformed.x = val
+		case 1:
+			transformed.y = val
+		case 2:
+			transformed.z = val
+		default:
+			panic("Switch Failure on Transform")
+		}
+	}
+	transformed.x *= matrix.x
+	transformed.y *= matrix.y
+	transformed.z *= matrix.z
+	return transformed
+}
+
+func VectorsToTransform(a, w Point) (Point, [][]int) {
+	transforms := [][]int{}
+	if math.Abs(float64(a.x)) != math.Abs(float64(w.x)) {
+		if math.Abs(float64(a.x)) == math.Abs(float64(w.y)) {
+			transforms = append(transforms, []int{0, 1})
+		} else if math.Abs(float64(a.x)) == math.Abs(float64(w.z)) {
+			transforms = append(transforms, []int{0, 2})
+		} else {
+			panic("Should not get here. Vector x didn't match x,y or z")
+		}
+	}
+	if math.Abs(float64(a.y)) != math.Abs(float64(w.y)) {
+		if math.Abs(float64(a.y)) == math.Abs(float64(w.x)) {
+			transforms = append(transforms, []int{1, 0})
+		} else if math.Abs(float64(a.y)) == math.Abs(float64(w.z)) {
+			transforms = append(transforms, []int{1, 2})
+		} else {
+			panic("Should not get here. Vector x didn't match x,y or z")
+		}
+	}
+	if math.Abs(float64(a.z)) != math.Abs(float64(w.z)) {
+		if math.Abs(float64(a.z)) == math.Abs(float64(w.x)) {
+			transforms = append(transforms, []int{2, 0})
+		} else if math.Abs(float64(a.z)) == math.Abs(float64(w.y)) {
+			transforms = append(transforms, []int{2, 1})
+		} else {
+			panic("Should not get here. Vector x didn't match x,y or z")
 		}
 	}
 
-	fmt.Println("Found ", match, "matches between", i, "and", j)
-	// }
+	transformed := ApplyTransform(w, Point{1, 1, 1}, transforms)
+
+	if math.Abs(float64(a.x)) != math.Abs(float64(transformed.x)) || math.Abs(float64(a.y)) != math.Abs(float64(transformed.y)) || math.Abs(float64(a.z)) != math.Abs(float64(transformed.z)) {
+		fmt.Println("Mismatch between a and tranformed", a, transformed)
+		panic("Mismatch between transformed vector")
+	}
+
+	matrix := Point{1, 1, 1}
+	if a.x != transformed.x {
+		matrix.x = -1
+	}
+	if a.y != transformed.y {
+		matrix.y = -1
+	}
+	if a.z != transformed.z {
+		matrix.z = -1
+	}
+
+	return matrix, transforms
 }
 
 func Part1(input string) int {

@@ -163,6 +163,24 @@ func TestCalcBeaconToBeaconDistance(t *testing.T) {
 	assert.Equal(t, Point{544, -627, -890}, points[1], "they should be equal")
 }
 
+func TestVectorsToTransform(t *testing.T) {
+	vectorAB := Point{-92, -1618, -1303}
+	vectorWU := Point{-1618, -92, 1303}
+
+	matrix, transform := VectorsToTransform(vectorAB, vectorWU)
+	assert.Equal(t, Point{1, 1, -1}, matrix, "they should be equal")
+	assert.Equal(t, [][]int{{0, 1}, {1, 0}}, transform, "they should be equal")
+}
+
+func TestApplyTransform(t *testing.T) {
+	vectorAB := Point{-92, -1618, -1303}
+	vectorWU := Point{-1618, -92, 1303}
+
+	matrix, transform := VectorsToTransform(vectorAB, vectorWU)
+	actual := ApplyTransform(vectorWU, matrix, transform)
+	assert.Equal(t, vectorAB, actual, "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
 	// sensors := StringToSensors(inputStr)
 	// CompareDistancesBetweenSensors(sensors)
