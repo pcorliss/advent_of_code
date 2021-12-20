@@ -181,6 +181,19 @@ func TestApplyTransform(t *testing.T) {
 	assert.Equal(t, vectorAB, actual, "they should be equal")
 }
 
+func TestCalcShift(t *testing.T) {
+	vectorAB := Point{-92, -1618, -1303}
+	vectorWU := Point{-1618, -92, 1303}
+
+	matrix, transform := VectorsToTransform(vectorAB, vectorWU)
+
+	a := Point{500, 723, -460}
+	w := Point{872, -547, -609}
+
+	shift := CalcShift(a, w, matrix, transform)
+	assert.Equal(t, Point{-1047, 149, 1069}, shift, "they should be equal")
+}
+
 func TestPart1(t *testing.T) {
 	// sensors := StringToSensors(inputStr)
 	// CompareDistancesBetweenSensors(sensors)

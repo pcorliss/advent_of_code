@@ -122,29 +122,6 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 					candidates[distances[i][dist][0]][distances[j][dist][1]]++
 					candidates[distances[i][dist][1]][distances[j][dist][0]]++
 					candidates[distances[i][dist][1]][distances[j][dist][1]]++
-
-					// fmt.Println(distances[i][dist], distances[j][dist])
-					// Looks feasible to match points given there are so many matches
-					// Example: 459, -707.. matches to -391, 539...
-					// [{390 -675 -793} {459 -707 401}] [{-322 571 750} {-391 539 -444}]
-					// [{-485 -357 347} {459 -707 401}] [{-391 539 -444} {553 889 -390}]
-
-					// {459 -707 401} == {-391 539 -444}
-					// {390 -675 -793} == {-322 571 750}
-					// {-485 -357 347} == {553 889 -390}
-
-					// 0 sensor | 1 sensor
-					// vec({ 69, -32, 1194}) == vec({-69, -32, -1194})
-					// transform({-1,1,-1})
-					// vec({944 , -350, 54}) == vec({ -944, -350, -54})
-					// transform({-1,1,-1})
-
-					// Now how do I figure orientation of sensor?
-					// If a sensor is at 0,0 another sensor should be able to calc the diff
-					// And then validate using a second point
-					// check all 24 rotations/transformations until a match is found
-
-					// Need to write a function
 				}
 			}
 			pointMatches := make(map[Point]Point)
@@ -180,6 +157,7 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 
 			fmt.Println("Sensors:", i, j)
 			var matrix Point
+			var shift Point
 			var transforms [][]int
 			found := false
 			for dist := range distances[i] {
@@ -200,27 +178,42 @@ func CompareDistancesBetweenSensors(sensors []Sensor) {
 						pointW, pointU = pointU, pointW
 					}
 					if pointMatches[pointA] == pointW && pointMatches[pointB] == pointU {
+						fmt.Println(pointA, pointB, pointU, pointW)
 						vectorAB := Point{pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z}
 						vectorWU := Point{pointU.x - pointW.x, pointU.y - pointW.y, pointU.z - pointW.z}
 
+						// Confirm once and break
 						if found {
 							m, t := VectorsToTransform(vectorAB, vectorWU)
 							if m != matrix || len(t) != len(transforms) {
 								panic("Found Matrix and Transform mismatch")
 							}
+							s := CalcShift(pointA, pointW, matrix, transforms)
+							if s != shift {
+								panic("Found Shift mismatch")
+							}
+							break
 						} else {
+							// Get vector transition
 							matrix, transforms = VectorsToTransform(vectorAB, vectorWU)
+							shift = CalcShift(pointA, pointW, matrix, transforms)
 							found = true
 						}
-						// fmt.Println("  Vectors:", vectorAB, vectorWU)
-						// fmt.Println("  Matrix: ", matrix, "Transforms:", transforms)
-
-						// Get vector transition
-						// Confirm once and break
+						fmt.Println("  Vectors:", vectorAB, vectorWU)
+						fmt.Println("  Matrix: ", matrix, "Transforms:", transforms, "Shift:", shift)
 					}
 				}
 			}
 		}
+	}
+}
+
+func CalcShift(a Point, b Point, matrix Point, transform [][]int) Point {
+	t := ApplyTransform(b, matrix, transform)
+	return Point{
+		t.x - a.x,
+		t.y - a.y,
+		t.z - a.z,
 	}
 }
 
