@@ -157,18 +157,19 @@ func BuildTransformMap(sensors []Sensor) []Transform {
 			}
 
 			// Not sure if 12 is meaningful here or not...
-			if len(pointMatches) >= 5 {
-				// fmt.Println("Found ", match, "matches between", i, "and", j)
-				// fmt.Println("Found point matches: ", len(pointMatches))
+			if len(pointMatches) >= 12 {
+				fmt.Println("Found ", match, "matches between", i, "and", j)
+				fmt.Println("  Found point matches: ", len(pointMatches))
 			} else {
 				continue
 			}
 
-			// fmt.Println("Sensors:", i, j)
 			var matrix Point
 			var shift Point
 			var transforms [][]int
-			found := false
+			// found := false
+
+			consensus := []Transform{}
 			for dist := range distances[i] {
 				if _, exists := distances[j][dist]; exists {
 					pointA := distances[i][dist][0]
@@ -186,37 +187,107 @@ func BuildTransformMap(sensors []Sensor) []Transform {
 					if !(pointMatches[pointA] == pointW && pointMatches[pointB] == pointU) {
 						pointW, pointU = pointU, pointW
 					}
+					if !(pointMatches[pointA] == pointW && pointMatches[pointB] == pointU) {
+						continue
+					}
 					if pointMatches[pointA] == pointW && pointMatches[pointB] == pointU {
 						// fmt.Println(pointA, pointB, pointU, pointW)
 						vectorAB := Point{pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z}
 						vectorWU := Point{pointU.x - pointW.x, pointU.y - pointW.y, pointU.z - pointW.z}
 
-						// Confirm once and break
-						if found {
-							m, t := VectorsToTransform(vectorAB, vectorWU)
-							if m != matrix || len(t) != len(transforms) {
-								panic("Found Matrix and Transform mismatch")
-							}
-							s := CalcShift(pointA, pointW, matrix, transforms)
-							if s != shift {
-								panic("Found Shift mismatch")
-							}
-							out = append(out, Transform{matrix, transforms, shift, i, j})
-							break
-						} else {
-							// Get vector transition
-							matrix, transforms = VectorsToTransform(vectorAB, vectorWU)
-							shift = CalcShift(pointA, pointW, matrix, transforms)
-							found = true
+						// Some vectors have identical magnitudes on an axis
+						// We need to skip those because they lead to unreliable Transforms
+						if SkipVector(vectorAB, vectorWU) {
+							// fmt.Println("Skipping Vectors:", vectorAB, vectorWU)
+							continue
 						}
+
+						// m_temp, _ := VectorsToTransform(vectorAB, vectorWU)
+						// fmt.Println("Matrix ", i, j, m_temp)
+						matrix, transforms = VectorsToTransform(vectorAB, vectorWU)
+						shift = CalcShift(pointA, pointW, matrix, transforms)
+						consensus = append(consensus, Transform{matrix, transforms, shift, i, j})
+						// fmt.Println("PreTransform:", vectorAB, vectorWU)
+						// Confirm once and break
+						// if found {
+						// 	m, t := VectorsToTransform(vectorAB, vectorWU)
+						// 	if m != matrix || len(t) != len(transforms) {
+						// 		fmt.Println("Matrix Trans Mismatch", i, j, m, matrix, t, transforms, vectorAB, vectorWU, pointA, pointB, pointMatches[pointA], pointMatches[pointB])
+						// 		panic("Found Matrix and Transform mismatch")
+						// 	}
+						// 	s := CalcShift(pointA, pointW, matrix, transforms)
+						// 	if s != shift {
+						// 		panic("Found Shift mismatch")
+						// 	}
+
+						// 	// break
+						// } else {
+						// 	// Get vector transition
+						// 	matrix, transforms = VectorsToTransform(vectorAB, vectorWU)
+						// 	shift = CalcShift(pointA, pointW, matrix, transforms)
+						// 	found = true
+						// 	out = append(out, Transform{matrix, transforms, shift, i, j})
+						// }
+						// fmt.Println("Sensors:", i, j)
 						// fmt.Println("  Vectors:", vectorAB, vectorWU)
 						// fmt.Println("  Matrix: ", matrix, "Transforms:", transforms, "Shift:", shift)
+						// fmt.Println("  Point A: ", pointA, "Point W:", pointW, "->", ApplyTransform(pointW, matrix, transforms, Point{}))
 					}
 				}
+			}
+
+			matrixCount := make(map[Point]int)
+			shiftCount := make(map[Point]int)
+
+			for _, t := range consensus {
+				matrixCount[t.matrix]++
+				shiftCount[t.shift]++
+			}
+			if len(matrixCount) == 1 && len(shiftCount) == 1 {
+				out = append(out, consensus[0])
+			} else if len(matrixCount) == 0 || len(shiftCount) == 0 {
+				continue
+			} else {
+				fmt.Println("MatCount:", matrixCount)
+				fmt.Println("ShiftCount:", shiftCount)
+				for _, t := range consensus {
+					l := len(consensus) / 2
+					if matrixCount[t.matrix] > l && shiftCount[t.shift] > l {
+						fmt.Println("Consensus Failure, taking most common result", t)
+						out = append(out, t)
+						break
+					}
+				}
+				// panic("Consensus Failure")
 			}
 		}
 	}
 	return out
+}
+
+func SkipVector(a, b Point) bool {
+	if math.Abs(float64(a.x)) != math.Abs(float64(b.x)) {
+		if math.Abs(float64(a.x)) == math.Abs(float64(b.y)) {
+		} else if math.Abs(float64(a.x)) == math.Abs(float64(b.z)) {
+		} else {
+			return true
+		}
+	}
+	if math.Abs(float64(a.y)) != math.Abs(float64(b.x)) {
+		if math.Abs(float64(a.y)) == math.Abs(float64(b.y)) {
+		} else if math.Abs(float64(a.y)) == math.Abs(float64(b.z)) {
+		} else {
+			return true
+		}
+	}
+	if math.Abs(float64(a.z)) != math.Abs(float64(b.x)) {
+		if math.Abs(float64(a.z)) == math.Abs(float64(b.y)) {
+		} else if math.Abs(float64(a.z)) == math.Abs(float64(b.z)) {
+		} else {
+			return true
+		}
+	}
+	return math.Abs(float64(a.x)) == math.Abs(float64(a.y)) || math.Abs(float64(a.x)) == math.Abs(float64(a.z)) || math.Abs(float64(a.y)) == math.Abs(float64(a.z))
 }
 
 func CalcShift(a Point, b Point, matrix Point, transform [][]int) Point {
@@ -257,9 +328,9 @@ func ApplyTransform(p Point, matrix Point, transforms [][]int, shift Point) Poin
 	transformed.y *= matrix.y
 	transformed.z *= matrix.z
 
-	transformed.x += shift.x
-	transformed.y += shift.y
-	transformed.z += shift.z
+	transformed.x -= shift.x
+	transformed.y -= shift.y
+	transformed.z -= shift.z
 	return transformed
 }
 
@@ -271,6 +342,7 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 		} else if math.Abs(float64(a.x)) == math.Abs(float64(w.z)) {
 			transforms = append(transforms, []int{0, 2})
 		} else {
+			fmt.Println("VecA:", a, "VecW:", w)
 			panic("Should not get here. Vector x didn't match x,y or z")
 		}
 	}
@@ -280,7 +352,8 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 		} else if math.Abs(float64(a.y)) == math.Abs(float64(w.z)) {
 			transforms = append(transforms, []int{1, 2})
 		} else {
-			panic("Should not get here. Vector x didn't match x,y or z")
+			fmt.Println("VecA:", a, "VecW:", w)
+			panic("Should not get here. Vector y didn't match x,y or z")
 		}
 	}
 	if math.Abs(float64(a.z)) != math.Abs(float64(w.z)) {
@@ -289,7 +362,8 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 		} else if math.Abs(float64(a.z)) == math.Abs(float64(w.y)) {
 			transforms = append(transforms, []int{2, 1})
 		} else {
-			panic("Should not get here. Vector x didn't match x,y or z")
+			fmt.Println("VecA:", a, "VecW:", w)
+			panic("Should not get here. Vector z didn't match x,y or z")
 		}
 	}
 
@@ -315,10 +389,15 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 }
 
 func ReduceSensors(sensors []Sensor) []Sensor {
-	transformMap := BuildTransformMap(sensors)
+	// transformMap := BuildTransformMap(sensors)
 
-	for i := 0; true; i++ {
+	for i := len(sensors) - 1; i > 0; i-- {
+		transformMap := BuildTransformMap(sensors[:i+1])
 		for _, transform := range transformMap {
+			if transform.sensorFrom != i {
+				continue
+			}
+			// sensors[transform.sensorFrom].readings
 			for p, _ := range sensors[transform.sensorFrom].readings {
 				t := ApplyTransform(p, transform.matrix, transform.transforms, transform.shift)
 				sensors[transform.sensorTo].readings[t] = true
@@ -327,14 +406,12 @@ func ReduceSensors(sensors []Sensor) []Sensor {
 		}
 
 		fmt.Println("Sensor L:", len(sensors[0].readings))
-		if i > 5 {
-			panic("Too many iterations!")
-		}
 	}
 
 	return sensors
 }
 
+// 128 too low
 func Part1(input string) int {
 	sensors := StringToSensors(input)
 	sensors = ReduceSensors(sensors)
