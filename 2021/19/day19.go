@@ -158,8 +158,8 @@ func BuildTransformMap(sensors []Sensor) []Transform {
 
 			// Not sure if 12 is meaningful here or not...
 			if len(pointMatches) >= 12 {
-				fmt.Println("Found ", match, "matches between", i, "and", j)
-				fmt.Println("  Found point matches: ", len(pointMatches))
+				// fmt.Println("Found ", match, "matches between", i, "and", j)
+				// fmt.Println("  Found point matches: ", len(pointMatches))
 			} else {
 				continue
 			}
@@ -248,12 +248,12 @@ func BuildTransformMap(sensors []Sensor) []Transform {
 			} else if len(matrixCount) == 0 || len(shiftCount) == 0 {
 				continue
 			} else {
-				fmt.Println("MatCount:", matrixCount)
-				fmt.Println("ShiftCount:", shiftCount)
+				// fmt.Println("MatCount:", matrixCount)
+				// fmt.Println("ShiftCount:", shiftCount)
 				for _, t := range consensus {
 					l := len(consensus) / 2
 					if matrixCount[t.matrix] > l && shiftCount[t.shift] > l {
-						fmt.Println("Consensus Failure, taking most common result", t)
+						// fmt.Println("Consensus Failure, taking most common result", t)
 						out = append(out, t)
 						break
 					}
@@ -388,8 +388,13 @@ func VectorsToTransform(a, w Point) (Point, [][]int) {
 	return matrix, transforms
 }
 
-func ReduceSensors(sensors []Sensor) []Sensor {
+func ReduceSensors(sensors []Sensor) ([]Sensor, []map[Point]bool) {
 	// transformMap := BuildTransformMap(sensors)
+
+	// sensorMap[Point]bool
+
+	sensorMap := make([]map[Point]bool, len(sensors))
+	// sensorMap[0] = make(map[Point]bool)
 
 	for i := len(sensors) - 1; i > 0; i-- {
 		transformMap := BuildTransformMap(sensors[:i+1])
@@ -402,22 +407,48 @@ func ReduceSensors(sensors []Sensor) []Sensor {
 				t := ApplyTransform(p, transform.matrix, transform.transforms, transform.shift)
 				sensors[transform.sensorTo].readings[t] = true
 			}
-			fmt.Println("Transformed ", transform.sensorFrom, "->", transform.sensorTo, "Points:", len(sensors[transform.sensorTo].readings))
+			// fmt.Println("Transformed ", transform.sensorFrom, "->", transform.sensorTo, "Points:", len(sensors[transform.sensorTo].readings))
+			if sensorMap[transform.sensorTo] == nil {
+				sensorMap[transform.sensorTo] = make(map[Point]bool)
+			}
+			t := ApplyTransform(Point{}, transform.matrix, transform.transforms, transform.shift)
+			sensorMap[transform.sensorTo][t] = true
+			for origin := range sensorMap[i] {
+				t := ApplyTransform(origin, transform.matrix, transform.transforms, transform.shift)
+				sensorMap[transform.sensorTo][t] = true
+			}
 		}
 
-		fmt.Println("Sensor L:", len(sensors[0].readings))
+		fmt.Println("Sensor L:", len(sensors[0].readings), len(sensorMap[0]))
 	}
 
-	return sensors
+	sensorMap[0][Point{}] = true
+	return sensors, sensorMap
 }
 
 // 128 too low
 func Part1(input string) int {
 	sensors := StringToSensors(input)
-	sensors = ReduceSensors(sensors)
+	sensors, _ = ReduceSensors(sensors)
 	return len(sensors[0].readings)
 }
 
 func Part2(input string) int {
-	return 0
+	sensors := StringToSensors(input)
+	_, sensorMap := ReduceSensors(sensors)
+	maxDist := 0
+	if len(sensorMap[0]) != len(sensors) {
+		fmt.Println(len(sensorMap[0]))
+		panic("Sensor Map is bogus")
+	}
+	for a := range sensorMap[0] {
+		for b := range sensorMap[0] {
+			dist := math.Abs(float64(b.x-a.x)) + math.Abs(float64(b.y-a.y)) + math.Abs(float64(b.z-a.z))
+			if dist > float64(maxDist) {
+				fmt.Println("A", a, "B", b)
+				maxDist = int(dist)
+			}
+		}
+	}
+	return maxDist
 }
