@@ -201,6 +201,7 @@ func Part1(input string) int {
 // 82760 - too high
 // 19058 - too high
 // 12287 - too low
+// 16757
 func Part2(input string) int {
 	lookup, grid := StringToGrid(input)
 	for i := 0; i < 50; i++ {
