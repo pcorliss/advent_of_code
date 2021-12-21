@@ -94,5 +94,5 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+	assert.Equal(t, 3351, Part2(inputStr), "they should be equal")
 }

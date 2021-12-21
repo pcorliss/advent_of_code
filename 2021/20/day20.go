@@ -102,7 +102,7 @@ func GridToString(g Grid) string {
 
 func Step(g Grid, l [512]bool) Grid {
 	newGrid := Grid{make(map[Point]bool), Point{}, Point{}}
-	margin := 8
+	margin := 3
 	for y := g.min.y - margin; y <= g.max.y+margin; y++ {
 		for x := g.min.x - margin; x <= g.max.x+margin; x++ {
 			bin := 0
@@ -151,6 +151,12 @@ func TrimBorder(g Grid) Grid {
 	return g
 }
 
+func TrimBorderMargin(g Grid, margin int) Grid {
+	g.min = Point{g.min.x + margin, g.min.y + margin}
+	g.max = Point{g.max.x - margin, g.max.y - margin}
+	return g
+}
+
 func CountTrimmedGrid(g Grid) int {
 	count := 0
 	for y := g.min.y; y <= g.max.y; y++ {
@@ -163,20 +169,49 @@ func CountTrimmedGrid(g Grid) int {
 	return count
 }
 
+// ######
+// ######
+// ######
+// ###
+// ###
+// ###
+
+// ......
+// ......
+// ..XXXX
+// ..X
+// ..X
+// ..X
+
 // 5960 - too high
 // 8194 - too high (after trimming)
+// 5786
 func Part1(input string) int {
 	lookup, grid := StringToGrid(input)
 	grid = Step(grid, lookup)
-	fmt.Println("Step1:")
-	fmt.Println(GridToString(grid))
+	// fmt.Println("Step1:")
+	// fmt.Println(GridToString(grid))
 	grid = Step(grid, lookup)
 	grid = TrimBorder(grid)
-	fmt.Println("Step2:")
-	fmt.Println(GridToString(grid))
+	// fmt.Println("Step2:")
+	// fmt.Println(GridToString(grid))
 	return CountTrimmedGrid(grid)
 }
 
+// 82760 - too high
+// 19058 - too high
+// 12287 - too low
 func Part2(input string) int {
-	return 0
+	lookup, grid := StringToGrid(input)
+	for i := 0; i < 50; i++ {
+		grid = Step(grid, lookup)
+		if i%2 == 0 && lookup[0] {
+			grid = TrimBorderMargin(grid, 4)
+		}
+	}
+	// fmt.Println("Step1:")
+	// fmt.Println(GridToString(grid))
+	// fmt.Println("Step2:")
+	// fmt.Println(GridToString(grid))
+	return CountTrimmedGrid(grid)
 }
