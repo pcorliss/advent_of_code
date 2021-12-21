@@ -102,8 +102,9 @@ func GridToString(g Grid) string {
 
 func Step(g Grid, l [512]bool) Grid {
 	newGrid := Grid{make(map[Point]bool), Point{}, Point{}}
-	for y := g.min.y - 1; y <= g.max.y+1; y++ {
-		for x := g.min.x - 1; x <= g.max.x+1; x++ {
+	margin := 8
+	for y := g.min.y - margin; y <= g.max.y+margin; y++ {
+		for x := g.min.x - margin; x <= g.max.x+margin; x++ {
 			bin := 0
 			p := Point{x, y}
 			for i, n := range Neighbors(p) {
@@ -131,11 +132,49 @@ func Step(g Grid, l [512]bool) Grid {
 	return newGrid
 }
 
+func TrimBorder(g Grid) Grid {
+	trimmedMin := false
+	trimmedMax := false
+
+	for i := 0; !trimmedMin || !trimmedMax; i++ {
+		minP := Point{g.min.x + i, g.min.y + i}
+		maxP := Point{g.max.x - i, g.max.y - i}
+		if !trimmedMin && !g.points[minP] {
+			g.min = minP
+			trimmedMin = true
+		}
+		if !trimmedMax && !g.points[maxP] {
+			g.max = maxP
+			trimmedMax = true
+		}
+	}
+	return g
+}
+
+func CountTrimmedGrid(g Grid) int {
+	count := 0
+	for y := g.min.y; y <= g.max.y; y++ {
+		for x := g.min.x; x <= g.max.x; x++ {
+			if g.points[Point{x, y}] {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+// 5960 - too high
+// 8194 - too high (after trimming)
 func Part1(input string) int {
-	lookup, grid := StringToGrid(inputStr)
+	lookup, grid := StringToGrid(input)
 	grid = Step(grid, lookup)
+	fmt.Println("Step1:")
+	fmt.Println(GridToString(grid))
 	grid = Step(grid, lookup)
-	return len(grid.points)
+	grid = TrimBorder(grid)
+	fmt.Println("Step2:")
+	fmt.Println(GridToString(grid))
+	return CountTrimmedGrid(grid)
 }
 
 func Part2(input string) int {
