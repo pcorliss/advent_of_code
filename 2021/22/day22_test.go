@@ -155,6 +155,11 @@ func TestCubeIntersectionVolume2(t *testing.T) {
 	assert.Equal(t, 27, IntersectionVolume(a, b), "they should be equal")
 }
 
+func TestCubeVolume(t *testing.T) {
+	cube := Cube{10, 12, 10, 12, 10, 12, false}
+	assert.Equal(t, 27, CubeVolume(cube), "they should be equal")
+}
+
 // func TestCubesNew(t *testing.T) {
 // 	inst := StringToInstructions(inputStr)
 // 	cubesOn := CubesNew(inst, 50, 4)
@@ -163,44 +168,30 @@ func TestCubeIntersectionVolume2(t *testing.T) {
 
 var explodeTests = []struct {
 	input       string
-	boundary    int
 	steps       int
 	expected    int
 	description string
 }{
-	{inputStr, 50, 1, 27, "The first step has no intersections and turns on a 3x3x3 grid"},
-	{inputStr, 50, 2, 27 + 19, "The second step has an intersection with the previous 3x3x3 grid"},
-	{inputStr, 50, 3, 27 + 19 - 8, "The third step interacts with the first two and is also a 3x3x3 grid"},
-	// {inputStr, 50, 0, 27 + 19 - 8 + 1, "A single cube is turned on"},
+	{inputStr, 1, 27, "The first step has no intersections and turns on a 3x3x3 grid"},
+	{inputStr, 2, 27 + 19, "The second step has an intersection with the previous 3x3x3 grid"},
+	{inputStr, 3, 27 + 19 - 8, "The third step interacts with the first two and is also a 3x3x3 grid"},
+	{inputStr, 0, 27 + 19 - 8 + 1, "A single cube is turned on"},
+	{HumongousStr, 0, 2758514936282235, "Giant Example"},
 }
 
 func TestNewCubesMatrix(t *testing.T) {
 	for _, tt := range explodeTests {
 		t.Run(tt.description, func(t *testing.T) {
-			inst := StringToInstructions(inputStr)
-			actual := CubesNew(inst, tt.boundary, tt.steps)
+			inst := StringToInstructions(tt.input)
+			actual := CubesNew(inst, tt.steps)
 			if actual != tt.expected {
-				t.Errorf("NewCubes(inst, %d, %d) got %d want %d", tt.boundary, tt.steps, actual, tt.expected)
+				t.Errorf("NewCubes(inst, %d) got %d want %d", tt.steps, actual, tt.expected)
 			}
 		})
 	}
 }
 
-// func TestPart2(t *testing.T) {
-// 	// Note that part 2 has different example data
-// 	assert.Equal(t, 2758514936282235, Part2(HumongousStr), "they should be equal")
-// }
-// total := 0
-// count := 0
-// for i, a := range inst {
-// 	for j, b := range inst {
-// 		if j <= i {
-// 			continue
-// 		}
-// 		total++
-// 		if CubeIntersect(a, b) {
-// 			count++
-// 		}
-// 	}
-// }
-// fmt.Println("Count:", count, "Total:", total)
+func TestPart2(t *testing.T) {
+	// Note that part 2 has different example data
+	assert.Equal(t, 2758514936282235, Part2(HumongousStr), "they should be equal")
+}

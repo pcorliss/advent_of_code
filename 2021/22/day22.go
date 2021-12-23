@@ -156,54 +156,62 @@ func max(a, b int) int {
 	return b
 }
 
-func IntersectionVolume(a Cube, b Cube) int {
-	// 12 - 10 == 2
-	return (min(a.xp, b.xp) - max(a.x, b.x) + 1) *
-		(min(a.yp, b.yp) - max(a.y, b.y) + 1) *
-		(min(a.zp, b.zp) - max(a.z, b.z) + 1)
+func CubeVolume(a Cube) int {
+	return (a.xp - a.x + 1) * (a.yp - a.y + 1) * (a.zp - a.z + 1)
 }
 
-func CubesNew(insts []Cube, minmax int, steps int) int {
-	count := 0
+func IntersectionVolume(a Cube, b Cube) int {
+	// 12 - 10 == 2
+	// return (min(a.xp, b.xp) - max(a.x, b.x) + 1) *
+	// 	(min(a.yp, b.yp) - max(a.y, b.y) + 1) *
+	// 	(min(a.zp, b.zp) - max(a.z, b.z) + 1)
 
-	boundaryCube := Cube{-minmax, minmax, -minmax, minmax, -minmax, minmax, true}
-	boundaryVol := IntersectionVolume(boundaryCube, boundaryCube)
-	newInst := []Cube{boundaryCube}
-	for _, i := range insts {
-		i.state = !i.state
-		newInst = append(newInst, i)
+	return CubeVolume(CubeIntersection(a, b))
+}
+
+func CubeIntersection(a Cube, b Cube) Cube {
+	return Cube{
+		max(a.x, b.x), min(a.xp, b.xp),
+		max(a.y, b.y), min(a.yp, b.yp),
+		max(a.z, b.z), min(a.zp, b.zp),
+		true}
+}
+
+func copyCubeMap(m map[Cube]int) map[Cube]int {
+	out := make(map[Cube]int, len(m))
+	for k, v := range m {
+		out[k] = v
 	}
+	return out
+}
 
-	for i, cube := range newInst {
-		if i > steps && steps > 0 {
-			// fmt.Println("Breaking on ", i)
+// Heavily influenced by this solution
+// https://www.reddit.com/r/adventofcode/comments/rlxhmg/2021_day_22_solutions/hpizza8/?utm_source=reddit&utm_medium=web2x&context=3
+func CubesNew(cubes []Cube, steps int) int {
+	subCubes := make(map[Cube]int)
+	for i, cube := range cubes {
+		if i >= steps && steps > 0 {
 			break
 		}
-		fmt.Println(i, cube)
-		if i == 0 {
-			// First cube is boundary box and is always on
-			count += IntersectionVolume(cube, cube)
-			// fmt.Println("  Count:", count)
-		}
-		for j := i - 1; j >= 0; j-- {
-			priorCube := newInst[j]
-			if !CubeIntersect(cube, priorCube) {
+
+		for subCube, esgn := range copyCubeMap(subCubes) {
+			if !CubeIntersect(subCube, cube) {
 				continue
 			}
-			vol := -1 * IntersectionVolume(cube, priorCube)
-			// if !cube.state {
-			// 	vol *= -1
-			// }
-			if cube.state == priorCube.state {
-				vol *= -1
-			}
-			count += vol
-			fmt.Println("  Count:", boundaryVol-count, -vol, cube.state, priorCube)
+
+			subCubes[CubeIntersection(cube, subCube)] -= esgn
 		}
-		// fmt.Println("    SubCount:", subCount)
+
+		if cube.state {
+			subCubes[cube] += 1
+		}
 	}
 
-	return boundaryVol - count
+	count := 0
+	for subCube, sgn := range subCubes {
+		count += CubeVolume(subCube) * sgn
+	}
+	return count
 }
 
 func Cubes(insts []Cube, minmax int) int {
@@ -216,5 +224,6 @@ func Part1(input string) int {
 }
 
 func Part2(input string) int {
-	return 0
+	inst := StringToInstructions(input)
+	return CubesNew(inst, 0)
 }
