@@ -63,7 +63,7 @@ func TestCubesBig(t *testing.T) {
 	assert.Equal(t, 590784, cubesOn, "they should be equal")
 }
 
-var BiggestStr = strings.TrimSpace(`
+var HumongousStr = strings.TrimSpace(`
 on x=-5..47,y=-31..22,z=-19..33
 on x=-44..5,y=-27..21,z=-14..35
 on x=-49..-1,y=-11..42,z=-10..38
@@ -126,15 +126,81 @@ on x=-53470..21291,y=-120233..-33476,z=-44150..38147
 off x=-93533..-4276,y=-16170..68771,z=-104985..-24507
 `)
 
-// func TestCubesBiggest(t *testing.T) {
-// 	inst := StringToInstructions(BiggestStr)
-// 	cubesOn := Cubes(inst, 1000000000)
-// 	assert.Equal(t, 2758514936282235, cubesOn, "they should be equal")
+// func TestCubesBiggestInit(t *testing.T) {
+// 	inst := StringToInstructions(HumongousStr)
+// 	cubesOn := Cubes(inst, 50)
+// 	assert.Equal(t, 474140, cubesOn, "they should be equal")
 // }
+
 func TestPart1(t *testing.T) {
 	assert.Equal(t, 39, Part1(inputStr), "they should be equal")
 }
 
-func TestPart2(t *testing.T) {
-	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
+func TestCubeIntersect(t *testing.T) {
+	inst := StringToInstructions(HumongousStr)
+	assert.Equal(t, true, CubeIntersect(inst[0], inst[1]), "they should be equal")
+	assert.Equal(t, false, CubeIntersect(inst[0], inst[4]), "they should be equal")
 }
+
+func TestCubeIntersectionVolume(t *testing.T) {
+	// on x=-5..47,y=-31..22,z=-19..33
+	// on x=-44..5,y=-27..21,z=-14..35
+	inst := StringToInstructions(HumongousStr)
+	assert.Equal(t, 11*49*48, IntersectionVolume(inst[0], inst[1]), "they should be equal")
+}
+
+func TestCubeIntersectionVolume2(t *testing.T) {
+	a := Cube{-50, 50, -50, 50, -50, 50, true}
+	b := Cube{10, 12, 10, 12, 10, 12, false}
+	assert.Equal(t, 27, IntersectionVolume(a, b), "they should be equal")
+}
+
+// func TestCubesNew(t *testing.T) {
+// 	inst := StringToInstructions(inputStr)
+// 	cubesOn := CubesNew(inst, 50, 4)
+// 	assert.Equal(t, 39, cubesOn, "they should be equal")
+// }
+
+var explodeTests = []struct {
+	input       string
+	boundary    int
+	steps       int
+	expected    int
+	description string
+}{
+	{inputStr, 50, 1, 27, "The first step has no intersections and turns on a 3x3x3 grid"},
+	{inputStr, 50, 2, 27 + 19, "The second step has an intersection with the previous 3x3x3 grid"},
+	{inputStr, 50, 3, 27 + 19 - 8, "The third step interacts with the first two and is also a 3x3x3 grid"},
+	// {inputStr, 50, 0, 27 + 19 - 8 + 1, "A single cube is turned on"},
+}
+
+func TestNewCubesMatrix(t *testing.T) {
+	for _, tt := range explodeTests {
+		t.Run(tt.description, func(t *testing.T) {
+			inst := StringToInstructions(inputStr)
+			actual := CubesNew(inst, tt.boundary, tt.steps)
+			if actual != tt.expected {
+				t.Errorf("NewCubes(inst, %d, %d) got %d want %d", tt.boundary, tt.steps, actual, tt.expected)
+			}
+		})
+	}
+}
+
+// func TestPart2(t *testing.T) {
+// 	// Note that part 2 has different example data
+// 	assert.Equal(t, 2758514936282235, Part2(HumongousStr), "they should be equal")
+// }
+// total := 0
+// count := 0
+// for i, a := range inst {
+// 	for j, b := range inst {
+// 		if j <= i {
+// 			continue
+// 		}
+// 		total++
+// 		if CubeIntersect(a, b) {
+// 			count++
+// 		}
+// 	}
+// }
+// fmt.Println("Count:", count, "Total:", total)
