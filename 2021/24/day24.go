@@ -169,23 +169,25 @@ func containsZero(in []int) bool {
 
 // What is the largest model number accepted by MONAD?
 func Part1(input string) int {
-	num := 99999999999999
-	for num > 0 {
-		digits := IntToDigits(num)
-		for containsZero(digits) {
-			num--
-			digits = IntToDigits(num)
-		}
-		out := Generated(digits)
-		if out[3] == 0 {
-			return num
-		}
-		if num%3333333 == 0 {
-			fmt.Println("Tried:", num)
-			fmt.Println("Out:", out)
-		}
-		num--
-	}
+	// num := 99999999999999
+	// for num > 0 {
+	// 	digits := IntToDigits(num)
+	// 	for containsZero(digits) {
+	// 		num--
+	// 		digits = IntToDigits(num)
+	// 	}
+	// 	out := Generated(digits)
+	// 	if out[3] == 0 {
+	// 		return num
+	// 	}
+	// 	if num%3333333 == 0 {
+	// 		fmt.Println("Tried:", num)
+	// 		fmt.Println("Out:", out)
+	// 	}
+	// 	num--
+	// }
+	// return -1
+	Generated()
 	return -1
 }
 
@@ -193,257 +195,390 @@ func Part2(input string) int {
 	return 0
 }
 
-func Generated(input []int) [4]int {
+func Generated() [4]int {
 	idx := 0
 	register := [4]int{}
-	register[0] = input[idx] // r0 = inp
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 1
-	register[1] += 10 // r1 = 10
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states := make(map[[4]int][]int)
+	input := []int{}
+
+	for i := 1; i < 10; i++ {
+		register[0] = i // r0 = inp
+		register[1] *= 0
+		register[1] += register[3]
+		register[1] %= 26
+		register[3] /= 1
+		register[1] += 10 // r1 = 10
+		if register[1] == register[0] {
+			register[1] = 1
+		} else {
+			register[1] = 0
+		}
+		if register[1] == 0 {
+			register[1] = 1
+		} else {
+			register[1] = 0
+		} // r1 = 1
+		register[2] *= 0
+		register[2] += 25 // r2 = 25
+		register[2] *= register[1]
+		register[2] += 1 // r2 = 26
+		register[3] *= register[2]
+		register[2] *= 0           // r2 = 0
+		register[2] += register[0] // r2 = r0
+		register[2] += 2           // r2 += 2
+		register[2] *= register[1] // r2 = (in0 + 2) * 10
+		register[3] += register[2] // r3 = (in0 + 2) * 10
+
+		states[register] = []int{i}
 	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	} // r1 = 1
-	register[2] *= 0
-	register[2] += 25 // r2 = 25
-	register[2] *= register[1]
-	register[2] += 1 // r2 = 26
-	register[3] *= register[2]
-	register[2] *= 0           // r2 = 0
-	register[2] += register[0] // r2 = r0
-	register[2] += 2           // r2 += 2
-	register[2] *= register[1] // r2 = (in0 + 2) * 10
-	register[3] += register[2] // r3 = (in0 + 2) * 10
+
+	fmt.Println("States:", len(states), states)
 
 	// r0 = inp
 	// r1 = r3
 	//
+	newState := make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i // in1
+			register[1] *= 0
+			register[1] += register[3] // r1 = r3 = (in0 + 2) * 10
+			register[1] %= 26          // r1 %= 26
+			register[3] /= 1
+			register[1] += 14
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 13
+			register[2] *= register[1]
+			register[3] += register[2]
 
-	register[0] = input[idx] // in1
-	idx++
-	register[1] *= 0
-	register[1] += register[3] // r1 = (in0 + 2) * 10
-	register[1] %= 26          // r1 %= 26
-	register[3] /= 1
-	register[1] += 14
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 1
+			register[1] += 14
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 13
+			register[2] *= register[1]
+			register[3] += register[2]
+
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 13
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 1
-	register[1] += 14
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 26
+			register[1] += -13
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 9
+			register[2] *= register[1]
+			register[3] += register[2]
+
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 1
+			register[1] += 10
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 15
+			register[2] *= register[1]
+			register[3] += register[2]
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 13
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 26
-	register[1] += -13
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 26
+			register[1] += -13
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 3
+			register[2] *= register[1]
+			register[3] += register[2]
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 26
+			register[1] += -7
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 6
+			register[2] *= register[1]
+			register[3] += register[2]
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 9
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 1
-	register[1] += 10
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 1
+			register[1] += 11
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 5
+			register[2] *= register[1]
+			register[3] += register[2]
+
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
+	states = newState
+
+	fmt.Println("States:", len(states))
+	// return register
+
+	newState = make(map[[4]int][]int)
+	for state, digits := range states {
+		register = state
+		for i := 9; i > 0; i-- {
+			register[0] = i
+			register[1] *= 0
+			register[1] += register[3]
+			register[1] %= 26
+			register[3] /= 1
+			register[1] += 10
+			if register[1] == register[0] {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			if register[1] == 0 {
+				register[1] = 1
+			} else {
+				register[1] = 0
+			}
+			register[2] *= 0
+			register[2] += 25
+			register[2] *= register[1]
+			register[2] += 1
+			register[3] *= register[2]
+			register[2] *= 0
+			register[2] += register[0]
+			register[2] += 16
+			register[2] *= register[1]
+			register[3] += register[2]
+			if _, exists := newState[register]; !exists {
+				newDigits := digits[:]
+				newDigits = append(newDigits, i)
+				newState[register] = newDigits
+			}
+		}
 	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 15
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 26
-	register[1] += -13
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 3
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 26
-	register[1] += -7
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 6
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 1
-	register[1] += 11
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 5
-	register[2] *= register[1]
-	register[3] += register[2]
-	register[0] = input[idx]
-	idx++
-	register[1] *= 0
-	register[1] += register[3]
-	register[1] %= 26
-	register[3] /= 1
-	register[1] += 10
-	if register[1] == register[0] {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	if register[1] == 0 {
-		register[1] = 1
-	} else {
-		register[1] = 0
-	}
-	register[2] *= 0
-	register[2] += 25
-	register[2] *= register[1]
-	register[2] += 1
-	register[3] *= register[2]
-	register[2] *= 0
-	register[2] += register[0]
-	register[2] += 16
-	register[2] *= register[1]
-	register[3] += register[2]
+	states = newState
+
+	fmt.Println("States:", len(states))
+	return register
+
 	register[0] = input[idx]
 	idx++
 	register[1] *= 0
