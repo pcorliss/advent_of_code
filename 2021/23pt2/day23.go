@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -383,7 +384,7 @@ func FindLowestEnergy(state State) int {
 		}
 		seen[candidate.state.lizards] = true
 
-		if candidate.state.energy > 44169 {
+		if candidate.state.energy > 441690 {
 			fmt.Println("Too Large Energy")
 			fmt.Println("Len:", pq.Len())
 			return -1
@@ -471,6 +472,10 @@ func FindLowestEnergy(state State) int {
 						fmt.Println("Candidate:", candidate.state)
 						panic("Invalid New Energy")
 					}
+					// Seems to speed up by about 4x, likely getting rid of dupes
+					sort.Slice(newLizards[:], func(i, j int) bool {
+						return (newLizards[i].pos.y*10 + newLizards[i].pos.x) < (newLizards[j].pos.y*10 + newLizards[j].pos.x)
+					})
 					// if seen[newLizards] {
 					// 	continue
 					// }

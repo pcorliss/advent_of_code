@@ -171,6 +171,6 @@ func TestCalcDistance(t *testing.T) {
 // ...A...C.A..
 // `)
 
-// func TestPart2(t *testing.T) {
-// 	assert.Equal(t, 44169, Part2(inputStr), "they should be equal")
-// }
+func TestPart2(t *testing.T) {
+	assert.Equal(t, 44169, Part2(inputStr), "they should be equal")
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -304,6 +305,9 @@ func FindLowestEnergy(state State) int {
 							newLizards[i] = Lizard{l.typ, Point{l.pos.x, l.pos.y}}
 						}
 					}
+					sort.Slice(newLizards[:], func(i, j int) bool {
+						return (newLizards[i].pos.y*10 + newLizards[i].pos.x) < (newLizards[j].pos.y*10 + newLizards[j].pos.x)
+					})
 					if newEnergy == 0 {
 						panic("Invalid New Energy")
 					}
