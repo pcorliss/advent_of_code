@@ -68,6 +68,9 @@ div z 26 : 26
 add x -9 : -9
 add y 9 : 9
 
+// Heavily influencede by https://github.com/dphilipson/advent-of-code-2021/blob/master/src/days/day24.rs
+
+div, check, offset
 {1, 10, 2}
 {1, 14, 13}
 {1, 14, 13}
@@ -82,3 +85,29 @@ add y 9 : 9
 {26, -9, 3}
 {26, -13, 7}
 {26, -9, 9}
+
+PUSH in[0] + 2
+PUSH in[1] + 13
+PUSH in[2] + 13
+POP in[3] == in[2] + 13 - 13
+PUSH in[4] + 15
+POP in[5] == in[4] + 15 - 13
+POP in[6] == in[1] + 13 - 7
+PUSH in[7] + 5
+PUSH in[8] + 16
+PUSH in[9] + 1
+POP in[10] == in[9] + 1 - 4
+POP in[11] == in[8] + 16 - 9
+POP in[12] == in[7] + 5 - 13
+POP in[13] == in[0] + 2 - 9
+
+in[3] == in[2]
+in[5] == in[4] + 2
+in[6] == in[1] + 6
+in[10] == in[9] - 3
+in[11] == in[8] + 7
+in[12] == in[7] - 8
+in[13] == in[0] - 7
+
+Digit Idx: 01234567890123
+           93997999296912

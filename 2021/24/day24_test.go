@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -130,35 +131,32 @@ func TestToBin(t *testing.T) {
 // 	assert.Equal(t, 0, Part1(inputStr), "they should be equal")
 // }
 
-// var generatedTest = []struct {
-// 	input       int
-// 	expected    [4]int
-// 	description string
-// }{
-// 	{99997373333595, [4]int{5, 1, 14, 140983012}, "Generated 1"},
-// 	{99997366666929, [4]int{9, 1, 18, 140967546}, "Generated 2"},
-// 	{99997346666931, [4]int{1, 0, 0, 5420476}, "Generated 3"},
-// 	{99997772478942, [4]int{2, 0, 0, 5422398}, "Generated 4"},
-// }
+var generatedTest = []struct {
+	input       int
+	expected    [4]int
+	description string
+}{
+	{99997373333595, [4]int{5, 1, 14, 140983012}, "Generated 1"},
+	{99997366666929, [4]int{9, 1, 18, 140967546}, "Generated 2"},
+	{99997346666931, [4]int{1, 0, 0, 5420476}, "Generated 3"},
+	{99997772478942, [4]int{2, 0, 0, 5422398}, "Generated 4"},
+	{93997999296912, [4]int{2, 0, 0, 0}, "Largest Zero Val"},
+}
 
-// func TestGenerated(t *testing.T) {
-// 	for _, tt := range generatedTest {
-// 		t.Run(tt.description, func(t *testing.T) {
-// 			actual := Generated(IntToDigits(tt.input))
-// 			if actual != tt.expected {
-// 				t.Errorf("Generated(%d) got %#v want %#v", tt.input, actual, tt.expected)
-// 			}
-// 			monadCode, err := os.ReadFile("input.txt")
-// 			if err != nil {
-// 				panic(err)
-// 			}
-// 			actual = Alu(string(monadCode), IntToDigits(tt.input))
-// 			if actual != tt.expected {
-// 				t.Errorf("Alu(%d) got %#v want %#v", tt.input, actual, tt.expected)
-// 			}
-// 		})
-// 	}
-// }
+func TestAluRules(t *testing.T) {
+	for _, tt := range generatedTest {
+		t.Run(tt.description, func(t *testing.T) {
+			monadCode, err := os.ReadFile("input.txt")
+			if err != nil {
+				panic(err)
+			}
+			actual := Alu(string(monadCode), IntToDigits(tt.input))
+			if actual != tt.expected {
+				t.Errorf("Alu(%d) got %#v want %#v", tt.input, actual, tt.expected)
+			}
+		})
+	}
+}
 
 func TestPart2(t *testing.T) {
 	assert.Equal(t, 0, Part2(inputStr), "they should be equal")
