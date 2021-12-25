@@ -198,7 +198,7 @@ func Part2(input string) int {
 func Generated() [4]int {
 	idx := 0
 	register := [4]int{}
-	states := make(map[[4]int][]int)
+	states := make(map[[2]int][]int)
 	input := []int{}
 
 	for i := 1; i < 10; i++ {
@@ -229,7 +229,8 @@ func Generated() [4]int {
 		register[2] *= register[1] // r2 = (in0 + 2) * 10
 		register[3] += register[2] // r3 = (in0 + 2) * 10
 
-		states[register] = []int{i}
+		var registerKey = [2]int{register[0], register[3]}
+		states[registerKey] = []int{i}
 	}
 
 	fmt.Println("States:", len(states), states)
@@ -237,9 +238,9 @@ func Generated() [4]int {
 	// r0 = inp
 	// r1 = r3
 	//
-	newState := make(map[[4]int][]int)
+	newState := make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i // in1
 			register[1] *= 0
@@ -268,10 +269,12 @@ func Generated() [4]int {
 			register[2] *= register[1]
 			register[3] += register[2]
 
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -280,9 +283,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i
 			register[1] *= 0
@@ -311,10 +314,12 @@ func Generated() [4]int {
 			register[2] *= register[1]
 			register[3] += register[2]
 
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -323,9 +328,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i
 			register[1] *= 0
@@ -354,10 +359,12 @@ func Generated() [4]int {
 			register[2] *= register[1]
 			register[3] += register[2]
 
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -366,9 +373,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i
 			register[1] *= 0
@@ -396,10 +403,12 @@ func Generated() [4]int {
 			register[2] += 15
 			register[2] *= register[1]
 			register[3] += register[2]
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -408,9 +417,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i
 			register[1] *= 0
@@ -438,10 +447,12 @@ func Generated() [4]int {
 			register[2] += 3
 			register[2] *= register[1]
 			register[3] += register[2]
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -450,9 +461,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 
 			register[0] = i
@@ -481,10 +492,12 @@ func Generated() [4]int {
 			register[2] += 6
 			register[2] *= register[1]
 			register[3] += register[2]
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -493,9 +506,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 
 			register[0] = i
@@ -525,10 +538,12 @@ func Generated() [4]int {
 			register[2] *= register[1]
 			register[3] += register[2]
 
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -537,9 +552,9 @@ func Generated() [4]int {
 	fmt.Println("States:", len(states))
 	// return register
 
-	newState = make(map[[4]int][]int)
+	newState = make(map[[2]int][]int)
 	for state, digits := range states {
-		register = state
+		register = [4]int{state[0], 0, 0, state[1]}
 		for i := 9; i > 0; i-- {
 			register[0] = i
 			register[1] *= 0
@@ -567,10 +582,12 @@ func Generated() [4]int {
 			register[2] += 16
 			register[2] *= register[1]
 			register[3] += register[2]
-			if _, exists := newState[register]; !exists {
+			var registerKey = [2]int{register[0], register[3]}
+
+			if _, exists := newState[registerKey]; !exists {
 				newDigits := digits[:]
 				newDigits = append(newDigits, i)
-				newState[register] = newDigits
+				newState[registerKey] = newDigits
 			}
 		}
 	}
@@ -687,6 +704,7 @@ func Generated() [4]int {
 	register[2] += 7
 	register[2] *= register[1]
 	register[3] += register[2]
+
 	register[0] = input[idx]
 	idx++
 	register[1] *= 0

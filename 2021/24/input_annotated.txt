@@ -1,0 +1,280 @@
+inp w    : w = in[0]
+mul x 0  : x = 0
+add x z  : x = 0
+mod x 26 : x = 0
+div z 1  : z = 0
+add x 10 : x = 10
+eql x w  : x = 0
+eql x 0  : x = 1
+mul y 0  : y = 0
+add y 25 : y = 25
+mul y x  : y = 25
+add y 1  : y = 26
+mul z y  : z = 0 // z is still zero
+mul y 0  : y = 0
+add y w  : y = in[0]
+add y 2  : y = in[0] + 2
+mul y x  : y = in[0] + 2
+add z y  : z = in[0] + 2
+
+
+z = in[0] + 2
+
+x = 0; y = 0
+inp w    : w = in[1]
+mul x 0  : x = 0
+add x z  : x = in[0] + 2
+mod x 26 : x %= 26 // Likely just in[0] + 2
+div z 1  : z = in[0] + 2
+add x 14 : x = (x % 26) + 14
+eql x w  : x = 0
+eql x 0  : x = 1
+mul y 0  : y = 0
+add y 25 : y = 25
+mul y x  : y = 25
+add y 1  : y = 26
+mul z y  : z = (in[0] + 2) * 26 // 26 digit number of some kind
+mul y 0  : y = 0
+add y w  : y = in[1]
+add y 13 : y = in[1] + 13
+mul y x  : y = in[1] + 13
+add z y  : z[1] = (in[0] + 2) * 26 + in[1] + 13
+
+inp w    : w = in[2]
+mul x 0  : x = 0
+add x z  : x = z[1]
+mod x 26 : x = z[1] % 26
+div z 1  : z = z
+add x 14 : x = (z[1] % 26) + 14
+eql x w  : x = 0
+eql x 0  : x = 1
+mul y 0  : y = 0
+add y 25 : y = 25
+mul y x  : y = 25
+add y 1  : y = 26
+mul z y  : z = z[1] * 26
+mul y 0  : y = 0
+add y w  : y = in[2]
+add y 13 : y = in[2] + 13
+mul y x  : y = in[2] + 13
+add z y  : z[2] = (in[2] + 13) + (z[1] * 26)
+
+inp w     : w = in[3]
+mul x 0   : x = 0
+add x z   : x = z[2]
+mod x 26  : x %= 26
+div z 26  : z = z[2] / 26
+add x -13 : x -= -13 : x = z[2] % 26 - 13
+eql x w   : if x != w { x = 1 } else { x = 0 }
+eql x 0   : if x != w { x = 1 } else { x = 0 }
+mul y 0   : y = 0
+add y 25  : y = 25
+mul y x   : y = 25 -or- y = 0 // x could be 0 or 1
+add y 1   : y = 26 -or- y = 1
+mul z y   : z = (z[2]/26)*26 -or- z[2]/26
+mul y 0   : y = 0
+add y w   : y = in[3]
+add y 9   : y = in[3] + 9
+mul y x   : y = (in[3] + 9) * [0 or 1]
+add z y   : z = ...
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 15
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 3
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -7
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 11
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 16
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 13
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 1
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -4
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -9 **
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 3 **
+mul y x
+add z y
+
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26
+add x -13 **
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 7 **
+mul y x
+add z y
+
+inp w : d[13]
+
+mul x 0 : x = 0
+add x z : x = z
+mod x 26 : x = z % 26
+div z 26 : z /= 26
+add x -9 : x += -9
+
+eql x w : if x == w { x = 1 } else { x = 0}
+eql x 0 : if x != w { x = 1 } else { x = 0}
+
+mul y 0 : y = 0
+add y 25 : y += 25 : y = 25
+mul y x : y *= x : y *=x : y = 25 * x
+add y 1 : y += 1 : y = (25 * x) + 1
+mul z y : z *= y : z = (25 * x) + 1 ...
+
+mul y 0 : y = 0 : z + ((9+w) * x) == 0
+add y w : y += w : z + ((y+9+w) * x) == 0
+add y 9 : y += 9 : z + ((y+9) * x) == 0
+mul y x : y *= x : z + (y * x) == 0
+add z y : z += y == 0
+
+
+The state of x and y don't matter after analysis, they just get zero'd
+The state of w doesn't matter after analysis, it gets replaced
+
+Still way too much memory usage and way too slow
+
