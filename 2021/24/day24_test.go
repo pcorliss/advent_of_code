@@ -141,6 +141,7 @@ var generatedTest = []struct {
 	{99997346666931, [4]int{1, 0, 0, 5420476}, "Generated 3"},
 	{99997772478942, [4]int{2, 0, 0, 5422398}, "Generated 4"},
 	{93997999296912, [4]int{2, 0, 0, 0}, "Largest Zero Val"},
+	{81111379141811, [4]int{1, 0, 0, 0}, "Smallest Zero Val"},
 }
 
 func TestAluRules(t *testing.T) {
