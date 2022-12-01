@@ -22,5 +22,9 @@ module Advent
     def most_calories
       @elves.map(&:sum).max
     end
+
+    def top_three_calories
+      @elves.map(&:sum).sort.last(3).sum
+    end
   end
 end

@@ -51,6 +51,12 @@ describe Advent do
       end
     end
 
+    describe "#top_three_calories" do
+      it "returns the sum of calories carried by the top 3 elves" do
+        expect(ad.top_three_calories).to eq(45000)
+      end
+    end
+
     context "validation" do
     end
   end
