@@ -9,11 +9,12 @@ jobs:
     env:
       SESSION: ${{ secrets.AOC_SESSION }} 
       USERID: 1063637
+      USERAGENT: "User-Agent: HTTPie - https://github.com/pcorliss/advent_of_code/ - pcorliss@gmail.com"
     steps:
     - name: Download Leaderboards
       run: |
         for YEAR in `seq 2015 2022`; do
-          http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json Cookie:session=$SESSION >> $YEAR.json
+          http --download GET https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json $USERAGENT Cookie:session=$SESSION >> $YEAR.json
         done
         echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
     - name: Show Stars
