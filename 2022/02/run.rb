@@ -6,3 +6,4 @@ input = File.read('./input.txt')
 
 ad = Advent::Rps.new(input)
 puts ad.play
+puts ad.play_2

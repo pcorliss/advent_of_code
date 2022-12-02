@@ -63,9 +63,29 @@ C Z
       end
     end
 
+    describe "#score_round_2" do
+      it "In the first round, your opponent will choose Rock (A), and you need the round to end in a draw (Y), so you also choose Rock. This gives you a score of 1 + 3 = 4." do
+        expect(ad.score_round_2(ad.rounds[0])).to eq(4)
+      end
+
+      it "In the second round, your opponent will choose Paper (B), and you choose Rock so you lose (X) with a score of 1 + 0 = 1." do
+        expect(ad.score_round_2(ad.rounds[1])).to eq(1)
+      end
+
+      it "In the third round, you will defeat your opponent's Scissors with Rock for a score of 1 + 6 = 7." do
+        expect(ad.score_round_2(ad.rounds[2])).to eq(7)
+      end
+    end
+
     describe "#play" do
       it "In this example, if you were to follow the strategy guide, you would get a total score of 15 (8 + 1 + 6)." do
         expect(ad.play).to eq(15)
+      end
+    end
+
+    describe "#play" do
+      it "Now that you're correctly decrypting the ultra top secret strategy guide, you would get a total score of 12." do
+        expect(ad.play_2).to eq(12)
       end
     end
 
