@@ -34,7 +34,7 @@ module Advent
       b_set = Set.new b
       c_set = Set.new c 
 
-      a.intersection(b).intersection(c).first
+      (a & b & c).first
     end
 
     def priority(item)
