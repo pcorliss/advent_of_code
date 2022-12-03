@@ -6,3 +6,4 @@ input = File.read('./input.txt')
 
 ad = Advent::Rucksacks.new(input)
 puts ad.priority_sum
+puts ad.priority_sum_groups
