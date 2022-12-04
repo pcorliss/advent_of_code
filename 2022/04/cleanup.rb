@@ -29,8 +29,19 @@ module Advent
       false
     end
 
+    def overlap?(two_ranges)
+      a, b = two_ranges
+      return true if a.include?(b.first)|| a.include?(b.last)
+      return true if b.include?(a.first)|| b.include?(a.last)
+      false
+    end
+
     def count_cover
       ranges.count { |r| cover?(r) }
+    end
+
+    def count_overlap
+      ranges.count { |r| overlap?(r) }
     end
   end
 end
