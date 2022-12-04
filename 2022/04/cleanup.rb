@@ -22,15 +22,15 @@ module Advent
       @debug = true
     end
 
-    def overlap?(two_ranges)
+    def cover?(two_ranges)
       a, b = two_ranges
       return true if a.cover? b
       return true if b.cover? a
       false
     end
 
-    def count_overlap
-      ranges.count { |r| overlap?(r) }
+    def count_cover
+      ranges.count { |r| cover?(r) }
     end
   end
 end

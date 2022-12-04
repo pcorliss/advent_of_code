@@ -26,23 +26,23 @@ describe Advent do
       end
     end
 
-    describe "overlap?" do
-      it "returns false if there's no overlap" do
-        expect(ad.overlap?(ad.ranges.first)).to be_falsey
+    describe "cover?" do
+      it "returns false if there's no cover" do
+        expect(ad.cover?(ad.ranges.first)).to be_falsey
       end
 
-      it "returns false if there's overlap by the first range" do
-        expect(ad.overlap?(ad.ranges[3])).to be_truthy
+      it "returns false if there's cover by the first range" do
+        expect(ad.cover?(ad.ranges[3])).to be_truthy
       end
 
-      it "returns false if there's overlap by the second range" do
-        expect(ad.overlap?(ad.ranges[4])).to be_truthy
+      it "returns false if there's cover by the second range" do
+        expect(ad.cover?(ad.ranges[4])).to be_truthy
       end
     end
 
-    describe "count_overlap" do
-      it "returns the number of pairs with a complete overlap" do
-        expect(ad.count_overlap).to eq(2)
+    describe "count_cover" do
+      it "returns the number of pairs with a complete cover" do
+        expect(ad.count_cover).to eq(2)
       end
     end
 
