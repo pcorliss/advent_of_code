@@ -49,9 +49,25 @@ module Advent
       end
     end
 
+    def move_multi!(instruction)
+        from = instruction[:from] - 1
+        to = instruction[:to] - 1
+        crates = []
+        instruction[:move].times do |i|
+          crates.push stacks[from].pop
+        end
+        stacks[to].concat(crates.reverse)
+    end
+
     def run!
       instructions.each do |inst|
         move!(inst)
+      end
+    end
+
+    def run_multi!
+      instructions.each do |inst|
+        move_multi!(inst)
       end
     end
 
