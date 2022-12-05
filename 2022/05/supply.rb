@@ -39,5 +39,24 @@ module Advent
     def debug!
       @debug = true
     end
+
+    def move!(instruction)
+      instruction[:move].times do |i|
+        from = instruction[:from] - 1
+        to = instruction[:to] - 1
+        crate = stacks[from].pop
+        stacks[to].push(crate)
+      end
+    end
+
+    def run!
+      instructions.each do |inst|
+        move!(inst)
+      end
+    end
+
+    def top_of_stacks
+      @stacks.map {|s| s.last }.join('')
+    end
   end
 end
