@@ -22,5 +22,11 @@ module Advent
         return idx + 4 if chars.uniq.count == 4
       end
     end
+
+    def message_marker
+      buffer.chars.each_cons(14).each_with_index do |chars, idx|
+        return idx + 14 if chars.uniq.count == 14
+      end
+    end
   end
 end

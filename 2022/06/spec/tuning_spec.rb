@@ -34,6 +34,21 @@ describe Advent do
       end
     end
 
+    describe "#message_marker" do
+      {
+        'mjqjpqmgbljsphdztnvjfqwrcgsmlb' => 19,
+        'bvwbjplbgvbhsrlpgdmjqwftvncz' => 23,
+        'nppdvjthqldpwncqszvftbrmjlhg' => 23,
+        'nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg' => 29,
+        'zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw' => 26,
+      }.each do |input, expected|
+        it "returns #{expected} when given #{input}" do
+          ad = Advent::Tuning.new(input)
+          expect(ad.message_marker).to eq(expected)
+        end
+      end
+    end
+
     context "validation" do
     end
   end
