@@ -75,5 +75,46 @@ describe Advent do
         expect(ad.count_visible).to eq(21)
       end
     end
+
+    describe "#viewing_distance" do
+      context "middle in second row [2,1]" do
+        let(:cell) { [2,1] }
+
+        it "Looking up, its view is not blocked; it can see 1 tree (of height 3)." do
+          expect(ad.viewing_distance(cell, [0,-1])).to eq(1)
+        end
+
+        it "Looking left, its view is blocked immediately; it can see only 1 tree (of height 5, right next to it)." do
+          expect(ad.viewing_distance(cell, [-1,0])).to eq(1)
+        end
+
+        it "Looking right, its view is not blocked; it can see 2 trees." do
+          expect(ad.viewing_distance(cell, [1,0])).to eq(2)
+        end
+
+        it "Looking down, its view is blocked eventually; it can see 2 trees (one of height 3, then the tree of height 5 that blocks its view)." do
+          expect(ad.viewing_distance(cell, [0,1])).to eq(2)
+        end
+      end
+    end
+
+    describe "#scenic_score" do
+      {
+        [0,0] => 0,
+        [2,1] => 4,
+        [2,3] => 8,
+        [0,2] => 0,
+      }.each do |cell, score|
+        it "returns the score #{score} for cell #{cell}" do
+          expect(ad.scenic_score(cell)).to eq(score)
+        end
+      end
+    end
+
+    describe "#max_scenic_score" do
+      it "returns the max scenic score" do
+        expect(ad.max_scenic_score).to eq(8)
+      end
+    end
   end
 end
