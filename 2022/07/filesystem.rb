@@ -100,19 +100,35 @@ module Advent
       cwd
     end
 
-    def find_small_dirs(max_size)
+    def find_all_dirs
       cwd = file_system('/')
       dirs = []
       candidates = [cwd]
       until candidates.empty?
         candidate = candidates.pop
-        if candidate.calc_size < max_size
-          dirs << candidate
-        end
         candidates.concat candidate.children.select(&:dir?) 
+        dirs << candidate
       end
-
       dirs
+    end
+
+    def find_small_dirs(max_size)
+      find_all_dirs.select do |dir|
+        dir.calc_size < max_size
+      end
+    end
+
+    DISK_SIZE = 70000000
+    DISK_NEEDED = 30000000
+
+    def find_directory_to_delete
+      disk_used = file_system('/').calc_size
+      disk_available = DISK_SIZE - disk_used
+      must_delete = DISK_NEEDED - disk_available
+    
+      find_all_dirs.select do |dir|
+        dir.calc_size >= must_delete
+      end.min_by(&:calc_size)
     end
   end
 end

@@ -104,5 +104,11 @@ $ ls
         expect(dirs.map(&:name)).to contain_exactly('a', 'e')
       end
     end
+
+    describe "#find_directory_to_delete" do
+      it "returns the smallest directory that frees enough space" do
+        expect(ad.find_directory_to_delete.name).to eq('d')
+      end
+    end
   end
 end
