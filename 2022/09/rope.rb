@@ -58,16 +58,13 @@ module Advent
           leader = @knots[idx - 1]
           follower = knot
           unless adjacent?(leader, follower)
-            x_diff = leader[0] - follower[0]
-            y_diff = leader[1] - follower[1]
+            # Yields -1, 0, or 1
+            x_diff = leader[0] <=> follower[0]
+            y_diff = leader[1] <=> follower[1]
             puts "Diff: #{[x_diff, y_diff]}" if debug
 
-            # Makes the math work below
-            x_diff = -1 if x_diff.negative?
-            y_diff = -1 if y_diff.negative?
-
-            follower[0] += [x_diff, 1].min
-            follower[1] += [y_diff, 1].min
+            follower[0] += x_diff
+            follower[1] += y_diff
           end
         end
 
