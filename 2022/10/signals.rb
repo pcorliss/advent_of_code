@@ -8,6 +8,7 @@ module Advent
     attr_accessor :debug
     attr_reader :instructions, :x, :cycle
     attr_reader :instruction_counter, :instruction_position
+    attr_reader :grid
 
     def initialize(input)
       @debug = false
@@ -21,13 +22,25 @@ module Advent
       @cycle = 0
       @instruction_counter = 0
       @instruction_position = 0
+
+      @grid = Grid.new(('.'*240).chars, 40)
     end
 
     def debug!
       @debug = true
     end
 
+    def draw_pixel
+      cell_x = cycle % grid.width
+      cell_y = cycle / grid.width
+      # if sprite present
+      # sprite is 3px wide and centered on X
+      @grid[cell_x,cell_y] = '#' if cell_x.between? x-1, x+1
+    end
+
     def run_cycle!
+      draw_pixel
+
       instruction, quant = instructions[instruction_position]
       # puts "Start of #{cycle + 1} cycle, X: #{x}, #{instruction} Part: #{instruction_counter}" if debug
       case instruction
@@ -61,6 +74,11 @@ module Advent
         puts "Cycle: #{cycle} #{signal_strength}" if debug
         signal_strength
       end
+    end
+
+    def render
+      240.times { run_cycle! }
+      grid.render
     end
   end
 end

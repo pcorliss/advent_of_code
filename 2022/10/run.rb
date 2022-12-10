@@ -8,3 +8,6 @@ ad = Advent::Signals.new(input)
 interesting = ad.interesting_signals
 puts interesting.inspect
 puts interesting.sum
+
+ad = Advent::Signals.new(input)
+puts ad.render

@@ -13,6 +13,17 @@ describe Advent do
   }
   let(:larger) { File.read('./spec/larger_input.txt') }
 
+  let(:crt) {
+    <<~EOS
+##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+    EOS
+  }
+
   describe Advent::Signals do
     let(:ad) { Advent::Signals.new(input) }
 
@@ -39,6 +50,10 @@ describe Advent do
       # For instructions that take multiple cycles
       it "instantiates an instruction counter" do
         expect(ad.instruction_counter).to eq(0)
+      end
+
+      it "instantiates a grid of width 40" do
+        expect(ad.grid.width).to eq(40)
       end
     end
 
@@ -94,6 +109,25 @@ describe Advent do
             expect(ad.instruction_position).to eq(2)
           end
         end
+      end
+
+      context "with a larger input" do
+        let(:ad) { Advent::Signals.new(larger) }
+
+        describe "crt drawing" do
+          it "draws pixels" do
+            240.times { ad.run_cycle! }
+            expect(ad.grid.render).to eq(crt.chomp)
+          end
+        end
+      end
+    end
+
+    describe "#render" do
+      let(:ad) { Advent::Signals.new(larger) }
+
+      it "runs cycles and renders output" do
+        expect(ad.render).to eq(crt.chomp)
       end
     end
 
