@@ -17,6 +17,19 @@ R 2
     EOS
   }
 
+  let(:big) {
+    <<~EOS
+    R 5
+    U 8
+    L 8
+    D 3
+    R 17
+    D 10
+    L 25
+    U 20
+    EOS
+  }
+
   describe Advent::Rope do
     let(:ad) { Advent::Rope.new(input) }
 
@@ -34,6 +47,11 @@ R 2
 
       it "instantiats a tracer" do
         expect(ad.tracer).to eq(Set.new([[0,0]]))
+      end
+
+      it "instantiates a longer rope" do
+        ad = Advent::Rope.new(input, 10)
+        expect(ad.knots.count).to be(10)
       end
     end
 
@@ -86,9 +104,19 @@ R 2
       it "returns the count of visited cells" do
         expect(ad.visited).to eq(13)
       end
+
     end
 
     context "validation" do
+      it "returns the proper visited count when the tail length 10" do
+        ad = Advent::Rope.new(input, 10)
+        expect(ad.visited).to eq(1)
+      end
+
+      it "returns the proper visited count when the tail length 10 and big input" do
+        ad = Advent::Rope.new(big, 10)
+        expect(ad.visited).to eq(36)
+      end
     end
   end
 end
