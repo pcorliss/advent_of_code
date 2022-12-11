@@ -1,6 +1,7 @@
 require './monkeys.rb'
 require 'rspec'
 require 'pry'
+require 'timeout'
 
 describe Advent do
 
@@ -92,6 +93,12 @@ Monkey 3:
         ad.process_monkey!(ad.monkeys.first)
         expect(ad.monkeys.first.inspected).to eq(2)
       end
+
+      it "doesn't divide by 3 with no worries" do
+        ad.no_worries = true
+        ad.process_monkey!(ad.monkeys.first)
+        expect(ad.monkeys.last.items).to eq([74,1501,1862])
+      end
     end
 
     describe "#process_round!" do
@@ -106,6 +113,56 @@ Monkey 3:
 
 
     context "validation" do
+      context "no worries" do
+        before do
+          ad.no_worries = true
+        end
+
+        it "inspects items" do
+          20.times { ad.process_round! }
+          expect(ad.monkeys[0].inspected).to eq(99)
+          expect(ad.monkeys[1].inspected).to eq(97)
+          expect(ad.monkeys[2].inspected).to eq(8)
+          expect(ad.monkeys[3].inspected).to eq(103)
+        end
+
+        context "validate mega divisor" do
+          {
+            1 => 2,
+            20 => 99,
+            1000 => 5204,
+            2000 => 10419,
+          }.each do |rounds, expected_inspected|
+            it "returns #{expected_inspected} after #{rounds}" do
+              Timeout::timeout(5) {
+                rounds.times {ad.process_round!}
+              }
+              expect(ad.monkeys.first.inspected).to eq(expected_inspected)
+            end
+          end
+        end
+
+        context "after 10000 rounds" do
+          before do
+            Timeout::timeout(5) {
+              10000.times { ad.process_round! }
+            }
+          end
+
+          it "inspects items" do
+            expect(ad.monkeys[0].inspected).to eq(52166)
+            expect(ad.monkeys[1].inspected).to eq(47830)
+            expect(ad.monkeys[2].inspected).to eq(1938)
+            expect(ad.monkeys[3].inspected).to eq(52013)
+          end
+
+          it "returns monkey business" do
+            expect(ad.monkey_business).to eq(2713310158)
+          end
+        end
+
+      end
+
       context "after 20 rounds" do
         before do
           20.times { ad.process_round! }
@@ -125,12 +182,14 @@ Monkey 3:
           expect(ad.monkeys[3].inspected).to eq(105)
         end
 
+
         describe "#monkey_business" do
           it "returns monkey business" do
             expect(ad.monkey_business).to eq(10605)
           end
         end
       end
+
     end
   end
 end

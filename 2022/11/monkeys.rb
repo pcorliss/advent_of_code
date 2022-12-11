@@ -28,7 +28,7 @@ module Advent
   end
 
   class Monkeys
-    attr_accessor :debug
+    attr_accessor :debug, :no_worries
     attr_reader :monkeys
 
     def initialize(input)
@@ -54,6 +54,8 @@ module Advent
           @monkeys.last.throw_test[bool == 'true:'] = monkey.to_i
         end
       end
+      @mega_divisor = @monkeys.map(&:div).inject(:*)
+      @no_worries = false
     end
 
     def debug!
@@ -62,7 +64,12 @@ module Advent
 
     def process_monkey!(monkey)
       monkey.items.each do |item|
-        newval = monkey.operate(item) / 3
+        newval = monkey.operate(item)
+        if @no_worries
+          newval %= @mega_divisor
+        else
+          newval /= 3
+        end
         newmonkey = monkey.throw(newval)
         @monkeys[newmonkey].items << newval
       end
