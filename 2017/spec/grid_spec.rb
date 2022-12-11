@@ -148,6 +148,22 @@ describe Grid do
       grid.width = 2
       expect(grid.render(1)).to eq(" 0 1\n 2 3")
     end
+
+    it "takes an optional bounding box" do
+      grid.cells = {
+        [0,0] => 0,
+        [1,0] => 1,
+        [2,0] => 2,
+        [0,1] => 3,
+        [1,1] => 4,
+        [2,1] => 5,
+        [0,2] => 6,
+        [1,2] => 7,
+        [2,2] => 8,
+      }
+      grid.width = 3
+      expect(grid.render(0, [0,0], [1,1])).to eq("01\n34")
+    end
   end
 
   describe "#neighbors" do
@@ -319,6 +335,37 @@ describe Grid do
       expect(joined_grid.cells).to eq(grid.cells)
       expect(joined_grid.width).to eq(6)
       expect(joined_grid.height).to eq(6)
+    end
+  end
+
+  describe "#ocr" do
+    let(:grid) { Grid.new(
+    <<~EOS
+####.####.###..###..###..####.####.####.
+#.......#.#..#.#..#.#..#.#.......#.#....
+###....#..###..#..#.###..###....#..###..
+#.....#...#..#.###..#..#.#.....#...#....
+#....#....#..#.#....#..#.#....#....#....
+#....####.###..#....###..#....####.#....
+    EOS
+    )}
+
+    it "returns the string equivalent" do
+      expect(grid.ocr).to eq('FZBPBFZF')
+    end
+  end
+
+  describe "#highlight" do
+    let(:grid) { Grid.new(
+    <<~EOS
+###
+#..
+#.#
+    EOS
+    )}
+
+    it "renders but replaces '#' with '█' and '.' with whitespace" do
+      expect(grid.highlight).to eq("███\n█  \n█ █")
     end
   end
 end

@@ -11,3 +11,5 @@ puts interesting.sum
 
 ad = Advent::Signals.new(input)
 puts ad.render
+puts ad.grid.highlight
+puts ad.grid.ocr

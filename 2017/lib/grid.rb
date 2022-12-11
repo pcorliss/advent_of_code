@@ -54,9 +54,13 @@ class Grid
     directions
   end
 
-  def render(pad = 0)
+  def render(pad = 0, box_start = nil, box_end = nil)
     min_y, max_y = @cells.keys.map(&:last).minmax
     min_x, max_x = @cells.keys.map(&:first).minmax
+
+    min_x, min_y = box_start if box_start
+    max_x, max_y = box_end if box_end
+
     max_val_width = @cells.values.map(&:to_s).map(&:length).max
     max_val_width += pad
 
@@ -267,5 +271,46 @@ class Grid
       end
     end
     g
+  end
+
+  # Sourced From: https://github.com/bsoyka/advent-of-code-ocr/blob/main/advent_of_code_ocr/characters.py
+  ALPHABET_6 = {
+    ".##.\n#..#\n#..#\n####\n#..#\n#..#" => "A",
+    "###.\n#..#\n###.\n#..#\n#..#\n###." => "B",
+    ".##.\n#..#\n#...\n#...\n#..#\n.##." => "C",
+    "####\n#...\n###.\n#...\n#...\n####" => "E",
+    "####\n#...\n###.\n#...\n#...\n#..." => "F",
+    ".##.\n#..#\n#...\n#.##\n#..#\n.###" => "G",
+    "#..#\n#..#\n####\n#..#\n#..#\n#..#" => "H",
+    ".###\n..#.\n..#.\n..#.\n..#.\n.###" => "I",
+    "..##\n...#\n...#\n...#\n#..#\n.##." => "J",
+    "#..#\n#.#.\n##..\n#.#.\n#.#.\n#..#" => "K",
+    "#...\n#...\n#...\n#...\n#...\n####" => "L",
+    ".##.\n#..#\n#..#\n#..#\n#..#\n.##." => "O",
+    "###.\n#..#\n#..#\n###.\n#...\n#..." => "P",
+    "###.\n#..#\n#..#\n###.\n#.#.\n#..#" => "R",
+    ".###\n#...\n#...\n.##.\n...#\n###." => "S",
+    "#..#\n#..#\n#..#\n#..#\n#..#\n.##." => "U",
+    "#...\n#...\n.#.#\n..#.\n..#.\n..#." => "Y",
+    "####\n...#\n..#.\n.#..\n#...\n####" => "Z",
+  }
+
+  def ocr
+    i = 0
+    return_str = ""
+    while i < @width do
+      char = ALPHABET_6[render(0,[i,0],[i+3,5])]
+      if char
+        return_str << char
+        i += 3
+      end
+      i += 1
+    end
+
+    return_str
+  end
+
+  def highlight
+    render.gsub('#', '█').gsub('.',' ')
   end
 end
