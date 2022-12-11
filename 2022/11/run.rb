@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require_relative 'monkeys'
+
+input = File.read('./input.txt')
+
+ad = Advent::Monkeys.new(input)
+20.times { ad.process_round! }
+puts ad.monkey_business
