@@ -14,6 +14,15 @@ abdefghi
     EOS
   }
 
+  let(:crevasse) {
+    <<~EOS
+Sabqponm
+abcryxxl
+accszExk
+ddctuvwj
+addefghi
+    EOS
+  }
   describe Advent::Climbing do
     let(:ad) { Advent::Climbing.new(input) }
 
@@ -58,6 +67,17 @@ abdefghi
 
       it "returns the path from start and end" do
         expect(ad.shortest_path.count).to eq(32)
+      end
+    end
+
+    describe "#find_best_starting_position" do
+      it "returns best starting position at elevation a" do
+        expect(ad.find_best_starting_position).to eq([0,4])
+      end
+
+      it "handles starting locations without a path" do
+        ad = Advent::Climbing.new(crevasse)
+        expect(ad.find_best_starting_position).to eq([1,0])
       end
     end
 

@@ -54,5 +54,15 @@ module Advent
 
       raise "Unable to find path" 
     end
+
+    def find_best_starting_position
+      @grid.find_all('a').min_by do |s|
+        begin
+          shortest_path(s, @end).count
+        rescue => e
+          1_000_000
+        end
+      end
+    end
   end
 end
