@@ -52,17 +52,17 @@ addefghi
     describe "#shortest_path" do
       it "finds the path from the start to an adjacent cell" do
         # ad.debug!
-        expect(ad.shortest_path([0,0],[1,0])).to eq([[0,0],[1,0]])
+        expect(ad.shortest_path([[[0,0]]],[1,0])).to eq([[0,0],[1,0]])
       end
 
       it "finds the path from the start to a cell two steps away" do
         # ad.debug!
-        expect(ad.shortest_path([0,0],[1,1]).count).to eq(3)
+        expect(ad.shortest_path([[[0,0]]],[1,1]).count).to eq(3)
       end
 
       it "finds the path from the start to a cell several steps away" do
         # ad.debug!
-        expect(ad.shortest_path([0,0],[2,4]).count).to eq(7)
+        expect(ad.shortest_path([[[0,0]]],[2,4]).count).to eq(7)
       end
 
       it "returns the path from start and end" do
@@ -72,6 +72,7 @@ addefghi
 
     describe "#find_best_starting_position" do
       it "returns best starting position at elevation a" do
+        # ad.debug!
         expect(ad.find_best_starting_position).to eq([0,4])
       end
 

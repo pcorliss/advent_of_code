@@ -22,17 +22,21 @@ module Advent
       @debug = true
     end
 
-    def shortest_path(s = @start, e = @end)
-      candidates = [[s]] 
-      visited = Set.new [s]
+    def shortest_path(s = [[@start]], e = @end)
+      candidates = s
+      visited = Set.new
+      s.each do |paths|
+        visited.add paths.first
+      end
 
-      Timeout::timeout(6) do
+      Timeout::timeout(60) do
         until candidates.empty? do
           puts "Candidates: #{candidates.count}" if @debug
           candidate = candidates.shift
           puts "\tCandidate: #{candidate}" if @debug
           current_cell = candidate.last
           current_val = @grid[candidate.last] 
+          # binding.pry if @debug
 
           puts "\t#{current_cell} - #{current_val}" if @debug
           @grid.neighbor_coords(current_cell).each do |n|
@@ -48,7 +52,7 @@ module Advent
               puts "\tNew Candidate added #{n} #{@grid[n]} - #{new_candidate}" if @debug
             end
           end
-          raise "Failure!" if candidates.count > 100
+          raise "Too many candidates!" if candidates.count > 1_000
         end
       end
 
@@ -56,13 +60,11 @@ module Advent
     end
 
     def find_best_starting_position
-      @grid.find_all('a').min_by do |s|
-        begin
-          shortest_path(s, @end).count
-        rescue => e
-          1_000_000
-        end
+      candidates = @grid.find_all('a').map do |cell|
+        [cell]
       end
+      puts "C: #{candidates}" if @debug
+      shortest_path(candidates, @end).first
     end
   end
 end
