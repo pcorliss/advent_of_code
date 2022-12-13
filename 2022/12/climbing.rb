@@ -22,14 +22,11 @@ module Advent
       @debug = true
     end
 
-    def shortest_path(s = [[@start]], e = @end)
-      candidates = s
-      visited = Set.new
-      s.each do |paths|
-        visited.add paths.first
-      end
+    def shortest_path(s = [@start], e = @end)
+      candidates = s.map { |cell| [cell] }
+      visited = Set.new s
 
-      Timeout::timeout(60) do
+      Timeout::timeout(5) do
         until candidates.empty? do
           puts "Candidates: #{candidates.count}" if @debug
           candidate = candidates.shift
@@ -60,9 +57,7 @@ module Advent
     end
 
     def find_best_starting_position
-      candidates = @grid.find_all('a').map do |cell|
-        [cell]
-      end
+      candidates = @grid.find_all('a')
       puts "C: #{candidates}" if @debug
       shortest_path(candidates, @end).first
     end
