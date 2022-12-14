@@ -29,12 +29,13 @@ module Advent
       @debug = true
     end
 
-    def compare_pair(left, right)
+    def user_compare(left, right)
       left.each_with_index do |l, idx|
         r = right[idx]
         puts "Compare #{l} #{r}" if @debug
 
         return 1 if r.nil?
+        # return -1 if l.nil?
 
         val = compare_pair([l], r) if r.is_a?(Array) && !l.is_a?(Array)
         val = compare_pair(l, [r]) if !r.is_a?(Array) && l.is_a?(Array)
@@ -45,6 +46,26 @@ module Advent
         return 1 if r < l
         return -1 if l < r
       end
+      -1
+    end
+
+    def compare_pair(left, right)
+      comp = left <=> right
+      return comp unless comp.nil?
+
+      left.zip(right).each do |l, r|
+        comp = l <=> r
+        next if !comp.nil? && comp.zero?
+        return comp unless comp.nil?
+
+        comp = compare_pair([l], r) if !l.is_a?(Array) && r.is_a?(Array)
+        comp = compare_pair(l, [r]) if l.is_a?(Array) && !r.is_a?(Array)
+        comp = compare_pair(l, r) if l.is_a?(Array) && r.is_a?(Array)
+
+        raise "Bad Comparison #{l} #{r}" if comp.nil?
+        return comp unless comp.zero?
+      end
+
       -1
     end
 
