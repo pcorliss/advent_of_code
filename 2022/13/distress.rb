@@ -62,6 +62,10 @@ module Advent
         comp = compare_pair(l, [r]) if l.is_a?(Array) && !r.is_a?(Array)
         comp = compare_pair(l, r) if l.is_a?(Array) && r.is_a?(Array)
 
+        return 1 if r.nil?
+
+        puts "Failure Comparing: #{left} #{right} #{left.zip(right)}" if comp.nil? && @debug
+        puts "Failure Comparing: #{l} #{r}" if comp.nil? && @debug
         raise "Bad Comparison #{l} #{r}" if comp.nil?
         return comp unless comp.zero?
       end
@@ -76,6 +80,35 @@ module Advent
         indexes << idx + 1 if compare_pair(left, right) == -1
       end
       indexes
+    end
+
+    def add_divider_packets!
+      @pairs << [[[2]], [[6]]]
+    end
+
+    def sorted_packets
+      add_divider_packets!
+      packets = []
+      @pairs.each do |left, right|
+        packets << left
+        packets << right
+      end
+
+      packets.sort do |a, b|
+        begin
+          compare_pair(a, b)
+        rescue => e
+          puts "Error comparing #{a} #{b}"
+          raise e
+        end
+      end
+    end
+
+    def decoder_key
+      sorted = sorted_packets
+      a = sorted.index([[2]]) + 1
+      b = sorted.index([[6]]) + 1
+      a * b
     end
   end
 end
