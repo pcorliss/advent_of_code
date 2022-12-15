@@ -37,6 +37,11 @@ describe Advent do
       it "sets the max y" do
         expect(ad.max_y).to eq(9)
       end
+
+      it "sets the floor" do
+        ad = Advent::Falling.new(input, true)
+        expect(ad.floor).to eq(11)
+      end
     end
 
     describe "#drop_sand" do
@@ -57,6 +62,7 @@ describe Advent do
         ad.drop_sand
         expect(ad.grid[501,8]).to eq('o')
       end
+
       let(:expected) {
       <<~EOS
             o   
@@ -78,11 +84,52 @@ describe Advent do
         24.times { ad.drop_sand }
         expect(ad.drop_sand).to eq(nil)
       end
+
+      context "floor" do
+        let(:ad) { Advent::Falling.new(input, true) }
+
+        it "settles on the floor" do
+          24.times { ad.drop_sand }
+          expect(ad.drop_sand).to eq([493,10])
+          expect(ad.grid[493,10]).to eq('o')
+        end
+
+        let(:floor_expected) {
+          <<~EOS
+                    o          
+                   ooo         
+                  ooooo        
+                 ooooooo       
+                oo#ooo##o      
+               ooo#ooo#ooo     
+              oo###ooo#oooo    
+             oooo oooo#ooooo   
+            oooooooooo#oooooo  
+           ooo#########ooooooo 
+          ooooo       ooooooooo
+          EOS
+        }
+        it "returns nil once the spout is blocked" do
+          91.times { ad.drop_sand }
+          expect(ad.drop_sand).to eq([501,1])
+          expect(ad.drop_sand).to eq([500,0])
+          expect(ad.drop_sand).to eq(nil)
+          expect(ad.grid.render).to eq(floor_expected.chomp)
+        end
+      end
     end
 
     describe "#fill_sand!" do
       it "returns the number of sand grains before they start falling" do
         expect(ad.fill_sand!).to eq(24)
+      end
+
+      context "floor" do
+        let(:ad) { Advent::Falling.new(input, true) }
+
+        it "returns the number of sand grains before they start falling" do
+          expect(ad.fill_sand!).to eq(93)
+        end
       end
     end
 

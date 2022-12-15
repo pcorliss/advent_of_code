@@ -6,9 +6,9 @@ module Advent
 
   class Falling
     attr_accessor :debug
-    attr_reader :grid, :max_y
+    attr_reader :grid, :max_y, :floor
 
-    def initialize(input)
+    def initialize(input, floor = false)
       @debug = false
       @grid = Grid.new
       @max_y = 0
@@ -44,8 +44,17 @@ module Advent
             @max_y = pos_y if pos_y > @max_y
           end
 
+          @floor = @max_y + 2 if floor
           start = coord
         end
+      end
+    end
+
+    def no_block_present?(pos_x, pos_y)
+      if @floor
+        @grid[pos_x, pos_y].nil? && pos_y < @floor
+      else
+        @grid[pos_x, pos_y].nil?
       end
     end
 
@@ -54,22 +63,25 @@ module Advent
       start = SAND
       pos_x, pos_y = start
 
+      return nil unless no_block_present?(pos_x, pos_y)
+
       settled = false
       i = 0
       until settled do
         puts "Testing #{[pos_x, pos_y]} - #{@grid[[pos_x, pos_y]]}" if @debug
-        if @grid[pos_x, pos_y + 1].nil?
+        if no_block_present?(pos_x, pos_y + 1)
           pos_y += 1
-        elsif @grid[pos_x - 1, pos_y + 1].nil?
+        elsif no_block_present?(pos_x - 1, pos_y + 1)
           pos_x -= 1
           pos_y += 1
-        elsif @grid[pos_x + 1, pos_y + 1].nil?
+        elsif no_block_present?(pos_x + 1, pos_y + 1)
           pos_x += 1
           pos_y += 1
         else
           settled = true
         end
-        return nil if pos_y > @max_y
+        puts "Floor Check: #{pos_y > @max_y} && #{!@floor}" if @debug
+        return nil if pos_y > @max_y && !@floor
         i += 1
         raise "Too many iterations" if i > 1000
       end
