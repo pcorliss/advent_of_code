@@ -55,7 +55,21 @@ module Advent
         set.delete b_x if b_y == y
       end
 
-      set.count
+      set
+    end
+
+    def find_beacon(coord_a, coord_b)
+      (coord_a.last..coord_b.last).each do |y|
+        null_x = null_positions(y)
+        (coord_a.first..coord_b.first).each do |x|
+          return [x,y] if @grid[x,y].nil? && !null_x.include?(x)
+        end
+        puts "Y: #{y} Done" if @debug
+      end
+    end
+
+    def tuning_frequency(coord)
+      coord.first * 4000000 + coord.last
     end
   end
 end

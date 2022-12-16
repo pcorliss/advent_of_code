@@ -56,7 +56,19 @@ describe Advent do
     end
     describe "#null_positions" do
       it "when y is 10 is returns 26" do
-        expect(ad.null_positions(10)).to eq(26)
+        expect(ad.null_positions(10).count).to eq(26)
+      end
+    end
+
+    describe "#tuning_frequency" do
+      it "returns the tuning frequency" do
+        expect(ad.tuning_frequency([14,11])).to eq(56000011)
+      end
+    end
+
+    describe "#find_beacon" do
+      it "returns the beacon" do
+        expect(ad.find_beacon([0,0],[20,20])).to eq([14,11])
       end
     end
 
