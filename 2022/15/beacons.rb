@@ -44,6 +44,29 @@ module Advent
       end.compact
     end
 
+    def collapsed_intervals(y)
+      ranges = []
+      sensor_intervals(y).sort_by(&:first).each_with_index do |range, idx|
+        if idx == 0
+          ranges << range if idx == 0
+          next
+        end
+
+        r = ranges.last
+        if range.first <= r.last
+          next if range.last < r.last
+          ranges.pop
+          ranges << (r.first..range.last)
+        else
+          ranges << range
+        end
+
+        puts "Ranges: #{ranges.inspect} #{range} #{idx}" if @debug
+      end
+
+      ranges
+    end
+
     def null_positions(y)
       set = Set.new
       sensor_intervals(y).each do |range|
@@ -59,6 +82,16 @@ module Advent
     end
 
     def find_beacon(coord_a, coord_b)
+      (coord_a.last..coord_b.last).each do |y|
+        intervals = collapsed_intervals(y)
+        if intervals.count > 1
+          x = intervals.first.last + 1
+          return [x, y]
+        end
+      end
+    end
+
+    def slow_find_beacon(coord_a, coord_b)
       (coord_a.last..coord_b.last).each do |y|
         null_x = null_positions(y)
         (coord_a.first..coord_b.first).each do |x|

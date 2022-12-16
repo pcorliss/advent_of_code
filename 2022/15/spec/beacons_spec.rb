@@ -48,12 +48,25 @@ describe Advent do
     describe "#sensor_intervals" do
       it "returns a list of ranges for sensors that overlap the row" do
         expect(ad.sensor_intervals(10)).to include((2..14))
+        # puts ad.sensor_intervals(10).inspect
+        # puts ad.sensor_intervals(11).inspect
       end
 
       it "omits sensors not in range" do
         expect(ad.sensor_intervals(10000000)).to be_empty
       end
     end
+
+    describe "#collapsed_intervals" do
+      it "returns a single interval" do
+        expect(ad.collapsed_intervals(10).count).to eq(1)
+      end
+
+      it "returns intervals with a gap" do
+        expect(ad.collapsed_intervals(11).count).to eq(2)
+      end
+    end
+
     describe "#null_positions" do
       it "when y is 10 is returns 26" do
         expect(ad.null_positions(10).count).to eq(26)
