@@ -45,6 +45,22 @@ module Advent
     end
 
     def collapsed_intervals(y)
+      interval = sensor_intervals(y).sort_by(&:first).inject do |acc, range|
+        puts "Acc: #{acc.inspect}" if @debug
+        puts "Range: #{range.inspect}" if @debug
+        acc ||= range
+        if range.first <= acc.last
+          acc = (acc.first..range.last) if range.last > acc.last
+          acc
+        else
+          puts "Early Return with Gap: #{[acc, range]}" if @debug
+          return [acc, range]
+        end
+      end
+      [interval]
+    end
+
+    def slow_collapsed_intervals(y)
       ranges = []
       sensor_intervals(y).sort_by(&:first).each_with_index do |range, idx|
         if idx == 0
