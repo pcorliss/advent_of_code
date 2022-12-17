@@ -40,8 +40,8 @@ Valve JJ has flow rate=21; tunnel leads to valve II
       {
         [:AA,:DD] => 1,
         [:AA,:EE] => 2,
-        [:AA,:FF] => 3,
-        [:AA,:GG] => 4,
+        # [:AA,:FF] => 3,
+        # [:AA,:GG] => 4,
         [:AA,:HH] => 5,
         [:HH,:EE] => 3,
       }.each do |start_end, distance|
@@ -90,7 +90,8 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
       it "handles a linear test case" do
         ad = Advent::Valveflow.new(linear)
-        puts ad.travel.inspect
+        # puts ad.travel.inspect
+        ad.debug!
         expect(ad.most_pressure.gas).to eq(2640)
       end
     end

@@ -30,16 +30,7 @@ module Advent
     end
 
     def precompute_travel
-      # @tunnels.each do |start, dests|
-      #   dests.each do |dest|
-      #     @travel[start] ||= {}
-      #     @travel[start][dest] = 1
-      #   end
-      # end
-
       locations = @tunnels.keys
-
-      # DFS
 
       require 'timeout'
       Timeout::timeout(5) do
@@ -55,8 +46,14 @@ module Advent
           end
         end
       end
-    end
 
+      ignore = @travel.keys - @valves.keys
+      locations.each do |l|
+        ignore.each do |i|
+          @travel[l].delete(i)
+        end
+      end
+    end
 
     def debug!
       @debug = true
@@ -80,9 +77,9 @@ module Advent
         # There's a pathological case here that we might be ignoring
         # An early result could prune a good branch
         # Or maybe not since best minutes is also a good measure
-        if c.gas < best.gas && c.minutes >= best.minutes
-          next
-        end
+        # if c.gas < best.gas && c.minutes >= best.minutes
+        #   next
+        # end
 
         if c.minutes >= MINUTES || c.valves.count >= @valves.count
           if c.gas > best.gas
@@ -95,7 +92,7 @@ module Advent
         # new_pos = follow_path.shift
         # distance = @travel[c.pos][new_pos]
         @travel[c.pos].each do |new_pos, distance|
-          next unless @valves[new_pos]
+          # next unless @valves[new_pos]
           next if c.valves.include? new_pos
           new_minutes = c.minutes + distance + 1
           next if new_minutes > MINUTES
@@ -121,7 +118,7 @@ module Advent
         best_counter += 1
         i += 1
 
-        if @debug && i % 1_000 == 0
+        if @debug && i % 100_000 == 0
           puts "Candidates Length: #{candidates.count}"
           puts "Candidate: #{c}"
           puts "Best: #{best}"
