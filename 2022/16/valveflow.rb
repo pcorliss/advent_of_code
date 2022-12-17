@@ -52,8 +52,9 @@ module Advent
 
               if @travel[a][b] && @travel[b][c]
                 # puts "#{a} #{b} #{c}"
-                @travel[a][c] ||= @travel[a][b] + @travel[b][c]
-                @travel[c][a] ||= @travel[a][b] + @travel[b][c]
+                cost = @travel[a][b] + @travel[b][c]
+                @travel[a][c] = [@travel[a][c],cost].compact.min
+                @travel[c][a] = [@travel[a][c],cost].compact.min
               end
             end
           end
@@ -95,14 +96,21 @@ module Advent
           next
         end
 
-        # new_pos = follow_path.shift
-        # distance = @travel[c.pos][new_pos]
-        @travel[c.pos].each do |new_pos, distance|
-          next unless @valves[new_pos]
-          next if c.valves.include? new_pos
+        new_pos = follow_path.shift
+        distance = @travel[c.pos][new_pos]
+        # @travel[c.pos].each do |new_pos, distance|
+          # next unless @valves[new_pos]
+          # next if c.valves.include? new_pos
           new_minutes = c.minutes + distance + 1
-          next if new_minutes > MINUTES
+          # next if new_minutes > MINUTES
           new_gas = c.gas + @valves[new_pos] * (MINUTES - new_minutes)
+
+          if @debug
+            puts "Current Candidate: #{c}"
+            puts "\tNew Pos: #{new_pos} +#{@travel[new_pos][c.pos]}"
+            puts "\tNew Gas: #{new_gas} +#{@valves[new_pos]}/min #{new_gas - c.gas}"
+            puts "\tNew Min: #{new_minutes}"
+          end
           candidates.push(
             Path.new(
               new_pos,
@@ -112,7 +120,7 @@ module Advent
             ),
             new_gas
           )
-        end
+        # end
 
         best_counter += 1
         i += 1

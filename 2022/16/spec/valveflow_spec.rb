@@ -43,6 +43,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         [:AA,:FF] => 3,
         [:AA,:GG] => 4,
         [:AA,:HH] => 5,
+        [:HH,:EE] => 3,
       }.each do |start_end, distance|
         it "precomputes costs from #{start_end} as #{distance}" do
           s, e = start_end
