@@ -54,7 +54,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
 
     describe "#most_pressure" do
       it "returns the candidate with the most pressure" do
-        ad.debug!
+        # ad.debug!
         expect(ad.most_pressure.gas).to eq(1651)
       end
     end

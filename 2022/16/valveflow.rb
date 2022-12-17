@@ -30,37 +30,32 @@ module Advent
     end
 
     def precompute_travel
-      @tunnels.each do |start, dests|
-        dests.each do |dest|
-          @travel[start] ||= {}
-          @travel[start][dest] = 1
-        end
-      end
+      # @tunnels.each do |start, dests|
+      #   dests.each do |dest|
+      #     @travel[start] ||= {}
+      #     @travel[start][dest] = 1
+      #   end
+      # end
 
-      locations = @travel.keys
-      # Wildly inefficient loops to build full travel graph
-      3.times do
+      locations = @tunnels.keys
+
+      # DFS
+
+      require 'timeout'
+      Timeout::timeout(5) do
         locations.each do |a|
-          locations.each do |b|
-            next if a == b
-            locations.each do |c|
-              next if a == c || b == c
-              # find an intermediary
-              # @travel[:AA][:DD] = 1
-              # @travel[:DD][:EE] = 1
-              # @travel[:AA][:EE] = 2
-
-              if @travel[a][b] && @travel[b][c]
-                # puts "#{a} #{b} #{c}"
-                cost = @travel[a][b] + @travel[b][c]
-                @travel[a][c] = [@travel[a][c],cost].compact.min
-                @travel[c][a] = [@travel[a][c],cost].compact.min
-              end
-            end
+          destinations = @tunnels[a].map {|d| [a, d]}
+          until destinations.empty? do
+            dest = destinations.shift
+            @travel[a] ||= {}
+            next if @travel[a][dest.last]
+            @travel[a][dest.last] = dest.count - 1
+            destinations.concat @tunnels[dest.last].map {|d| dest.clone << d}
           end
         end
       end
     end
+
 
     def debug!
       @debug = true
@@ -76,7 +71,7 @@ module Advent
       i = 0
       best_counter = 0
 
-      follow_path = [:DD, :BB, :JJ, :HH, :EE, :CC]
+      # follow_path = [:DD, :BB, :JJ, :HH, :EE, :CC]
 
       until candidates.empty? do
         c = candidates.pop
@@ -96,21 +91,21 @@ module Advent
           next
         end
 
-        new_pos = follow_path.shift
-        distance = @travel[c.pos][new_pos]
-        # @travel[c.pos].each do |new_pos, distance|
-          # next unless @valves[new_pos]
-          # next if c.valves.include? new_pos
+        # new_pos = follow_path.shift
+        # distance = @travel[c.pos][new_pos]
+        @travel[c.pos].each do |new_pos, distance|
+          next unless @valves[new_pos]
+          next if c.valves.include? new_pos
           new_minutes = c.minutes + distance + 1
-          # next if new_minutes > MINUTES
+          next if new_minutes > MINUTES
           new_gas = c.gas + @valves[new_pos] * (MINUTES - new_minutes)
 
-          if @debug
-            puts "Current Candidate: #{c}"
-            puts "\tNew Pos: #{new_pos} +#{@travel[new_pos][c.pos]}"
-            puts "\tNew Gas: #{new_gas} +#{@valves[new_pos]}/min #{new_gas - c.gas}"
-            puts "\tNew Min: #{new_minutes}"
-          end
+          # if @debug
+          #   puts "Current Candidate: #{c}"
+          #   puts "\tNew Pos: #{new_pos} +#{@travel[new_pos][c.pos]}"
+          #   puts "\tNew Gas: #{new_gas} +#{@valves[new_pos]}/min #{new_gas - c.gas}"
+          #   puts "\tNew Min: #{new_minutes}"
+          # end
           candidates.push(
             Path.new(
               new_pos,
@@ -120,20 +115,20 @@ module Advent
             ),
             new_gas
           )
-        # end
+        end
 
         best_counter += 1
         i += 1
 
-        if @debug && i % 100 == 0
+        if @debug && i % 1_000 == 0
           puts "Candidates Length: #{candidates.count}"
           puts "Candidate: #{c}"
           puts "Best: #{best}"
         end
 
-        if best_counter > 10_000_000
-          return best
-        end
+        # if best_counter > 10_000_000
+        #   return best
+        # end
         # raise "Too many iterations!!!" if i > 100_000_000
       end
 

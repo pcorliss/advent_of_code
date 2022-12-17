@@ -6,7 +6,9 @@ input = File.read('./input.txt')
 
 ad = Advent::Valveflow.new(input)
 ad.debug!
-# puts ad.most_pressure.gas
+puts ad.most_pressure.gas
 
 # 1186 your answer is too low.
 # 1234 your answer is too low.
+# 1368 your answer is too low. ---- Ugh, this is after fixing the branching
+# 1219 your answer is too low.
