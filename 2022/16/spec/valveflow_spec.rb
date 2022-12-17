@@ -50,6 +50,10 @@ Valve JJ has flow rate=21; tunnel leads to valve II
           expect(ad.travel[s][e]).to eq(distance)
         end
       end
+
+      it "inits minutes" do
+        expect(ad.minutes).to eq(30)
+      end
     end
 
     describe "#most_pressure" do
@@ -59,6 +63,12 @@ Valve JJ has flow rate=21; tunnel leads to valve II
       end
     end
 
+    describe "#elephant_assisstance" do
+      it "returns the candidate with the most pressure" do
+        # ad.debug!
+        expect(ad.elephant_assisstance.gas).to eq(1707)
+      end
+    end
 
 
     context "validation" do
@@ -93,6 +103,14 @@ Valve JJ has flow rate=21; tunnel leads to valve II
         # puts ad.travel.inspect
         # ad.debug!
         expect(ad.most_pressure.gas).to eq(2640)
+      end
+
+      it "handles a linear test case for part 2" do
+        ad = Advent::Valveflow.new(linear)
+        ad.minutes = 26
+        # puts ad.travel.inspect
+        ad.debug!
+        expect(ad.elephant_assisstance.gas).to eq(2670)
       end
     end
   end
