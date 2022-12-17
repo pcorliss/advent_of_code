@@ -48,6 +48,7 @@ module Advent
           until destinations.empty? do
             dest = destinations.shift
             @travel[a] ||= {}
+            next if dest.last == a
             next if @travel[a][dest.last]
             @travel[a][dest.last] = dest.count - 1
             destinations.concat @tunnels[dest.last].map {|d| dest.clone << d}
