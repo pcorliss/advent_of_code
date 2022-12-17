@@ -20,3 +20,4 @@ puts ad.elephant_assisstance.gas
 
 # 1748 your answer is too low.
 # 1836 your answer is too low.
+# 1933 was correct!
