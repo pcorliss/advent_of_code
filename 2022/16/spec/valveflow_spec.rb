@@ -91,7 +91,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
       it "handles a linear test case" do
         ad = Advent::Valveflow.new(linear)
         # puts ad.travel.inspect
-        ad.debug!
+        # ad.debug!
         expect(ad.most_pressure.gas).to eq(2640)
       end
     end

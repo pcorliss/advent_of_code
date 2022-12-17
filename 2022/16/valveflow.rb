@@ -81,12 +81,12 @@ module Advent
         #   next
         # end
 
-        if c.minutes >= MINUTES || c.valves.count >= @valves.count
-          if c.gas > best.gas
+        if c.gas > best.gas
+        # if c.minutes >= MINUTES || c.valves.count >= @valves.count
             best = c
             best_counter = 0
-          end
-          next
+          # end
+          # next
         end
 
         # new_pos = follow_path.shift
