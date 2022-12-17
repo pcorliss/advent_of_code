@@ -88,7 +88,7 @@ Valve JJ has flow rate=21; tunnel leads to valve II
       # 1240 |AA|DA|EA|FA|GA|HA|IA|JA|CA
       # 1430 |AA|KA|LA|MA|NA|OA|PA
 
-      it "handles a linear test case" do
+      xit "handles a linear test case" do
         ad = Advent::Valveflow.new(linear)
         # puts ad.travel.inspect
         # ad.debug!

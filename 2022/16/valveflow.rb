@@ -74,36 +74,17 @@ module Advent
       until candidates.empty? do
         c = candidates.pop
 
-        # There's a pathological case here that we might be ignoring
-        # An early result could prune a good branch
-        # Or maybe not since best minutes is also a good measure
-        # if c.gas < best.gas && c.minutes >= best.minutes
-        #   next
-        # end
-
         if c.gas > best.gas
-        # if c.minutes >= MINUTES || c.valves.count >= @valves.count
             best = c
             best_counter = 0
-          # end
-          # next
         end
 
-        # new_pos = follow_path.shift
-        # distance = @travel[c.pos][new_pos]
         @travel[c.pos].each do |new_pos, distance|
-          # next unless @valves[new_pos]
           next if c.valves.include? new_pos
           new_minutes = c.minutes + distance + 1
           next if new_minutes > MINUTES
           new_gas = c.gas + @valves[new_pos] * (MINUTES - new_minutes)
 
-          # if @debug
-          #   puts "Current Candidate: #{c}"
-          #   puts "\tNew Pos: #{new_pos} +#{@travel[new_pos][c.pos]}"
-          #   puts "\tNew Gas: #{new_gas} +#{@valves[new_pos]}/min #{new_gas - c.gas}"
-          #   puts "\tNew Min: #{new_minutes}"
-          # end
           candidates.push(
             Path.new(
               new_pos,
