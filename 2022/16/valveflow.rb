@@ -69,14 +69,15 @@ module Advent
 
     def most_pressure
       candidates = FastContainers::PriorityQueue.new(:max)
-      # candidates = [Path.new(:AA, Set.new, 0, 0)]
       candidates.push(Path.new(:AA, Set.new, 0, 0), 0)
       best = Path.new(:AA, Set.new, 0, MINUTES)
 
+      i = 0
       best_counter = 0
 
+      follow_path = [:DD, :BB, :JJ, :HH, :EE, :CC]
+
       until candidates.empty? do
-        # Currently depth first search
         c = candidates.pop
 
         # There's a pathological case here that we might be ignoring
@@ -94,38 +95,29 @@ module Advent
           next
         end
 
-
-        if !c.valves.include?(c.pos) && @valves.has_key?(c.pos)
-          new_gas = c.gas + @valves[c.pos] * (MINUTES - c.minutes - 1)
-          candidates.push(
-            Path.new(
-              c.pos,
-              c.valves.clone.add(c.pos),
-              new_gas,
-              c.minutes + 1
-            ),
-            new_gas / (c.minutes + 1)
-          )
-        end
-        # @travel[c.pos].each do |new_pos, distance|
-        # We should change this to instead only go to remaining
-        # valves and then just include the cost
-        # Would save lots and lots of branches
-        @tunnels[c.pos].each do |new_pos|
+        # new_pos = follow_path.shift
+        # distance = @travel[c.pos][new_pos]
+        @travel[c.pos].each do |new_pos, distance|
+          next unless @valves[new_pos]
+          next if c.valves.include? new_pos
+          new_minutes = c.minutes + distance + 1
+          next if new_minutes > MINUTES
+          new_gas = c.gas + @valves[new_pos] * (MINUTES - new_minutes)
           candidates.push(
             Path.new(
               new_pos,
-              c.valves.clone,
-              c.gas,
-              c.minutes + 1
+              c.valves.clone.add(new_pos),
+              new_gas,
+              new_minutes,
             ),
-            c.gas / (c.minutes + 1)
+            new_gas
           )
         end
 
         best_counter += 1
+        i += 1
 
-        if @debug && best_counter % 100_000 == 0
+        if @debug && i % 100 == 0
           puts "Candidates Length: #{candidates.count}"
           puts "Candidate: #{c}"
           puts "Best: #{best}"
@@ -137,6 +129,7 @@ module Advent
         # raise "Too many iterations!!!" if i > 100_000_000
       end
 
+      puts "I: #{i}" if @debug
       best
     end
   end
