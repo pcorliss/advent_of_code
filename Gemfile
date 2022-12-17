@@ -10,3 +10,4 @@ gem 'bitset'
 gem 'ruby_deep_clone'
 gem 'notiffany', git: "https://github.com/pcorliss/notiffany.git"
 #gem 'notiffany', path: '~/git/notiffany'
+gem 'priority_queue_cxx'
