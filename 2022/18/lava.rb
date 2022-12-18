@@ -74,9 +74,10 @@ module Advent
         amp = 0
         until edge || collision do
           coord = [x + d_x*amp, y + d_y*amp, z + d_z*amp]
-          edge ||= coord[X] > max[X] || coord[X] < min[X]
-          edge ||= coord[Y] > max[Y] || coord[Y] < min[Y]
-          edge ||= coord[Z] > max[Z] || coord[Z] < min[Z]
+          # Just in case there's some off by one we add 2 to the edges
+          edge ||= coord[X] > (max[X]+2) || coord[X] < (min[X]-2)
+          edge ||= coord[Y] > (max[Y]+2) || coord[Y] < (min[Y]-2)
+          edge ||= coord[Z] > (max[Z]+2) || coord[Z] < (min[Z]-2)
           break if edge
             
           collision = @cubes.include? coord
