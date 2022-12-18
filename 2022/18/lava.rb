@@ -28,7 +28,7 @@ module Advent
 
         if (a_x - b_x).abs + (a_y - b_y).abs + (a_z - b_z).abs == 1
           matched_sides += 1
-          puts "Adjacent: #{a}, #{b}" if @debug
+          # puts "Adjacent: #{a}, #{b}" if @debug
         end
       end
 
@@ -67,6 +67,9 @@ module Advent
     NEIGHBORS = [[-1,0,0],[1,0,0],[0,-1,0],[0,1,0],[0,0,-1],[0,0,1]]
 
     def inside_cube?(cube, min, max)
+      # cast rays outwards in all 6 directions
+      # if you hit an edge we're outside
+      # if you hit a rock we're inside
       x, y, z = cube
       NEIGHBORS.all? do |d_x, d_y, d_z|
         edge = false
@@ -79,7 +82,7 @@ module Advent
           edge ||= coord[Y] > (max[Y]+2) || coord[Y] < (min[Y]-2)
           edge ||= coord[Z] > (max[Z]+2) || coord[Z] < (min[Z]-2)
           break if edge
-            
+
           collision = @cubes.include? coord
           break if collision
 
@@ -136,9 +139,9 @@ module Advent
       until candidates.empty? do
         c = candidates.shift # BFS
 
-        puts "Candidates: #{candidates.count}" if @debug
-        puts "Candidate: #{c}" if @debug
-        puts "Center Cubes: #{center_cubes.count}" if @debug
+        # puts "Candidates: #{candidates.count}" if @debug
+        # puts "Candidate: #{c}" if @debug
+        # puts "Center Cubes: #{center_cubes.count}" if @debug
 
         NEIGHBORS.each do |d_x, d_y, d_z|
           x, y, z = c
@@ -147,7 +150,7 @@ module Advent
           next if center_cubes.include? new_candidate
           next if @cubes.include? new_candidate
 
-          puts "\tAdding Neighbor #{new_candidate} candidate" if @debug
+          # puts "\tAdding Neighbor #{new_candidate} candidate" if @debug
           # binding.pry if @debug
           center_cubes.add new_candidate
           candidates << new_candidate
@@ -156,6 +159,7 @@ module Advent
         i += 1
         raise "Too many iterations!!!" if i > 10000
       end
+      puts "Found #{center_cubes.count} cubes in the center" if @debug
       center_cubes
     end
 
@@ -167,12 +171,64 @@ module Advent
       center = center_point(min, max)
 
       # Find unoccupied cube in center
-      unoccupied_center = find_unoccupied_inside_cube(min, max, center)
+      # unoccupied_center = find_unoccupied_inside_cube(min, max, center)
 
       # Identify neighboring cubes that make up the unoccupied center
-      center_cubes = fill_center(unoccupied_center)
+      # center_cubes = fill_center(unoccupied_center)
+
+      center_cubes = interior_cubes(min, max)
 
       exposed_sides(center_cubes)
+    end
+
+    def interior_cubes(min, max)
+      interior = Set.new
+
+      (min[X]..max[X]).each do |x|
+        (min[Y]..max[Y]).each do |y|
+          (min[Z]..max[Z]).each do |z|
+            cube = [x,y,z]
+
+            next if @cubes.include? cube
+            interior.add cube if inside_cube?(cube, min, max)
+
+          end
+        end
+      end
+
+      interior
+    end
+
+    def cube_state_counts
+      min, max = bounding_box(@cubes)
+
+      states = {
+        inside: 0,
+        outside: 0,
+        lava: 0,
+      }
+
+      counter = 0
+      (min[X]..max[X]).each do |x|
+        (min[Y]..max[Y]).each do |y|
+          (min[Z]..max[Z]).each do |z|
+            counter += 1
+            cube = [x,y,z]
+
+            if @cubes.include? cube
+              states[:lava] += 1
+            elsif inside_cube?(cube, min, max)
+              states[:inside] += 1
+            else
+              states[:outside] += 1
+            end
+          end
+        end
+      end
+
+      puts "States: #{states}" if @debug
+      puts "Counter: #{counter}" if @debug
+      puts "Cubes: #{@cubes.count}" if @debug
     end
   end
 end

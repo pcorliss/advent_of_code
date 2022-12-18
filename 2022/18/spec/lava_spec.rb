@@ -158,6 +158,11 @@ describe Advent do
           expect(ad.exposed_sides - ad.interior_sides).to eq(90)
         end
       end
+
+      it "outputs" do
+        ad.debug!
+        ad.cube_state_counts
+      end
     end
   end
 end
