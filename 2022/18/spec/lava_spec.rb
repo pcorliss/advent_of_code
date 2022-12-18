@@ -5,6 +5,24 @@ require 'pry'
 describe Advent do
 
   let(:input) {
+
+   #   (2,2,1)
+
+   #
+  ###   (2,2,2)
+   #
+
+   #    (2,2,3)
+   
+   #    (2,2,4)
+
+   #
+  # #   (2,3,5)
+   #
+
+   #    (2,2,6)
+
+
     <<~EOS
 2,2,2
 1,2,2
@@ -59,6 +77,13 @@ describe Advent do
 
       it "returns the number of sides exposed for a larger example" do
         expect(ad.exposed_sides).to eq(64)
+      end
+    end
+
+    describe "#interior_sides" do
+      it "returns the number of sides exposed to the interior" do
+        ad.debug!
+        expect(ad.interior_sides).to eq(6)
       end
     end
 

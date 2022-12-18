@@ -6,3 +6,7 @@ input = File.read('./input.txt')
 
 ad = Advent::Lava.new(input)
 puts ad.exposed_sides
+ad.debug!
+puts ad.interior_sides
+
+# 1178. Too low
