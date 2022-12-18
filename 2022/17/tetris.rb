@@ -82,7 +82,7 @@ module Advent
 
       min_x, max_x = new_x_coords.map(&:first).minmax
       if min_x <= 0 || max_x >= RIGHT_WALL
-        puts "Wall Collision!" if @debug
+        # puts "Wall Collision!" if @debug
         delta_x = 0
       end
 
@@ -90,7 +90,7 @@ module Advent
         @grid[coord] == '#'
       end
 
-      puts "Block Collision!" if @debug && collision
+      # puts "Block Collision!" if @debug && collision
 
       delta_x = 0 if collision
 
@@ -98,7 +98,7 @@ module Advent
 
       solidify = false
       if new_max_y >= FLOOR
-        puts "Floor Collision!" if @debug
+        # puts "Floor Collision!" if @debug
         delta_y = 0
         solidify = true
       end
@@ -112,7 +112,7 @@ module Advent
       end
 
       if collision
-        puts "Downward Collision!" if @debug
+        # puts "Downward Collision!" if @debug
         delta_y = 0
         solidify = true
       end
@@ -141,6 +141,72 @@ module Advent
 
     def tower_height
       grid.cells.keys.map(&:last).min.abs
+    end
+
+    def cycle_tower_height(iterations)
+      cycle_data = find_cycle
+      puts "Cycle Info: #{cycle_data[:size]}" if @debug
+      cycle_count = (iterations - cycle_data[:start]) / cycle_data[:size]
+      cycle_rem = (iterations - cycle_data[:start]) % cycle_data[:size]
+      height = cycle_data[:height] + cycle_count * cycle_data[:cycle].sum + cycle_data[:cycle].first(cycle_rem).sum
+
+      # binding.pry if @debug
+
+      height
+    end
+
+    def find_cycle
+      return @find_cycle if @find_cycle
+      iterations = 100
+      min_cycles = 5
+
+      cycle_size = -1
+      counter = 0
+      heights = []
+      while cycle_size <= 0 do
+        heights.concat iterations.times.map { rock!; tower_height }
+        counter += iterations
+        @heights = heights
+        deltas = heights.each_with_index.map do |h, idx|
+          idx == 0 ? 0 : h - heights[idx - 1]
+        end
+        @deltas = deltas
+
+        cycle = []
+        (1..(counter / min_cycles)).each do |slice_size|
+          slices = deltas.reverse.each_slice(slice_size).to_a
+          last_slice = slices.first
+          found_cycle = slices.first(min_cycles).all? do |s|
+            last_slice == s
+          end
+          if found_cycle
+            cycle = last_slice.reverse
+            cycle_size = slice_size
+            break
+          end
+        end
+        
+        if cycle_size == -1
+          puts "Unable to find cycle after #{counter}" if @debug
+        end
+      end
+
+      start = -1
+      deltas.each_with_index do |d, idx|
+        if deltas.slice(idx, cycle_size) == cycle
+          start = idx
+          break
+        end
+      end
+
+      # binding.pry if @debug
+
+      @find_cycle = {
+        size: cycle_size,
+        cycle: cycle,
+        start: start,
+        height: heights[start - 1],
+      }
     end
   end
 end

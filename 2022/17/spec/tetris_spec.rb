@@ -163,6 +163,36 @@ describe Advent do
       end
     end
 
+    describe "#cycle_tower_height" do
+      it "returns the tower height computed via cycles" do
+        # ad.debug!
+        expect(ad.cycle_tower_height(2022)).to eq(3068)
+      end
+
+      it "returns the tower height computed via cycles" do
+        expect(ad.cycle_tower_height(1000000000000)).to eq(1514285714288)
+      end
+    end
+
+    describe "#find_cycle" do
+      it "returns the cycle size" do
+        expect(ad.find_cycle[:size]).to eq(35)
+      end
+
+      it "returns the first iteration where the cycle applies" do
+        ad.debug!
+        expect(ad.find_cycle[:start]).to eq(25)
+      end
+
+      it "returns the height at the cycle start" do
+        expect(ad.find_cycle[:height]).to eq(43)
+      end
+
+      it "returns the full cycle delta list" do
+        expect(ad.find_cycle[:cycle]).to include(1,2,3,0,1,1)
+      end
+    end
+
     context "validation" do
       let(:two_rocks) {
         <<~EOS
@@ -203,6 +233,37 @@ describe Advent do
         10.times { ad.rock! }
         expect(ad.grid.render).to include(ten_rocks.strip)
       end
+
+      # xit "does stuff" do
+      #   # Could look for cycles that are repeatable
+      #   # Ever increasing window after 1000 iterations
+      #   iterations = 1_000
+      #   min_cycles = 10
+      #   heights = iterations.times.map { ad.rock!;ad.tower_height }
+      #   deltas = heights.each_with_index.map do |h, idx|
+      #     if idx == 0
+      #       0
+      #     else
+      #       h - heights[idx - 1]
+      #     end
+      #   end
+
+      #   found_cycle_size = -1
+      #   (1..(iterations / min_cycles)).each do |slice_size|
+      #     slices = deltas.reverse.each_slice(slice_size).to_a
+      #     last_slice = slices.first
+      #     found_cycle = slices.first(min_cycles).all? do |s|
+      #       last_slice == s
+      #     end
+      #     if found_cycle
+      #       found_cycle_size = slice_size
+      #       break
+      #     end
+      #   end
+      #   # Pattern is capture in test data via the following on a wide screen
+      #   # deltas.each_slice(35).to_a
+      #   binding.pry
+      # end
 
     end
   end
