@@ -163,6 +163,10 @@ describe Advent do
         ad.debug!
         ad.cube_state_counts
       end
+
+      it "renders" do
+        ad.render
+      end
     end
   end
 end

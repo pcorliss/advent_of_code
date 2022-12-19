@@ -230,5 +230,23 @@ module Advent
       puts "Counter: #{counter}" if @debug
       puts "Cubes: #{@cubes.count}" if @debug
     end
+
+    def z_slices
+      @cubes.group_by { |c| c[Z] }
+    end
+
+    def render
+      z_slices.keys.sort.each do |z|
+        z_slice = z_slices[z]
+        g = Grid.new
+        g[0,0] = '.'
+        z_slice.each do |cube|
+          g[cube[X],cube[Y]] = '#'
+        end
+        puts "Z: #{z}"
+        puts g.render
+        puts ""
+      end
+    end
   end
 end
