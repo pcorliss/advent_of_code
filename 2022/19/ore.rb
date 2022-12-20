@@ -50,7 +50,7 @@ module Advent
       :geode,
     ]
 
-    def blueprint_options(blueprint)
+    def blueprint_options(blueprint, bounds = {})
       options = []
 
       goods = []
@@ -62,6 +62,7 @@ module Advent
         cost = blueprint[type]
 
         next if goods & cost.keys != cost.keys
+        next if bounds[type] && bounds[type] <= blueprint[:robots][type]
         
         # figure out minute when we can build
         min_to_build = 1
@@ -128,10 +129,22 @@ module Advent
       sum
     end
 
+    def upper_bound(blueprint)
+      max = {geode: 1000}
+      TYPES.each do |type|
+        blueprint[type].each do |t, c|
+          next if t == type
+          max[t] ||= 0
+          max[t] = c if max[t] < c
+        end
+      end
+      max
+    end
     
 
     # This might be easier if we just determined the scarce resources
     def optimize_blueprint(blueprint)
+      bounds = upper_bound(blueprint)
       candidates = FastContainers::PriorityQueue.new(:max)
       candidates.push(blueprint, priority_score(blueprint))
   
@@ -155,12 +168,12 @@ module Advent
           best_scores[candidate[:minute]] = score
         end
 
-        if score <= best_scores[candidate[:minute]] * 0.75
-          next
-        end
+        # if score <= best_scores[candidate[:minute]] * 0.25
+        #   next
+        # end
         
 
-        blueprint_options(candidate).each do |opt|
+        blueprint_options(candidate, bounds).each do |opt|
           # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:minute] == 7
           # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:robots][:obsidian] == 1 && opt[:minute] == 11 
           # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:robots][:obsidian] == 1 && opt[:minute] == 11 
@@ -179,10 +192,10 @@ module Advent
           puts "\tCandidate: M:#{candidate[:minute]             } I:#{candidate[:inventory]} R:#{candidate[:robots]} S:#{priority_score(candidate)}"
           puts "\tBest: #{candidate[:id] }    M:#{best[:minute] } I:#{best[:inventory]} R:#{best[:robots]} S:#{priority_score(best)}"
         end
-        if i > 1_000_000
-          break
-        end
-        # raise "Too many iterations #{i}" if i > 1_000_000
+        # if i > 100_000_000
+        #   break
+        # end
+        raise "Too many iterations #{i}" if i > 10_000_000
       end
 
       best

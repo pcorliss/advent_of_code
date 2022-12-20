@@ -11,6 +11,14 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
     EOS
   }
 
+  # Next Steps
+  # Optimize by creating upper bounds
+  # We don't want more than X ore robots if we'll only ever spend X ore per turn
+  # We don't want more than X clay robots ...
+
+  # Investigate whatever linear programming is
+
+
   describe Advent::Ore do
     let(:ad) { Advent::Ore.new(input) }
     let(:blueprint) { ad.blueprints.first }
@@ -55,6 +63,16 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
       it "inits minute" do
         expect(ad.blueprints.first[:minute]).to eq(0)
         expect(ad.blueprints.last[:minute]).to eq(0)
+      end
+    end
+
+    describe "#upper_bound" do
+      it "returns the upper bounds on numbers of robots" do
+        bounds = ad.upper_bound(blueprint)
+        expect(bounds[:ore]).to eq(3)
+        expect(bounds[:clay]).to eq(14)
+        expect(bounds[:obsidian]).to eq(7)
+        expect(bounds[:geode]).to eq(1000)
       end
     end
 
@@ -116,6 +134,14 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
       it "doesn't mutate the original" do
         ad.blueprint_options(blueprint)
         expect(blueprint[:minute]).to eq(0)
+      end
+
+      it "accepts bounds and doesn't build beyond them" do
+        blueprint[:robots] = {ore: 1, clay: 1, obsidian: 1, geode: 1}
+        bounds = {ore: 1, clay: 1, obsidian: 1, geode: 1}
+        options = ad.blueprint_options(blueprint, bounds)
+        expect(options.count).to eq(1)
+        expect(options.first[:robots]).to eq(blueprint[:robots])
       end
     end
 
