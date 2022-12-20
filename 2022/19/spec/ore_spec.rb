@@ -59,59 +59,58 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
     end
 
     describe "#blueprint_options" do
-
-# Blueprint 1:
-# Each ore robot costs 4 ore.
-# Each clay robot costs 2 ore.
-# Each obsidian robot costs 3 ore and 14 clay.
-# Each geode robot costs 2 ore and 7 obsidian.
-      it "returns one option if you can't afford anything" do
+      it "returns an option where you don't build" do
+        blueprint[:clay] = {ore: 1_000}
+        blueprint[:ore] = {ore: 1_000}
         options = ad.blueprint_options(blueprint)
         expect(options.count).to eq(1)
         expect(options.first[:robots]).to eq(blueprint[:robots])
+        expect(options.first[:minute]).to eq(24)
+        expect(options.first[:inventory][:ore]).to eq(24)
       end
 
-      it "returns the base option and a build option" do
-        blueprint[:inventory][:ore] = 2 
+      it "returns an option where you build an ore robot" do
+        # ad.debug!
+        blueprint[:clay] = {ore: 1_000}
         options = ad.blueprint_options(blueprint)
         expect(options.count).to eq(2)
-        expect(options.first[:robots]).to eq(blueprint[:robots])
-        expect(options.last[:robots][:clay]).to eq(1)
-        expect(options.last[:inventory][:ore]).to eq(1)
+        expect(options.first[:robots][:ore]).to eq(2)
+        expect(options.first[:minute]).to eq(5) # End of min 5 Begin Min 6
+        expect(options.first[:inventory][:ore]).to eq(1)
       end
 
-      it "spends multiple types of resources" do
-        blueprint[:inventory][:ore] = 2 
-        blueprint[:inventory][:obsidian] = 7 
+      it "returns an option where you build a clay robot" do
+        # ad.debug!
         options = ad.blueprint_options(blueprint)
         expect(options.count).to eq(3)
-        expect(options.last[:robots][:geode]).to eq(1)
-        expect(options.last[:inventory][:ore]).to eq(1)
-        expect(options.last[:inventory][:obsidian]).to eq(0)
+       
+        opt = options.find { |o| o[:robots][:clay] == 1}
+        expect(opt[:robots][:ore]).to eq(1)
+        expect(opt[:robots][:clay]).to eq(1)
+        expect(opt[:minute]).to eq(3) # End of min 3 / Begin of Min 4
+        expect(opt[:inventory][:ore]).to eq(1)
       end
 
-      it "increments resources" do
-        blueprint[:robots] = {ore: 1, clay: 2, obsidian: 3, geode: 4}
+      it "handles late game building properly" do
+        blueprint = {:id=>1, :robots=>{:ore=>1, :clay=>4, :obsidian=>2, :geode=>0}, :inventory=>{:ore=>2, :clay=>1, :obsidian=>4, :geode=>0}, :minute=>16, :ore=>{:ore=>4}, :clay=>{:ore=>2}, :obsidian=>{:ore=>3, :clay=>14}, :geode=>{:ore=>2, :obsidian=>7}}
+        expected = {:id=>1, :robots=>{:ore=>1, :clay=>4, :obsidian=>2, :geode=>1}, :inventory=>{:ore=>3, :clay=>13, :obsidian=>3, :geode=>0}, :minute=>19, :ore=>{:ore=>4}, :clay=>{:ore=>2}, :obsidian=>{:ore=>3, :clay=>14}, :geode=>{:ore=>2, :obsidian=>7}}
         options = ad.blueprint_options(blueprint)
-        ore = options.map {|bp| bp[:inventory][:ore]}.max
-        clay = options.map {|bp| bp[:inventory][:clay]}.max
-        obsidian = options.map {|bp| bp[:inventory][:obsidian]}.max
-        geode = options.map {|bp| bp[:inventory][:geode]}.max
-        expect(ore).to eq(1)
-        expect(clay).to eq(2)
-        expect(obsidian).to eq(3)
-        expect(geode).to eq(4)
+        # ad.debug!
+        expect(options).to include(expected)
       end
 
-      it "increments minute" do
-        expect(ad.blueprint_options(blueprint).first[:minute]).to eq(1)
-      end
 
-      it "only builds a single robot at a time" do
-        blueprint[:inventory][:ore] = 4_000
+      it "spends multiple types of resources" do
+        blueprint[:inventory][:ore] = 2
+        blueprint[:inventory][:obsidian] = 7
+        blueprint[:robots][:obsidian] = 1
         options = ad.blueprint_options(blueprint)
-        clay_robots = options.map {|bp| bp[:robots][:clay]}.max
-        expect(clay_robots).to eq(1)
+        expect(options.count).to eq(4)
+        opt = options.find { |o| o[:robots][:geode] == 1}
+        expect(opt).to_not be_nil
+        expect(opt[:robots][:geode]).to eq(1)
+        expect(opt[:inventory][:ore]).to eq(1)
+        expect(opt[:inventory][:obsidian]).to eq(1)
       end
 
       it "doesn't mutate the original" do
@@ -122,7 +121,7 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
 
     describe "#optimize_blueprint" do
       it "returns the best blueprint" do
-        # ad.debug!
+        #ad.debug!
         best = ad.optimize_blueprint(blueprint)
         expect(best[:inventory][:geode]).to eq(9)
       end
@@ -135,7 +134,7 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
     end
 
     describe "#quality_levels" do
-      it "returns the sum of all quality levels" do
+      xit "returns the sum of all quality levels" do
         expect(ad.quality_levels).to eq(33)
       end
     end

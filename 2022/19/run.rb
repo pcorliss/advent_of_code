@@ -9,3 +9,4 @@ ad.debug!
 puts ad.quality_levels
 
 # 1211 - too low.
+# 1155 - after refactoring :-(

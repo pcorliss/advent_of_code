@@ -43,34 +43,70 @@ module Advent
       @debug = true
     end
 
+    TYPES = [
+      :ore,
+      :clay,
+      :obsidian,
+      :geode,
+    ]
+
     def blueprint_options(blueprint)
-      # Spend to build - use `blueprint` instead of clone
-      # Figure out what we can afford
-      afford = [:ore, :clay, :obsidian, :geode].select do |type|
+      options = []
+
+      goods = []
+      blueprint[:robots].each { |type, quant| goods << type if quant > 0 }
+
+      remaining = MINUTES - blueprint[:minute]
+
+      TYPES.each do |type|
         cost = blueprint[type]
-        cost.all? do |cost_type, quant|
-          blueprint[:inventory][cost_type] >= quant
+
+        next if goods & cost.keys != cost.keys
+        
+        # figure out minute when we can build
+        min_to_build = 1
+        cost.each do |cost_type, cost_quant|
+          inventory = blueprint[:inventory][cost_type]
+          if inventory < cost_quant
+            robots = blueprint[:robots][cost_type]
+            deficit = cost_quant - inventory
+            min = deficit / robots
+            min += 1 if deficit % robots > 0
+            min_to_build = min + 1 if min + 1 > min_to_build
+          end
         end
+
+        # binding.pry if @debug
+        # check that it's <= MINUTES
+        next if min_to_build + blueprint[:minute] >= MINUTES
+
+        # increment to that minute
+        build_opt = DeepClone.clone(blueprint)
+        build_opt[:minute] += min_to_build
+        build_opt[:robots].each do |type, quant|
+          build_opt[:inventory][type] += quant * (min_to_build)
+        end 
+
+        # subtract costs and add robot
+        cost.each do |cost_type, cost_quant|
+          build_opt[:inventory][cost_type] -= cost_quant
+        end
+
+        # Add the robot
+        build_opt[:robots][type] += 1
+
+        # add to options
+        options << build_opt
+
+        options
       end
 
-      # Collect - doesn't add until end
       bp = DeepClone.clone(blueprint)
       bp[:robots].each do |type, quant|
-        bp[:inventory][type] += quant
+        bp[:inventory][type] += quant * remaining
       end
-
-      bp[:minute] += 1
-
-      options = [bp]
-      # Build Robot
-      afford.each do |type|
-        new_opt = DeepClone.clone(bp)
-        bp[type].each do |cost_type, cost|
-          new_opt[:inventory][cost_type] -= cost
-        end
-        new_opt[:robots][type] += 1
-        options << new_opt
-      end
+      bp[:minute] += remaining
+      options << bp
 
       options
     end
@@ -85,13 +121,16 @@ module Advent
         :obsidian => 10,
         :geode => 1000,
       }.each do |type, mult|
-        sum += blueprint[:inventory][type] * mult
+        sum += blueprint[:inventory][type] * mult * 2
         sum += blueprint[:robots][type] * mult * minutes_remaing
       end
 
       sum
     end
 
+    
+
+    # This might be easier if we just determined the scarce resources
     def optimize_blueprint(blueprint)
       candidates = FastContainers::PriorityQueue.new(:max)
       candidates.push(blueprint, priority_score(blueprint))
@@ -122,14 +161,23 @@ module Advent
         
 
         blueprint_options(candidate).each do |opt|
+          # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:minute] == 7
+          # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:robots][:obsidian] == 1 && opt[:minute] == 11 
+          # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:robots][:obsidian] == 1 && opt[:minute] == 11 
+          # binding.pry if @debug && opt[:robots][:geode] == 1
+          # binding.pry if @debug && opt[:inventory][:geode] == 12
+
+          # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 0} && opt[:minute] == 15
+          # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 1} && opt[:minute] == 18
+          # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 2} && opt[:minute] == 21
           candidates.push(opt, priority_score(opt))
         end
 
         i += 1
         if @debug && i % 10_000 == 0
           puts "Candidates: #{candidates.count}"
-          puts "\tCandidate: #{candidate[:inventory]} #{candidate[:robots]} #{priority_score(candidate)}"
-          puts "\tBest: #{candidate[:id]}   #{best[:inventory]} #{best[:robots]} #{priority_score(best)}"
+          puts "\tCandidate: M:#{candidate[:minute]             } I:#{candidate[:inventory]} R:#{candidate[:robots]} S:#{priority_score(candidate)}"
+          puts "\tBest: #{candidate[:id] }    M:#{best[:minute] } I:#{best[:inventory]} R:#{best[:robots]} S:#{priority_score(best)}"
         end
         if i > 1_000_000
           break
