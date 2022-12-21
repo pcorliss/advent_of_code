@@ -265,14 +265,10 @@ module Advent
         optimize_blueprint(bp)
       end
 
-      binding.pry
-
-      mult = best.inject(:*) do |b|
-        b[:inventory][:geode]
+      mult = best.inject(1) do |acc, b|
+        acc *= b[:inventory][:geode]
       end
       puts "Mult: #{mult}"
-
-      binding.pry
     end
   end
 end
