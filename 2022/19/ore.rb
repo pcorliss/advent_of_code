@@ -8,12 +8,13 @@ module Advent
 
   class Ore
     attr_accessor :debug
-    attr_reader :blueprints
+    attr_reader :blueprints, :minutes
 
-    MINUTES = 24
+    MINUTES_PART_1 = 24
 
-    def initialize(input)
+    def initialize(input, minutes = MINUTES_PART_1)
       @debug = false
+      @minutes = minutes
       @blueprints = []
       input.each_line do |line|
         line.chomp!
@@ -56,7 +57,7 @@ module Advent
       goods = []
       blueprint[:robots].each { |type, quant| goods << type if quant > 0 }
 
-      remaining = MINUTES - blueprint[:minute]
+      remaining = @minutes - blueprint[:minute]
 
       TYPES.each do |type|
         cost = blueprint[type]
@@ -79,7 +80,7 @@ module Advent
 
         # binding.pry if @debug
         # check that it's <= MINUTES
-        next if min_to_build + blueprint[:minute] >= MINUTES
+        next if min_to_build + blueprint[:minute] >= @minutes
 
         # increment to that minute
         build_opt = DeepClone.clone(blueprint)
@@ -113,13 +114,19 @@ module Advent
     end
 
     def priority_score(blueprint)
-      minutes_remaing = MINUTES - blueprint[:minute]
+      minutes_remaing = @minutes - blueprint[:minute]
 
       sum = 0
+      # {
+      #   :ore => 1,
+      #   :clay => 2,
+      #   :obsidian => 10,
+      #   :geode => 1000,
+      # }.each do |type, mult|
       {
-        :ore => 1,
-        :clay => 2,
-        :obsidian => 10,
+        :ore => 0,
+        :clay => 1,
+        :obsidian => 1,
         :geode => 1000,
       }.each do |type, mult|
         sum += blueprint[:inventory][type] * mult * 2
@@ -140,6 +147,31 @@ module Advent
       end
       max
     end
+
+    BREAKPOINTS = [
+      # {minute: 5, robots: {ore: 2, clay: 0, obsidian: 0, geode: 0}},
+      # {minute: 7, robots: {ore: 2, clay: 1, obsidian: 0, geode: 0}},
+      # {minute: 8, robots: {ore: 2, clay: 2, obsidian: 0, geode: 0}},
+      # {minute: 9, robots: {ore: 2, clay: 3, obsidian: 0, geode: 0}},
+      # {minute: 10, robots: {ore: 2, clay: 4, obsidian: 0, geode: 0}},
+      # {minute: 11, robots: {ore: 2, clay: 5, obsidian: 0, geode: 0}},
+      # {minute: 12, robots: {ore: 2, clay: 6, obsidian: 0, geode: 0}},
+      # {minute: 13, robots: {ore: 2, clay: 7, obsidian: 0, geode: 0}},
+      # {minute: 14, robots: {ore: 2, clay: 7, obsidian: 1, geode: 0}},
+      # {minute: 16, robots: {ore: 2, clay: 7, obsidian: 2, geode: 0}},
+      # {minute: 17, robots: {ore: 2, clay: 7, obsidian: 3, geode: 0}},
+      # {minute: 19, robots: {ore: 2, clay: 7, obsidian: 4, geode: 0}},
+      # {minute: 20, robots: {ore: 2, clay: 7, obsidian: 4, geode: 1}},
+      # {minute: 21, robots: {ore: 2, clay: 7, obsidian: 5, geode: 1}},
+      # {minute: 22, robots: {ore: 2, clay: 7, obsidian: 5, geode: 2}},
+      # {minute: 23, robots: {ore: 2, clay: 7, obsidian: 5, geode: 3}}, #
+      # {minute: 24, robots: {ore: 2, clay: 7, obsidian: 5, geode: 4}},
+      # {minute: 26, robots: {ore: 2, clay: 7, obsidian: 5, geode: 5}}, #
+      # {minute: 27, robots: {ore: 2, clay: 7, obsidian: 5, geode: 6}},
+      # {minute: 29, robots: {ore: 2, clay: 7, obsidian: 5, geode: 7}},
+      # {minute: 30, robots: {ore: 2, clay: 7, obsidian: 5, geode: 8}},
+      # {minute: 31, robots: {ore: 2, clay: 7, obsidian: 5, geode: 9}},
+    ]
     
 
     # This might be easier if we just determined the scarce resources
@@ -156,7 +188,7 @@ module Advent
         score = candidates.top_key
         candidate = candidates.pop
 
-        if candidate[:minute] >= MINUTES
+        if candidate[:minute] >= @minutes
           if candidate[:inventory][:geode] > best[:inventory][:geode]
             best = candidate
           end
@@ -164,14 +196,20 @@ module Advent
         end
 
         # Add Prune here based on scores at various minute levels
-        if best_scores[candidate[:minute]].nil? || score > best_scores[candidate[:minute]]
-          best_scores[candidate[:minute]] = score
-        end
-
-        # if score <= best_scores[candidate[:minute]] * 0.25
+        # if best_scores[candidate[:minute]].nil? || score > best_scores[candidate[:minute]]
+        #   best_scores[candidate[:minute]] = score
+        # end
+        # if score <= best_scores[candidate[:minute]] * 0.5
         #   next
         # end
-        
+
+        # Assume we can build a geode roboto every turn until the end
+        # How many geodes would we have?
+        # If less than best, prune
+        # Triangle Number n + (n-1) + (n-2) .... 1
+        n = @minutes - candidate[:minute]
+        utopia_geodes = candidate[:inventory][:geode] + candidate[:robots][:geode]*n + (n**2 + n) / 2
+        next if utopia_geodes < best[:inventory][:geode]
 
         blueprint_options(candidate, bounds).each do |opt|
           # binding.pry if @debug && opt[:robots][:ore] == 1 && opt[:robots][:clay] == 3 && opt[:minute] == 7
@@ -183,6 +221,11 @@ module Advent
           # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 0} && opt[:minute] == 15
           # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 1} && opt[:minute] == 18
           # binding.pry if @debug && opt[:robots] == {ore: 1, clay: 4, obsidian: 2, geode: 2} && opt[:minute] == 21
+
+          # if @debug && BREAKPOINTS.include?(opt.slice(:minute, :robots))
+          #   binding.pry
+          # end
+
           candidates.push(opt, priority_score(opt))
         end
 
@@ -196,6 +239,10 @@ module Advent
         #   break
         # end
         raise "Too many iterations #{i}" if i > 10_000_000
+        # if i > 1_000_000
+        #   puts "Too many iterations #{i}. Exiting prematurely"
+        #   break
+        # end
       end
 
       best
@@ -210,6 +257,22 @@ module Advent
       optimized.sum do |opt|
         opt[:inventory][:geode] * opt[:id]
       end
+    end
+
+    def first_three_blueprints_long
+      best = @blueprints.first(3).map do |bp|
+        puts "Starting BP: #{bp}" if @debug
+        optimize_blueprint(bp)
+      end
+
+      binding.pry
+
+      mult = best.inject(:*) do |b|
+        b[:inventory][:geode]
+      end
+      puts "Mult: #{mult}"
+
+      binding.pry
     end
   end
 end

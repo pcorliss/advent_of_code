@@ -64,6 +64,16 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
         expect(ad.blueprints.first[:minute]).to eq(0)
         expect(ad.blueprints.last[:minute]).to eq(0)
       end
+
+      it "inits minute limit" do
+        expect(ad.minutes).to eq(24)
+      end
+
+
+      it "allows setting the minute limit" do
+        ad = Advent::Ore.new(input, 32)
+        expect(ad.minutes).to eq(32)
+      end
     end
 
     describe "#upper_bound" do
@@ -143,20 +153,51 @@ Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsid
         expect(options.count).to eq(1)
         expect(options.first[:robots]).to eq(blueprint[:robots])
       end
+
+      # https://www.reddit.com/r/adventofcode/comments/zpy5rm/2022_day_19_what_are_your_insights_and/
+      # Note that we can do a bit better:
+      #   For any resource R that's not geode:
+      #   if you already have X robots creating resource R,
+      #     a current stock of Y for that resource, T minutes left,
+      #     and no robot requires more than Z of resource R to build,
+      #     and X * T+Y >= T * Z, then you never need to build another
+      #     robot mining R anymore.
+
+      # I credited the geodes the moment the geode bot was created
+      # (ie a geode bot created with five minutes left was immediate +5 score),
+      # which meant I no longer had to track the count of geode bots at all and
+      # let me collapse some states together.
     end
 
     describe "#optimize_blueprint" do
-      it "returns the best blueprint" do
+      xit "returns the best blueprint" do
         #ad.debug!
         best = ad.optimize_blueprint(blueprint)
         expect(best[:inventory][:geode]).to eq(9)
       end
 
-      it "returns the best blueprint for id 2" do
+      xit "returns the best blueprint for id 2" do
         # ad.debug!
         best = ad.optimize_blueprint(blueprint2)
         expect(best[:inventory][:geode]).to eq(12)
       end
+
+      context "part 2 longer" do
+        let(:ad) { Advent::Ore.new(input, 32) }
+
+        it "returns the best blueprint" do
+          # ad.debug!
+          best = ad.optimize_blueprint(blueprint)
+          expect(best[:inventory][:geode]).to eq(56)
+        end
+
+        it "returns the best blueprint for id 2" do
+          # ad.debug!
+          best = ad.optimize_blueprint(blueprint2)
+          expect(best[:inventory][:geode]).to eq(62)
+        end
+      end
+
     end
 
     describe "#quality_levels" do
