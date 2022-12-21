@@ -12,10 +12,12 @@ module Advent
       prev_node.next = @nodes.first
       @nodes.first.prev = prev_node
       @length = @nodes.length
+      @first = @nodes.first
     end
 
+    # There's a bug here where the first node can be destroyed
     def first
-      @nodes.first
+      @first
     end
 
     def destroy(node)
@@ -24,10 +26,18 @@ module Advent
       prev_node.next = next_node
       next_node.prev = prev_node
       @length -= 1
+      @first = node.next if node == @first
     end
 
     def add(node, val)
-      n = Node.new(val, node.next, node)
+      n = nil
+      if val.is_a? Node
+        n = val
+        n.next = node.next
+        n.prev = node
+      else
+        n = Node.new(val, node.next, node)
+      end
       @nodes << n
       @length += 1
       node.next.prev = n
@@ -39,12 +49,30 @@ module Advent
     end
 
     def to_a(node = @nodes.first, x = @length)
+      nodes(node, x).map(&:val)
+    end
+
+    def nodes(node = @nodes.first, x = @length)
       n = node
       x.times.map do |i|
-        v = n.val
+        p = n
         n = n.next
-        v
+        p
       end
+    end
+
+    def shift(node, amount)
+      return if amount == 0
+      destroy(node)
+      n = node.prev # 0
+
+      if amount >= 0
+        amount.times { n = n.next } # 2, 3
+      else
+        amount.abs.times { n = n.prev } # 4, 3, 2
+      end
+
+      add(n, node)
     end
 
     def reverse(node, length)

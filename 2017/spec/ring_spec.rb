@@ -29,6 +29,17 @@ describe Advent do
       end
     end
 
+    describe "#first" do
+      it "returns the first element" do
+        expect(list.first.val).to eq(0)
+      end
+
+      it "returns the next element if the first element is destroyed" do
+        list.destroy(list.first)
+        expect(list.first.val).to eq(1)
+      end
+    end
+
     describe "#destroy" do
       it "resets the next element" do
         prev_node = node
@@ -66,6 +77,32 @@ describe Advent do
         expect(node.next.next.val).to eq(99)
         expect(node.next.next.next.val).to eq(2)
         expect(node.next.next.next.prev.val).to eq(99)
+      end
+
+      it "allows adding a node value back in" do
+        one = list.first.next
+        node.val = 99
+        list.destroy(node)
+        list.add(node.next, node)
+        expect(list.to_a(one)).to eq([1, 99, 2, 3, 4])
+      end
+    end
+
+    describe "#nodes" do
+      it "returns the list as an array of nodes" do
+        expect(list.nodes.map(&:val)).to eq(5.times.to_a)
+      end
+    end
+
+    describe "#shift" do
+      it "shifts forward" do
+        list.shift(node.next, 2)
+        expect(list.to_a).to eq([0, 2, 3, 1, 4])
+      end
+
+      it "shifts backwards" do
+        list.shift(node.next, -3)
+        expect(list.to_a).to eq([0, 2, 1, 3, 4])
       end
     end
 
