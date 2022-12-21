@@ -6,11 +6,15 @@ module Advent
 
   class Grove
     attr_accessor :debug
-    attr_reader :ring
+    attr_reader :ring, :mult
 
-    def initialize(input)
+    def initialize(input, mult = 1)
       @debug = false
       @ring = CircularLinkedList.new input.each_line.map(&:to_i)
+      @mult = mult
+      @ring.nodes.each do |node|
+        node.val *= mult
+      end
     end
 
     def debug!
@@ -19,10 +23,12 @@ module Advent
     
     def mix
       first = @ring.first
-      nodes = @ring.nodes
+      @ordered_nodes ||= @ring.nodes
       puts "Nodes: #{@ring.to_a(first)}" if @debug
-      nodes.each do |node|
-        @ring.shift(node, node.val)
+      @ordered_nodes.each do |node|
+        next if node.val.zero?
+        puts "Shifting: #{node.val % @ring.length}" if @debug
+        @ring.shift(node, node.val % (@ring.length - 1))
         puts "Nodes: #{@ring.to_a(first)} Shifted: #{node.val}" if @debug
       end
       @ring
