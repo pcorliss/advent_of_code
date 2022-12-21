@@ -51,6 +51,12 @@ hmdt: 32
       end
     end
 
+    describe "#human" do
+      it "returns the number that causes root to pass equality" do
+        expect(ad.human).to eq(301)
+      end
+    end
+
     context "validation" do
     end
   end
