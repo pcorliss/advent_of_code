@@ -54,8 +54,7 @@ module Advent
     # Technicall only need to solve half the tree
     
     class MonkeyNode
-      attr_accessor :left, :right
-      attr_reader :val, :op
+      attr_accessor :left, :right, :val, :op
 
       def initialize(val = nil, op = nil, left = nil, right = nil)
         @val = val
@@ -65,13 +64,83 @@ module Advent
       end
 
       def calc
+        return @val if @val
+        return nil unless @left && @right
+        @left.calc
+        @right.calc
+        return nil unless @left.val && @right.val
         @val ||= @left.calc.__send__(@op, @right.calc)
+      end
+
+      def solve!
+        return unless @left && @right
+        # @left.calc if @left.val.nil?
+        # @right.calc if @right.val.nil?
+
+        return if @left.val && @right.val
+
+        if @op == :+
+          if @left.val.nil?
+            @left.val = @val - @right.val
+          else
+            @right.val = @val - @left.val
+          end
+        elsif @op == :-
+          if @left.val.nil?
+            # 10 = X - 3
+            # 10 + 3 == X
+            @left.val = @val + @right.val
+          else
+            # 10 = 13 - X
+            # (10 - 13) * -1 == X
+            @right.val = (@val - @left.val) * -1
+          end
+        elsif @op == :*
+          # 21 = X * 3
+          # 21 / 3 == X
+          if @left.val.nil?
+            @left.val = @val / @right.val
+          else
+            @right.val = @val / @left.val
+          end
+        elsif @op == :/
+          # 3 = X / 7
+          # 3 * 7 == X
+          if @left.val.nil?
+            @left.val = @val * @right.val
+          # 3 = 21 / X
+          # X == 21 / 3
+          else
+            @right.val = @left.val / @val
+          end
+        elsif @op == :==
+          if @left.val.nil?
+            @left.val = @right.val
+          else
+            @right.val = @left.val
+          end
+        end
+
+        @left.solve!
+        @right.solve!
+        calc
       end
     end
 
     def human
+      # Force Re-Init
+      @nodes = nil
+      # Set Root to `==`
+      node_tree[:root] = MonkeyNode.new(nil, :==, node_tree[:root].left, node_tree[:root].right)
+      # Nil out Human Entry
+      node_tree[:humn].val = nil
 
-      0
+      puts "Starting Calc of Root" if @debug
+      node_tree[:root].calc
+      puts "Starting Solve of Root" if @debug
+      node_tree[:root].solve!
+
+      node_tree[:humn].val
     end
 
     def debug!

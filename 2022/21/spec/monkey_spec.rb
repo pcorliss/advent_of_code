@@ -51,6 +51,121 @@ hmdt: 32
       end
     end
 
+    describe Advent::Monkey::MonkeyNode do
+      let(:klass) { Advent::Monkey::MonkeyNode }
+      let(:add)   { klass.new(nil, :+, left, right) }
+      let(:sub)   { klass.new(nil, :-, left, right) }
+      let(:mul)   { klass.new(nil, :*, left, right) }
+      let(:div)   { klass.new(nil, :/, left, right) }
+      let(:eql)   { klass.new(nil, :==, left, right) }
+      let(:left)  { klass.new(3) }
+      let(:right) { klass.new(5) }
+      let(:human) { klass.new }
+
+      describe "#solve" do
+        context "addition" do
+          it "handles computing the left side" do
+            add.left = human
+            add.val = 8
+            add.solve!
+            expect(human.val).to eq(3)
+          end 
+
+          it "handles computing the right side" do
+            add.right = human
+            add.val = 8
+            add.solve!
+            expect(human.val).to eq(5)
+          end 
+        end
+
+        context "subtraction" do
+          it "handles computing the left side" do
+            sub.left = human
+            sub.val = 8
+            sub.solve!
+            expect(human.val).to eq(13)
+          end 
+
+          it "handles computing the right side" do
+            sub.right = human
+            sub.val = 8
+            sub.solve!
+            expect(human.val).to eq(-5)
+          end 
+        end
+
+        context "multiplication" do
+          it "handles computing the left side" do
+            mul.left = human
+            mul.val = 15
+            mul.solve!
+            expect(human.val).to eq(3)
+          end 
+
+          it "handles computing the right side" do
+            mul.right = human
+            mul.val = 15
+            mul.solve!
+            expect(human.val).to eq(5)
+          end 
+        end
+
+        context "division" do
+          let(:left)  { klass.new(21) }
+          let(:right) { klass.new(7) }
+
+          it "handles computing the left side" do
+            div.left = human
+            div.val = 3
+            div.solve!
+            expect(human.val).to eq(21)
+          end 
+
+          it "handles computing the right side" do
+            div.right = human
+            div.val = 3
+            div.solve!
+            expect(human.val).to eq(7)
+          end 
+        end
+
+        context "equality" do
+          it "handles computing the left side" do
+            eql.left = human
+            eql.solve!
+            expect(human.val).to eq(5)
+          end 
+
+          it "handles computing the right side" do
+            eql.right = human
+            eql.solve!
+            expect(human.val).to eq(3)
+          end 
+        end
+      end
+
+      describe "#calc" do
+        it "returns the expected value based on children" do
+          expect(add.calc).to eq(8)
+        end
+
+        it "sets the val" do
+          add.calc
+          expect(add.val).to eq(8)
+        end
+
+        it "returns nil if there's no children and no val" do
+          expect(human.calc).to be_nil
+        end
+
+        it "returns nil if there's a child that returns nil" do
+          add.left = human
+          expect(add.calc).to be_nil
+        end
+      end
+    end
+
     describe "#human" do
       it "returns the number that causes root to pass equality" do
         expect(ad.human).to eq(301)
