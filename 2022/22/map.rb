@@ -110,5 +110,100 @@ module Advent
       col = x + 1
       1000 * row + 4 * col + facing[@dir]
     end
+
+    def cube_side_size
+      return @cube_side_size if @cube_side_size
+      count = @grid.cells.count do |cell, val|
+        !nil_cell?(cell)
+      end
+      count /= 6
+      @cube_side_size = Math.sqrt(count).to_i
+    end
+
+    # Edge Mapping to notional Grids
+    #    D....B....B....B....B...D
+    #   ABC..ADC..ECD..DAE..AEC.CFA
+    #    E....F....F....F....F...E
+
+    EDGE_MAP = {
+      A: {B: [:W, :N], C: [:S, :N], D: [:E, :N], F: [:N, :S]},
+      B: {A: [:N, :W], C: [:E, :W], E: [:S, :W], F: [:W, :W]},
+      C: {A: [:N, :S], B: [:W, :E], D: [:E, :W], E: [:S, :N]},
+      D: {A: [:N, :E], C: [:W, :E], E: [:S, :E], F: [:E, :E]},
+      E: {B: [:W, :S], C: [:N, :S], D: [:E, :S], F: [:S, :N]},
+      F: {A: [:S, :N], B: [:W, :N], D: [:E, :E], E: [:N, :S]},
+    }
+
+    CARDINAL_DIRECTIONS = {
+      W: [-1, 0], # West
+      E: [ 1, 0], # East
+      N: [ 0,-1], # North
+      S: [ 0, 1], # South
+    }
+
+    def cube
+      return @cube if @cube
+      @cube = {}
+      cube_grid_map = {}
+      # Find initial side
+      visited = Set.new
+      x, y = [0,0]
+      6.times do |i|
+        x = i * cube_side_size
+        y = 0
+        visited.add [x,y]
+        next if nil_cell?([x,y])
+        @cube[:A] = Grid.new(@grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1]))
+        cube_grid_map[:A] = [x,y]
+        break
+      end
+
+      i = 0 
+      6.times do |cube_marker|
+        cube_key = @cube.keys[cube_marker]
+        puts "Cube Key: #{cube_key}" if @debug
+        # binding.pry if cube_key.nil?
+        raise "No Cube Key Found" if cube_key.nil?
+        CARDINAL_DIRECTIONS.each do |dir, delta|
+          x_delta, y_delta = delta
+          x, y = cube_grid_map[cube_key]
+          # binding.pry if x.nil?
+          raise "No Cube Found" if x.nil?
+          x += x_delta * cube_side_size
+          y += y_delta * cube_side_size
+          puts "\tChecking for new cube at #{x} #{y}" if @debug
+          next if nil_cell?([x,y])
+          next if visited.include? [x,y]
+          visited.add [x,y]
+
+          side, dir_changes = EDGE_MAP[cube_key].find do |side, dir_changes|
+            dir_changes.first == dir
+          end
+
+          puts "\tSide: #{side} #{dir_changes}" if @debug
+          start_dir, end_dir = dir_changes
+          start_idx = DIRS.keys.index(start_dir)
+          end_idx = DIRS.keys.index(end_dir)
+          end_idx -= 2
+          end_idx += DIRS.keys.length if end_idx < start_idx
+          right_turns = end_idx - start_idx
+          puts "\tTurning #{right_turns} times #{start_idx} #{end_idx} #{DIRS.keys.length}" if @debug
+          # We need to handle rotations here
+
+          @cube[side] = Grid.new(
+            @grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1])
+          )
+          right_turns.times { @cube[side] = @cube[side].rotate }
+
+          cube_grid_map[side] = [x,y]
+        end
+
+        i += 1
+        raise "Too many iterations!!" if i > 1_000
+      end
+
+      @cube
+    end
+    
   end
 end
