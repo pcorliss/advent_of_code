@@ -6,7 +6,7 @@ module Advent
 
   class Map
     attr_accessor :debug, :pos, :dir
-    attr_reader :grid, :instructions
+    attr_reader :grid, :instructions, :cube_side, :cube_dir, :cube_pos
 
     def initialize(input)
       @debug = false
@@ -45,6 +45,10 @@ module Advent
 
       @dir = :E
       @pos = @grid.find('.')
+
+      @cube_side = :A
+      @cube_dir = :E
+      @cube_pos = [0,0]
     end
 
     def debug!
@@ -65,6 +69,8 @@ module Advent
       W: 3,
     }
 
+    LOOKUP_DIR = [:N, :E, :S, :W]
+
     DIR_MOD = {
       L: -1,
       R: 1,
@@ -76,8 +82,8 @@ module Advent
       @dir = directions[new_idx % directions.length]
     end
 
-    def nil_cell?(pos)
-      @grid[pos] == ' ' || @grid[pos].nil?
+    def nil_cell?(pos, g = @grid)
+      g[pos] == ' ' || g[pos].nil?
     end
 
     def run_instruction(inst)
@@ -104,11 +110,87 @@ module Advent
       end
     end
 
+    def cube_turn(inst)
+      directions = DIRS.keys
+      new_idx = directions.index(@dir) + DIR_MOD[inst]
+      @cube_dir = directions[new_idx % directions.length]
+    end
+
+    def offset(x, y, dir)
+      offset = dir == :N || dir == :S ? x : y
+      offset = cube_side_size - 1 - offset if dir == :S || dir == :W
+      offset
+    end
+
+    def new_pos_from_offset(offset, edge)
+      if edge == :S
+        [offset, cube_side_size - 1]
+      elsif edge == :N
+        [offset, 0]
+      elsif edge == :E
+        [cube_side_size - 1, offset]
+      elsif edge == :W
+        [0, offset]
+      end
+    end
+
+    def run_cube_instruction(inst)
+      cube
+      # @cube_side = :A
+      # @cube_dir = :E 
+      # @cube_pos = [0,0]
+
+      g = @cube[@cube_side]
+
+      if inst.is_a? Symbol
+        cube_turn(inst)
+      else
+        delta_x, delta_y = DIRS[@cube_dir]
+        inst.times do |i|
+          x, y = @cube_pos
+          new_pos = [x + delta_x, y + delta_y]
+          new_dir = @cube_dir
+          new_side = @cube_side
+          # We've reached an edge
+          if nil_cell?(new_pos, g)
+            # Find Side:
+            new_side, dir_changes = EDGE_MAP[@cube_side].find do |new_side, dir_changes|
+              dir_changes.first == @cube_dir
+            end
+
+            # [1] pry(#<Advent::Map>)> new_side
+            # => :F
+            # [2] pry(#<Advent::Map>)> dir_changes
+            # => [:N, :S]
+            
+            new_dir = LOOKUP_DIR[(DIRS_KEY[dir_changes.last] + 2) % DIRS_KEY.length]
+
+            offset = offset(x, y, @cube_dir)
+            new_pos = new_pos_from_offset(offset, dir_changes.last)
+
+            # binding.pry if @debug
+            raise if nil_cell?(new_pos, @cube[new_side])
+          end
+          break if g[new_pos] == '#'
+          @cube_side = new_side
+          @cube_dir = new_dir
+          @cube_pos = new_pos
+        end
+      end
+    end
+
     def run
       @instructions.each do |inst|
         run_instruction(inst)
       end
     end
+
+    def run_cube
+      @instructions.each do |inst|
+        run_cube_instruction(inst)
+      end
+    end
+
 
     def password
       facing = { N: 3, E: 0, S: 1, W: 2, }
@@ -151,8 +233,8 @@ module Advent
     def cube
       return @cube if @cube
       @cube = {}
-      cube_grid_map = {}
-      orientation_map = {}
+      @cube_grid_map = {}
+      @orientation_map = {}
       # Find initial side
       visited = Set.new
       x, y = [0,0]
@@ -162,8 +244,8 @@ module Advent
         visited.add [x,y]
         next if nil_cell?([x,y])
         @cube[:A] = Grid.new(@grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1]))
-        cube_grid_map[:A] = [x,y]
-        orientation_map[:A] = 0
+        @cube_grid_map[:A] = [x,y]
+        @orientation_map[:A] = 0
         break
       end
 
@@ -175,7 +257,7 @@ module Advent
         raise "No Cube Key Found" if cube_key.nil?
         CARDINAL_DIRECTIONS.each do |dir, delta|
           x_delta, y_delta = delta
-          x, y = cube_grid_map[cube_key]
+          x, y = @cube_grid_map[cube_key]
           # binding.pry if x.nil?
           raise "No Cube Found" if x.nil?
           x += x_delta * cube_side_size
@@ -187,7 +269,7 @@ module Advent
 
           # BUG HERE
           # Need to take into account orientation before using edge map
-          turned_times = orientation_map[cube_key]
+          turned_times = @orientation_map[cube_key]
           oriented = DIRS_KEY.keys[DIRS_KEY[dir] + turned_times]
           side, dir_changes = EDGE_MAP[cube_key].find do |side, dir_changes|
             # dir_changes.first == dir
@@ -212,8 +294,8 @@ module Advent
           )
           right_turns.times { @cube[side] = @cube[side].rotate }
           # Number of turns to orient this with North Up
-          orientation_map[side] = right_turns
-          cube_grid_map[side] = [x,y]
+          @orientation_map[side] = right_turns
+          @cube_grid_map[side] = [x,y]
         end
 
         i += 1
@@ -222,6 +304,22 @@ module Advent
 
       @cube
     end
-    
+  
+    # 0,0 -> 3,0 -> 0,3 -> 0,3 (3x3)
+    # 1,1 -> 2,1 -> 2,2 -> 1,2 (4x4)
+    def translate_cube(side = @cube_side, pos = @cube_pos, dir = @cube_dir)
+      x, y = @cube_grid_map[side]
+      turns = @orientation_map[side]
+      g = Grid.new
+      g.width = cube_side_size
+      g.height = cube_side_size
+      p_x, p_y = pos
+      g[p_x,p_y] = '.'
+      ((DIRS_KEY.length - turns) % DIRS_KEY.length).times { g = g.rotate }
+      p_x, p_y = g.find('.')
+
+      new_dir = LOOKUP_DIR[(DIRS_KEY[dir] - turns) % DIRS_KEY.length]
+      [[p_x + x, p_y + y], new_dir]
+    end
   end
 end

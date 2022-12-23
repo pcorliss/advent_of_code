@@ -8,5 +8,4 @@ ad = Advent::Map.new(input)
 ad.run
 puts ad.password
 
-require 'pry'
-binding.pry
+ad.cube

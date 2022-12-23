@@ -3,6 +3,24 @@ require 'rspec'
 require 'pry'
 
 describe Advent do
+  let(:full_input_like_cube) {
+    <<~EOS
+   a.bb.h
+   .A..D.
+   c.dd.f
+   c.d
+   .C.
+   e.f
+c.ee.f
+.B..E.
+a.gg.h
+a.g
+.F.
+b.h
+   
+10R5L5R10L4R5L5
+  EOS
+  }
 
   let(:input) {
     <<~EOS
@@ -44,6 +62,14 @@ describe Advent do
 
       it "inits a direction" do
         expect(ad.dir).to eq(:E)
+      end
+
+      it "inits a cube direction" do
+        expect(ad.cube_dir).to eq(:E)
+      end
+
+      it "inits a current cube side" do
+        expect(ad.cube_side).to eq(:A)
       end
     end
 
@@ -91,6 +117,35 @@ describe Advent do
       it "rotates your direction 360 degrees" do
         4.times { ad.run_instruction(:R) }
         expect(ad.dir).to eq(:E)
+      end
+    end
+
+    describe "#run_cube_instruction" do
+      it "handles simple movement and turns" do
+        ad.run_cube_instruction(2)
+        ad.run_cube_instruction(:L)
+        expect(ad.translate_cube).to eq([[10,0], :N])
+      end
+
+      it "handles simple wall blocks" do
+        ad.run_cube_instruction(3)
+        ad.run_cube_instruction(:L)
+        expect(ad.translate_cube).to eq([[10,0], :N])
+      end
+
+      it "handles shifting to the next side on a turned cube" do
+        # ad.debug!
+        ad.run_cube_instruction(1)
+        ad.run_cube_instruction(:L)
+        ad.run_cube_instruction(2)
+        expect(ad.translate_cube).to eq([[2,5], :S])
+      end
+    end
+
+    describe "#run_cube" do
+      it "runs all the instructions against the cube" do
+        ad.run_cube
+        expect(ad.translate_cube).to eq([[6,4], :N])
       end
     end
 
@@ -195,7 +250,7 @@ describe Advent do
           #...
           c..d
   b..aa..cc..d
-  .....B..#C..
+  ..x..B..#C..
   ..F....#....
   h..gg..ee.#f
           e..ff..d
@@ -229,24 +284,7 @@ describe Advent do
 
       end
       context "input like cube map" do
-        let(:input) {
-          <<~EOS
-   a.bb.h
-   .A..D.
-   c.dd.f
-   c.d
-   .C.
-   e.f
-c.ee.f
-.B..E.
-a.gg.h
-a.g
-.F.
-b.h
-   
-10R5L5R10L4R5L5
-          EOS
-        }
+        let(:input) { full_input_like_cube }
         
         it "maps the grid to a cube" do
           # ad.debug!
@@ -304,6 +342,26 @@ g.ee.ff.h
           expect(ad.cube[:E][0,0]).to eq('e')
           expect(ad.cube[:F][0,0]).to eq('g')
         end
+      end
+    end
+
+    context "#translate_cube" do
+      let(:input) { full_input_like_cube }
+
+      before { ad.cube }
+
+      it "translates a cube position and direction for origin" do
+        expect(ad.translate_cube(:A, [0,0], :N)).to eq([[3,0], :N])
+      end
+
+      it "translates a straightforward rotation" do
+        # ad.debug!
+        expect(ad.translate_cube(:D, [0,0], :N)).to eq([[6,2], :W])
+      end
+
+      it "translates a complicated rotation" do
+        # ad.debug!
+        expect(ad.translate_cube(:F, [0,2], :N)).to eq([[0,9], :E])
       end
     end
 
