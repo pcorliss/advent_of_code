@@ -144,6 +144,7 @@ b.h
 
     describe "#run_cube" do
       it "runs all the instructions against the cube" do
+        ad.debug!
         ad.run_cube
         expect(ad.translate_cube).to eq([[6,4], :N])
       end
@@ -161,6 +162,14 @@ b.h
       it "returns the password" do
         ad.run
         expect(ad.password).to eq(6032)
+      end
+
+      it "returns the password for the cube" do
+        ad.run_cube
+        pos, dir = ad.translate_cube
+        expect(pos).to eq([6,4])
+        expect(dir).to eq(:N)
+        expect(ad.password(pos, dir)).to eq(5031)
       end
     end
 

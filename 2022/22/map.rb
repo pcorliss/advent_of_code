@@ -112,16 +112,18 @@ module Advent
 
     def cube_turn(inst)
       directions = DIRS.keys
-      new_idx = directions.index(@dir) + DIR_MOD[inst]
+      new_idx = directions.index(@cube_dir) + DIR_MOD[inst]
       @cube_dir = directions[new_idx % directions.length]
     end
 
+    # Bug here - offset may need to be aware of other side
     def offset(x, y, dir)
       offset = dir == :N || dir == :S ? x : y
-      offset = cube_side_size - 1 - offset if dir == :S || dir == :W
+      # offset = cube_side_size - 1 - offset if dir == :S || dir == :W
       offset
     end
 
+    # Bug here - offset may need to be aware of other side
     def new_pos_from_offset(offset, edge)
       if edge == :S
         [offset, cube_side_size - 1]
@@ -143,11 +145,13 @@ module Advent
       g = @cube[@cube_side]
 
       if inst.is_a? Symbol
+        dir_before = @cube_dir
         cube_turn(inst)
+        puts "Turned: #{dir_before} to #{@cube_dir}" if @debug
       else
-        delta_x, delta_y = DIRS[@cube_dir]
         inst.times do |i|
           x, y = @cube_pos
+          delta_x, delta_y = DIRS[@cube_dir]
           new_pos = [x + delta_x, y + delta_y]
           new_dir = @cube_dir
           new_side = @cube_side
@@ -168,13 +172,17 @@ module Advent
             offset = offset(x, y, @cube_dir)
             new_pos = new_pos_from_offset(offset, dir_changes.last)
 
-            # binding.pry if @debug
+            puts "Edge Switch: Side: #{@cube_side}-#{@cube_pos} Dir: #{@cube_dir} -> Side: #{new_side}-#{new_pos} Dir: #{new_dir}" if @debug
+            # binding.pry if @debug && @pause
             raise if nil_cell?(new_pos, @cube[new_side])
           end
-          break if g[new_pos] == '#'
+          puts "\tWall @ #{new_side} #{new_pos}" if @cube[new_side][new_pos] == '#'
+          break if @cube[new_side][new_pos] == '#'
           @cube_side = new_side
           @cube_dir = new_dir
           @cube_pos = new_pos
+          puts "\tMoved to: #{new_side}-#{new_pos} Dir: #{new_dir}"
+          # binding.pry if @debug && @pause
         end
       end
     end
@@ -185,19 +193,35 @@ module Advent
       end
     end
 
+    DIR_CHAR_LOOKUP  = {
+      N: '^',
+      S: 'v',
+      E: '>',
+      W: '<',
+    }
+
     def run_cube
-      @instructions.each do |inst|
+      @instructions.each_with_index do |inst, idx|
+        @pause = @debug && idx == 10
         run_cube_instruction(inst)
+        if @debug
+          pos, dir = translate_cube
+          @grid[pos] = DIR_CHAR_LOOKUP[dir]
+          puts "\tLast Inst: #{inst} - #{@cube_side} - #{@cube_pos}"
+        end
+        # if @debug && idx == 10
+        #   puts @grid.render
+        #   puts ""
+        # end
       end
     end
 
-
-    def password
+    def password(p = @pos, d = @dir)
       facing = { N: 3, E: 0, S: 1, W: 2, }
-      x, y = @pos
+      x, y = p
       row = y + 1
       col = x + 1
-      1000 * row + 4 * col + facing[@dir]
+      1000 * row + 4 * col + facing[d]
     end
 
     def cube_side_size
@@ -220,7 +244,9 @@ module Advent
       C: {A: [:N, :S], B: [:W, :E], D: [:E, :W], E: [:S, :N]},
       D: {A: [:N, :E], C: [:W, :E], E: [:S, :E], F: [:E, :E]},
       E: {B: [:W, :S], C: [:N, :S], D: [:E, :S], F: [:S, :N]},
-      F: {A: [:S, :N], B: [:W, :N], D: [:E, :E], E: [:N, :S]},
+      # Bug Here:
+      # F: {A: [:S, :N], B: [:W, :N], D: [:E, :E], E: [:N, :S]},
+      F: {A: [:S, :N], B: [:W, :W], D: [:E, :E], E: [:N, :S]},
     }
 
     CARDINAL_DIRECTIONS = {
