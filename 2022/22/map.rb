@@ -58,6 +58,13 @@ module Advent
       W: [-1,  0],
     }
 
+    DIRS_KEY = {
+      N: 0,
+      E: 1,
+      S: 2,
+      W: 3,
+    }
+
     DIR_MOD = {
       L: -1,
       R: 1,
@@ -145,6 +152,7 @@ module Advent
       return @cube if @cube
       @cube = {}
       cube_grid_map = {}
+      orientation_map = {}
       # Find initial side
       visited = Set.new
       x, y = [0,0]
@@ -155,6 +163,7 @@ module Advent
         next if nil_cell?([x,y])
         @cube[:A] = Grid.new(@grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1]))
         cube_grid_map[:A] = [x,y]
+        orientation_map[:A] = 0
         break
       end
 
@@ -176,25 +185,34 @@ module Advent
           next if visited.include? [x,y]
           visited.add [x,y]
 
+          # BUG HERE
+          # Need to take into account orientation before using edge map
+          turned_times = orientation_map[cube_key]
+          oriented = DIRS_KEY.keys[DIRS_KEY[dir] + turned_times]
           side, dir_changes = EDGE_MAP[cube_key].find do |side, dir_changes|
-            dir_changes.first == dir
+            # dir_changes.first == dir
+            dir_changes.first == oriented
           end
 
           puts "\tSide: #{side} #{dir_changes}" if @debug
+          binding.pry if @cube[side] && @debug
+          raise "Already loaded this cube!!!" if @cube[side]
+          
           start_dir, end_dir = dir_changes
-          start_idx = DIRS.keys.index(start_dir)
-          end_idx = DIRS.keys.index(end_dir)
+          start_idx = DIRS_KEY[start_dir]
+          end_idx = DIRS_KEY[end_dir]
           end_idx -= 2
-          end_idx += DIRS.keys.length if end_idx < start_idx
-          right_turns = end_idx - start_idx
-          puts "\tTurning #{right_turns} times #{start_idx} #{end_idx} #{DIRS.keys.length}" if @debug
+          # end_idx += orientation
+          right_turns = (turned_times + end_idx - start_idx) % DIRS_KEY.length
+          puts "\tTurning #{right_turns} times #{start_idx} #{end_idx} #{DIRS_KEY.length}" if @debug
           # We need to handle rotations here
 
           @cube[side] = Grid.new(
             @grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1])
           )
           right_turns.times { @cube[side] = @cube[side].rotate }
-
+          # Number of turns to orient this with North Up
+          orientation_map[side] = right_turns
           cube_grid_map[side] = [x,y]
         end
 

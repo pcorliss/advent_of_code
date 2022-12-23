@@ -228,6 +228,45 @@ describe Advent do
         end
 
       end
+      context "input like cube map" do
+        let(:input) {
+          <<~EOS
+   a.bb.h
+   .A..D.
+   c.dd.f
+   c.d
+   .C.
+   e.f
+c.ee.f
+.B..E.
+a.gg.h
+a.g
+.F.
+b.h
+   
+10R5L5R10L4R5L5
+          EOS
+        }
+        
+        it "maps the grid to a cube" do
+          # ad.debug!
+          expect(ad.cube_side_size).to eq(3)
+          expect(ad.cube.count).to eq(6)
+          expect(ad.cube[:A][1,1]).to eq('A')
+          expect(ad.cube[:B][1,1]).to eq('B')
+          expect(ad.cube[:C][1,1]).to eq('C')
+          expect(ad.cube[:D][1,1]).to eq('D')
+          expect(ad.cube[:E][1,1]).to eq('E')
+          expect(ad.cube[:F][1,1]).to eq('F')
+
+          expect(ad.cube[:A][0,0]).to eq('a')
+          expect(ad.cube[:B][0,0]).to eq('a')
+          expect(ad.cube[:C][0,0]).to eq('c')
+          expect(ad.cube[:D][0,0]).to eq('d')
+          expect(ad.cube[:E][0,0]).to eq('e')
+          expect(ad.cube[:F][0,0]).to eq('g')
+        end
+      end
       context "straightforward cube map" do
         let(:input) {
           <<~EOS
@@ -269,6 +308,12 @@ g.ee.ff.h
     end
 
     context "validation" do
+      let(:input) { File.read('input.txt') }
+
+      it "maps the cube" do
+        # ad.debug!
+        expect(ad.cube.count).to eq(6)
+      end
     end
   end
 end
