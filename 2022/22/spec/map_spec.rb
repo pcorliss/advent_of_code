@@ -140,11 +140,34 @@ b.h
         ad.run_cube_instruction(2)
         expect(ad.translate_cube).to eq([[2,5], :S])
       end
+
+      it "handles the shift to the upside down side F with proper offset" do
+        instructions = [2, :R, 4, :R, 6, :L, 3, :R, 1, :R, :R, 1]
+        # ad.debug!
+        instructions.each do |inst|
+          ad.run_cube_instruction(inst)
+        end
+        expect(ad.translate_cube).to eq([[4,7], :E])
+      end
+
+      it "handles the shift from E to B" do
+        instructions = [2, :R, 6, :R, 2, :L, 5, :R, 1]
+        ad.debug!
+        instructions.each do |inst|
+          ad.run_cube_instruction(inst)
+        end
+        expect(ad.translate_cube).to eq([[4,7], :N])
+        instructions = [:R, :R, 1]
+        instructions.each do |inst|
+          ad.run_cube_instruction(inst)
+        end
+        expect(ad.translate_cube).to eq([[8,11], :E])
+      end
     end
 
     describe "#run_cube" do
       it "runs all the instructions against the cube" do
-        ad.debug!
+        # ad.debug!
         ad.run_cube
         expect(ad.translate_cube).to eq([[6,4], :N])
       end
@@ -282,7 +305,6 @@ b.h
           expect(ad.cube[:E][1,1]).to eq('E')
           expect(ad.cube[:F][1,1]).to eq('F')
 
-
           expect(ad.cube[:A][0,0]).to eq('a')
           expect(ad.cube[:B][0,0]).to eq('a')
           expect(ad.cube[:C][0,0]).to eq('c')
@@ -375,11 +397,20 @@ g.ee.ff.h
     end
 
     context "validation" do
-      let(:input) { File.read('input.txt') }
+      xit "interactive" do
+        ad.debug!
+        ad.interactive
 
-      it "maps the cube" do
-        # ad.debug!
-        expect(ad.cube.count).to eq(6)
+        # There's an issue between side B side E edges
+      end
+
+      context "Full input" do
+        let(:input) { File.read('input.txt') }
+
+        it "maps the cube" do
+          # ad.debug!
+          expect(ad.cube.count).to eq(6)
+        end
       end
     end
   end

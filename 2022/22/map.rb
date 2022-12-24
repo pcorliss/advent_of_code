@@ -124,7 +124,12 @@ module Advent
     end
 
     # Bug here - offset may need to be aware of other side
-    def new_pos_from_offset(offset, edge)
+    def new_pos_from_offset(offset, edge, starting_edge)
+      if edge == starting_edge
+        passed_offset = offset
+        offset = cube_side_size - 1 - offset
+        puts "\tDetected a Flipped Side: #{passed_offset} -> #{offset}" if @debug
+      end
       if edge == :S
         [offset, cube_side_size - 1]
       elsif edge == :N
@@ -134,6 +139,67 @@ module Advent
       elsif edge == :W
         [0, offset]
       end
+    end
+
+    require 'deep_clone'
+    def new_pos_by_rotation(start_side, end_side, direction, position)
+      start_edge, end_edge = EDGE_MAP[start_side][end_side]
+
+      opposite = (DIRS_KEY[start_edge] + 2) % DIRS.length
+      rotations = (DIRS_KEY[end_edge] + opposite) % DIRS.length
+      rotations = (DIRS.length - DIRS_KEY[end_edge] - DIRS_KEY[start_edge]) % DIRS.length
+      # 4 - 3 - 0 == 1
+      # 4 - 2 - 3 == -1 == 3
+
+      # DIRS_KEY[start_edge]
+      # DIRS_KEY[end_edge]
+      # rotate until end_edge == opposite
+
+      # opp_start == east == 1
+      # rotations = south -> east = 3
+      # (opposite - end_edge) % 4
+      # (1 - 2) % 4 == 3
+
+      # opp_start == north == 0
+      # rotations = west -> north = 1
+      # (opposite - end_edge) % 4
+      # (0 - 3) % 4 == 1
+
+      rotations = (opposite - DIRS_KEY[end_edge]) % DIRS.length
+
+      # binding.pry if @debug && start_side == :E && end_side == :B
+
+      target_grid = DeepClone.clone @cube[end_side]
+
+      x, y = position
+      puts "\t\tStart Edge: #{start_edge} End Edge: #{end_edge}" if @debug
+      puts "\t\tRotating #{rotations} times Opp: #{opposite}}" if @debug
+      rotations.times do |i|
+        target_grid = target_grid.rotate
+      end
+
+      offset = direction == :N || direction == :S ? position.first : position.last
+      puts "\t\tOffset: #{offset}-#{direction}-[#{position.first},#{position.last}]" if @debug
+      case direction
+      when :N
+        new_pos = [x, cube_side_size - 1]
+      when :S
+        new_pos = [x, 0]
+      when :W
+        new_pos = [cube_side_size - 1, y]
+      when :E
+        new_pos = [0, y]
+      end
+      target_grid[new_pos] = :X
+      puts "\t\tNew Pos on rotated grid: #{new_pos}" if @debug
+
+      rotate_back = ((DIRS.count - rotations) % DIRS.length)
+      puts "\t\tRotating Back #{rotate_back} times" if @debug
+      rotate_back.times do |i|
+        target_grid = target_grid.rotate
+      end
+
+      target_grid.find(:X)
     end
 
     def run_cube_instruction(inst)
@@ -169,19 +235,29 @@ module Advent
             
             new_dir = LOOKUP_DIR[(DIRS_KEY[dir_changes.last] + 2) % DIRS_KEY.length]
 
+            # offset = offset(x, y, @cube_dir)
+            # new_pos = new_pos_from_offset(offset, dir_changes.last, dir_changes.first)
+
+            # new_pos_beta = new_pos_by_rotation(@cube_side, new_side, @cube_dir, @cube_pos)
+
+            # puts "Beta New Position: #{new_pos_beta}" if @debug
+
             offset = offset(x, y, @cube_dir)
-            new_pos = new_pos_from_offset(offset, dir_changes.last)
+            new_pos = new_pos_from_offset(offset, dir_changes.last, dir_changes.first)
+
+            new_pos = new_pos_by_rotation(@cube_side, new_side, @cube_dir, @cube_pos)
 
             puts "Edge Switch: Side: #{@cube_side}-#{@cube_pos} Dir: #{@cube_dir} -> Side: #{new_side}-#{new_pos} Dir: #{new_dir}" if @debug
-            # binding.pry if @debug && @pause
+            binding.pry if @debug && @pause
+            # binding.pry if @debug && new_side == :B && @cube_side == :E
             raise if nil_cell?(new_pos, @cube[new_side])
           end
-          puts "\tWall @ #{new_side} #{new_pos}" if @cube[new_side][new_pos] == '#'
+          puts "\tWall @ #{new_side} #{new_pos}" if @cube[new_side][new_pos] == '#' if @debug
           break if @cube[new_side][new_pos] == '#'
           @cube_side = new_side
           @cube_dir = new_dir
           @cube_pos = new_pos
-          puts "\tMoved to: #{new_side}-#{new_pos} Dir: #{new_dir}"
+          puts "\tMoved to: #{new_side}-#{new_pos} Dir: #{new_dir}" if @debug
           # binding.pry if @debug && @pause
         end
       end
@@ -202,7 +278,7 @@ module Advent
 
     def run_cube
       @instructions.each_with_index do |inst, idx|
-        @pause = @debug && idx == 10
+        # @pause = @debug && idx == 10
         run_cube_instruction(inst)
         if @debug
           pos, dir = translate_cube
@@ -213,6 +289,40 @@ module Advent
         #   puts @grid.render
         #   puts ""
         # end
+      end
+    end
+
+    require 'io/console'
+    def interactive
+      cube
+      puts "Interactive Mode:\n\n"
+      while true do
+        # c = STDIN.getc.chr
+        c = STDIN.getch
+        case c
+        when "\e"
+          puts "Exiting."
+          return
+        when "k"
+          inst = 1
+        when "h"
+          inst = :L
+        when "l"
+          inst = :R
+        when "b"
+          @pause = !@pause
+          inst = 0
+        else
+          inst = 0
+        end
+
+        # binding.pry
+        run_cube_instruction(inst)
+        pos, dir = translate_cube
+        @grid[pos] = DIR_CHAR_LOOKUP[dir]
+        puts "\tLast Inst: #{inst} - #{@cube_side} - #{@cube_pos}"
+        puts @grid.render
+        puts ""
       end
     end
 
@@ -240,6 +350,7 @@ module Advent
 
     EDGE_MAP = {
       A: {B: [:W, :N], C: [:S, :N], D: [:E, :N], F: [:N, :S]},
+      # B: {A: [:N, :W], C: [:E, :W], E: [:S, :W], F: [:W, :E]},
       B: {A: [:N, :W], C: [:E, :W], E: [:S, :W], F: [:W, :W]},
       C: {A: [:N, :S], B: [:W, :E], D: [:E, :W], E: [:S, :N]},
       D: {A: [:N, :E], C: [:W, :E], E: [:S, :E], F: [:E, :E]},
@@ -303,7 +414,7 @@ module Advent
           end
 
           puts "\tSide: #{side} #{dir_changes}" if @debug
-          binding.pry if @cube[side] && @debug
+          # binding.pry if @cube[side] && @debug
           raise "Already loaded this cube!!!" if @cube[side]
           
           start_dir, end_dir = dir_changes
@@ -313,7 +424,8 @@ module Advent
           # end_idx += orientation
           right_turns = (turned_times + end_idx - start_idx) % DIRS_KEY.length
           puts "\tTurning #{right_turns} times #{start_idx} #{end_idx} #{DIRS_KEY.length}" if @debug
-          # We need to handle rotations here
+
+          # binding.pry if @debug && side == :F
 
           @cube[side] = Grid.new(
             @grid.render(0, [x,y], [x+cube_side_size - 1,y+cube_side_size - 1])
