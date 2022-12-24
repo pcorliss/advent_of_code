@@ -86,5 +86,17 @@ module Advent
         char == ' '
       end
     end
+
+    def final_round
+      i = 0
+      while true do
+        previous = @grid
+        step!
+        i += 1
+        break if previous.cells == @grid.cells
+        raise "Too many iterations" if i > 10000
+      end
+      i
+    end
   end
 end

@@ -7,3 +7,6 @@ input = File.read('./input.txt')
 ad = Advent::Unstable.new(input)
 10.times { ad.step! }
 puts ad.empty_ground
+
+ad = Advent::Unstable.new(input)
+puts ad.final_round

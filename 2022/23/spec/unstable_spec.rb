@@ -93,6 +93,12 @@ describe Advent do
       end
     end
 
+    describe "#final_round" do
+      it "returns the round where no elves move" do
+        expect(ad.final_round).to eq(20)
+      end
+    end
+
     context "validation" do
     end
   end
