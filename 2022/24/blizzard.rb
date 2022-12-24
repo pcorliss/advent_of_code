@@ -76,37 +76,29 @@ module Advent
       @tick[minute] = new_grid
     end
 
-    def distance_to_goal(pos)
+    def distance_to_goal(pos, end_pos)
       pos_x, pos_y = pos
-      goal_x, goal_y = @goal
+      goal_x, goal_y = end_pos
       (goal_x - pos_x).abs + (goal_y - pos_y).abs
     end
 
-    def score(pos, minute)
-      @best_distance ||= {}
+    def score(pos, minute, end_pos)
+      # @best_distance ||= {}
 
-      distance = distance_to_goal(pos)
-      @best_distance[distance] ||= minute
-      if @best_distance[distance] > minute
-        @best_distance[distance] = minute
-      end
+      distance = distance_to_goal(pos, end_pos)
+      # @best_distance[distance] ||= minute
+      # if @best_distance[distance] > minute
+      #   @best_distance[distance] = minute
+      # end
 
-      best_score = minute - @best_distance[distance]
+      # best_score = minute - @best_distance[distance]
 
-      @visited ||= {}
-      @visited[pos] ||= minute
-      v_score = 0
-      if @visited[pos] < minute
-        v_score = (minute - @visited[pos])
-      else
-        @visited[pos] = minute
-      end
       distance + minute #/ 2 #+ v_score / 4 + best_score / 4
     end
 
-    def solve
+    def solve(start_min = 0, start_pos = @exp, end_pos = @goal)
       candidates = FastContainers::PriorityQueue.new(:min)
-      candidates.push({minute: 0, pos: @exp}, score(@exp, 0))
+      candidates.push({minute: start_min, pos: start_pos}, score(start_pos, start_min, end_pos))
       
       best = nil
 
@@ -124,14 +116,14 @@ module Advent
 
         # puts "Candidate: #{candidate}" if @debug
         # best calc
-        if candidate[:pos] == @goal
+        if candidate[:pos] == end_pos
           if best.nil? || candidate[:minute] < best[:minute]
             best = candidate
           end
           next
         end
 
-        distance = distance_to_goal(candidate[:pos])
+        distance = distance_to_goal(candidate[:pos], end_pos)
 
         # Prune paths tht have no hope of yielding an optimal solution
         next if best && distance + candidate[:minute] > best[:minute]
@@ -144,7 +136,7 @@ module Advent
             # puts "New Candidate: #{cell} #{val}" if @debug
             candidates.push(
               {minute: candidate[:minute] + 1, pos: cell},
-              score(cell, candidate[:minute] + 1)
+              score(cell, candidate[:minute] + 1, end_pos)
             )
           end
         end
@@ -153,14 +145,14 @@ module Advent
         if g[candidate[:pos]] == '.'
           candidates.push(
             {minute: candidate[:minute] + 1, pos: candidate[:pos]},
-            score(candidate[:pos], candidate[:minute] + 1)
+            score(candidate[:pos], candidate[:minute] + 1, end_pos)
           )
         end
 
         i += 1
         if @debug && i % 10_000 == 0
           puts "\tCandidates: #{candidates.count} - Iterations: #{i}"
-          puts "\tLast Candidate: #{candidate} Distance: #{distance_to_goal(candidate[:pos])}"
+          puts "\tLast Candidate: #{candidate} Distance: #{distance_to_goal(candidate[:pos], end_pos)}"
           puts "Best: #{best}"
         end
         raise "Too many iterations" if i > 10_000_000

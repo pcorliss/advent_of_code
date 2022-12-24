@@ -69,6 +69,16 @@ describe Advent do
         ad.debug!
         expect(ad.solve).to eq(18)
       end
+
+      it "takes an optional minute, goal, and start" do
+        ad.debug!
+        expect(ad.solve(18, ad.goal, ad.exp)).to eq(23 + 18)
+      end
+
+      it "solves the third leg of the trip" do
+        ad.debug!
+        expect(ad.solve(23 + 18, ad.exp, ad.goal)).to eq(23 + 18 + 13)
+      end
     end
 
     context "validation" do
