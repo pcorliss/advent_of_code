@@ -30,9 +30,38 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green
       end
     end
 
+    describe "#minimum_cubes" do
+      [
+        {red: 4, blue: 6, green: 2 },
+        {red: 1, blue: 4, green: 3 },
+        {red: 20, blue: 6, green: 13 },
+        {red: 14, blue: 15, green: 3 },
+        {red: 6, blue: 2, green: 3 },
+      ].each_with_index do |min, idx|
+        it "returns the minimum number of cubes, #{min}, needed to play for game #{idx + 1}" do
+          line = input.lines[idx]
+          expect(ad.minimum_cubes(line)).to eq(min)
+        end
+      end
+    end
+
+    describe "#minimum_cubes_power" do
+      [ 48, 12, 1560, 630, 36 ].each_with_index do |power, idx|
+        it "returns the power of the min, #{power}, needed to play for game #{idx + 1}" do
+          line = input.lines[idx]
+          min = ad.minimum_cubes(line)
+          expect(ad.minimum_cubes_power(min)).to eq(power)
+        end
+      end
+    end
+
     context "validation" do
       it "returns the sum of possible games" do
         expect(ad.possible_game_sum).to eq(8)
+      end
+
+      it "returns the power sum" do
+        expect(ad.minimum_cubes_power_sum).to eq(2286)
       end
     end
   end

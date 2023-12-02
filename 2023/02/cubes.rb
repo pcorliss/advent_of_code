@@ -38,6 +38,28 @@ module Advent
       end
     end
 
+    def minimum_cubes(line)
+      games = parse_line(line)
+      games.inject({}) do |hsh, game|
+        game.each do |color, count|
+          hsh[color] ||= 0
+          hsh[color] = count if count > hsh[color]
+        end
+        hsh
+      end
+    end
+
+    def minimum_cubes_power(min)
+      min.values.inject(:*)
+    end
+
+    def minimum_cubes_power_sum
+      @lines.each.sum do |line|
+        min = minimum_cubes(line)
+        minimum_cubes_power(min)
+      end
+    end
+
     def debug!
       @debug = true
     end
