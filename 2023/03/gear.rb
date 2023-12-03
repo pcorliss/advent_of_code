@@ -32,6 +32,7 @@ module Advent
       x += 1
       val = @grid[x, y]
       part_num = val
+      start = [x,y]
 
       while val.is_a? Integer do
         x += 1
@@ -42,18 +43,22 @@ module Advent
         end  
       end
 
-      part_num
+      [part_num, start]
     end
 
     def part_nums
-      parts = Set.new
+      parts = []
+      used_part_positions = Set.new
       @grid.cells.each do |pos, val|
         next if val.nil?
         next if val.is_a? Integer
 
         @grid.neighbors(pos, true).each do |n_pos, n_val|
           if n_val.is_a? Integer
-            parts << read_number(n_pos)
+            part, start_pos = read_number(n_pos)
+            next if used_part_positions.include? start_pos
+            used_part_positions << start_pos
+            parts << part
           end
         end
       end
