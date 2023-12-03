@@ -66,7 +66,32 @@ module Advent
       parts
     end
 
-    def part_nums_sum
+    def gears
+      gears = []
+      @grid.cells.each do |pos, val|
+        next unless val == '*'
+
+        parts = []
+        used_part_positions = Set.new
+        @grid.neighbors(pos, true).each do |n_pos, n_val|
+          if n_val.is_a? Integer
+            part, start_pos = read_number(n_pos)
+            next if used_part_positions.include? start_pos
+            used_part_positions << start_pos
+            parts << part
+          end
+        end
+
+        gears << parts if parts.length == 2
+      end
+
+      gears
+    end
+
+    def gear_ratio_sum
+      gears.map do |gear|
+        gear.inject(:*)
+      end.sum
     end
   end
 end

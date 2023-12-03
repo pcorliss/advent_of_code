@@ -10,3 +10,6 @@ puts "Part 1: #{ad.part_nums.sum}"
 # That's not the right answer; your answer is too low.
 # Part 1: 330744
 # Part 1: 537053
+
+
+puts "Part 2: #{ad.gear_ratio_sum}"

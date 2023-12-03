@@ -19,6 +19,21 @@ describe Advent do
     EOS
   }
 
+  let(:three_gear) {
+    <<~EOS
+467.114...
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..
+    EOS
+  }
+
   describe Advent::Gear do
     let(:ad) { Advent::Gear.new(input) }
 
@@ -48,9 +63,24 @@ describe Advent do
       end
     end
 
+    describe "#gears" do
+      it "returns a list of all gear pairs" do
+        expect(ad.gears).to contain_exactly(contain_exactly(467, 35), contain_exactly(755,598))
+      end
+
+      it "excludes gears with three part numbers" do
+        ad = Advent::Gear.new(three_gear)
+        expect(ad.gears).to contain_exactly(contain_exactly(755,598))
+      end
+    end
+
     context "validation" do
       it "returns the part number sum for part 1" do
         expect(ad.part_nums.sum).to eq(4361)
+      end
+
+      it "returns the gear_ratio sum for part 2" do
+        expect(ad.gear_ratio_sum).to eq(467835)
       end
     end
   end
