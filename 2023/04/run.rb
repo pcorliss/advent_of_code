@@ -6,3 +6,4 @@ input = File.read('./input.txt')
 
 ad = Advent::Scratcher.new(input)
 puts "Sum: #{ad.score_sum}"
+puts "Copies: #{ad.copied_card_count}"

@@ -34,9 +34,22 @@ Card  6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11
       end
     end
 
+    describe "#copy_cards!" do
+      [1, 2, 4, 8, 14, 1].each_with_index do |copies, idx|
+        it "populates the card copy counter for card #{idx + 1} and sets it to #{copies}" do
+          ad.copy_cards!
+          expect(ad.cards[idx].copies).to eq(copies)
+        end
+      end
+    end
+
     context "validation" do
       it "returns the sum of scores for part 1" do
         expect(ad.score_sum).to eq(13)
+      end
+
+      it "returns the count of copied cards for part 2" do
+        expect(ad.copied_card_count).to eq(30)
       end
     end
   end
