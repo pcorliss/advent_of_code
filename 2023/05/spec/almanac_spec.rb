@@ -123,10 +123,15 @@ humidity-to-location map:
       it "doesn't remap already mapped ranges" do
         expect(ad.new_ranges([5...10],[[30, 8, 4],[40, 30, 2]])).to match_array([5...8, 30...32])
       end
+
+      it "doesn't remap already mapped ranges that are covered" do
+        expect(ad.new_ranges([5...10],[[30, 0, 20],[90, 30, 20]])).to match_array([35...40])
+      end
     end
 
     describe "#collapse_ranges" do
       it "returns locations ranges from seed ranges" do
+        # ad.debug!
         new_ranges = ad.collapse_ranges
         lowest = new_ranges.sort_by!(&:min).first.first
         expect(lowest).to eq(46)

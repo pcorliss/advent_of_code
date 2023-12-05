@@ -100,7 +100,7 @@ module Advent
           if map_range.cover?(range)
             # map_range includes range entirely
             # We can map the whole range and do a 1:1 replacement
-            original_ranges << ((range.min + offset)...(range.last + offset))
+            new_result_ranges << ((range.min + offset)...(range.last + offset))
           elsif range.cover?(map_range)
             # range includes map range entirely
             # We'll need to make 1-3 new ranges
@@ -129,7 +129,17 @@ module Advent
         result_ranges.concat new_result_ranges
       end
 
+      puts "Result Ranges: #{result_ranges.inspect}" if @debug
+      puts "Working Ranges: #{working_ranges.inspect}" if @debug
       result_ranges.concat working_ranges
+     
+      # Sanity Check
+      # result_ranges.each_with_index do |a, idx_a|
+      #   result_ranges.each_with_index do |b, idx_b|
+      #     next if idx_a == idx_b
+      #     raise "Unexpected Error: #{a} Overlaps with #{b} " if overlaps?(a,b)
+      #   end
+      # end
 
       return result_ranges
     end
