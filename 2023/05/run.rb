@@ -6,3 +6,7 @@ input = File.read('./input.txt')
 
 ad = Advent::Almanac.new(input)
 puts "Lowest Location: #{ad.lowest_location}"
+puts "Lowest Location 2: #{ad.lowest_location_optimized}"
+
+# Lowest Location 2: 70224450
+# That's not the right answer; your answer is too high.

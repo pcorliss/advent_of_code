@@ -54,6 +54,8 @@ humidity-to-location map:
         # [source-to-dest]
         # [dest range, source range, inclusive size]
         expect(ad.maps['seed-to-soil']).to eq([[50,98,2],[52,50,48]])
+        expect(ad.map_map['seed']).to eq('soil')
+        expect(ad.map_map['humidity']).to eq('location')
       end
     end
 
@@ -86,11 +88,77 @@ humidity-to-location map:
       end
     end
 
+    describe "#new_ranges" do
+      # 1:1 range
+      it "handles ranges that don't overlap" do
+        expect(ad.new_ranges([1...10],[[12, 20, 10]])).to match_array([1...10])
+      end
+
+      # 1 new range
+      it "handles ranges that are entirely covered by the destination range" do
+        expect(ad.new_ranges([5...10],[[30, 0, 20]])).to match_array([35...40])
+      end
+
+      # 3 new ranges
+      it "handles ranges that eclipse the destination range" do
+        expect(ad.new_ranges([5...10],[[30, 6, 2]])).to match_array([5...6, 30...32, 8...10])
+      end
+
+      it "handles ranges that eclipse the destination range and are on the edge" do
+        expect(ad.new_ranges([5...10],[[30, 5, 2]])).to match_array([30...32, 7...10])
+      end
+
+      it "handles ranges that eclipse the destination range and are on the right edge" do
+        expect(ad.new_ranges([5...10],[[30, 8, 2]])).to match_array([5...8, 30...32])
+      end
+
+      it "handles ranges on the left-edge" do
+        expect(ad.new_ranges([5...10],[[30, 3, 4]])).to match_array([32...34, 7...10])
+      end
+
+      it "handles ranges on the right-edge" do
+        expect(ad.new_ranges([5...10],[[30, 8, 4]])).to match_array([5...8, 30...32])
+      end
+
+      it "doesn't remap already mapped ranges" do
+        expect(ad.new_ranges([5...10],[[30, 8, 4],[40, 30, 2]])).to match_array([5...8, 30...32])
+      end
+    end
+
+    describe "#collapse_ranges" do
+      it "returns locations ranges from seed ranges" do
+        new_ranges = ad.collapse_ranges
+        lowest = new_ranges.sort_by!(&:min).first.first
+        expect(lowest).to eq(46)
+      end
+    end
+
     context "validation" do
 
       it "returns the lowest location for part 1" do
         expect(ad.lowest_location).to eq(35)
       end
+
+      it "returns the lowest location for part 2" do
+        expect(ad.lowest_location_2).to eq(46)
+      end
+
+      it "returns the lowest location for part 2 (optimized)" do
+        expect(ad.lowest_location_optimized).to eq(46)
+      end
     end
   end
 end
+
+
+###
+ ###
+
+ ###
+###
+
+###
+ # 
+
+ # 
+###
