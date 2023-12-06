@@ -15,13 +15,16 @@ module Advent
       @races = []
       times = nil
       records = nil
+      last_race = Race.new
       input.each_line do |line|
         if line =~ /^(\w+):\s+([\d\s]+)$/ or raise "Bad line: #{line}"
           case $1
           when "Time"
             times = $2.split.map(&:to_i)
+            last_race.time = $2.split.join.to_i
           when "Distance"
             records = $2.split.map(&:to_i)
+            last_race.record = $2.split.join.to_i
           end
         end
       end
@@ -29,6 +32,9 @@ module Advent
       times.zip(records).each do |time, record|
         @races << Race.new(time, record)
       end
+      @races << last_race
+
+
     end
 
     def debug!
@@ -42,7 +48,7 @@ module Advent
     end
 
     def number_of_ways_product
-      @races.map do |race|
+      @races[0..-2].map do |race|
         number_of_ways(race)
       end.reduce(:*)
     end
