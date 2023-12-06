@@ -42,9 +42,17 @@ module Advent
     end
 
     def number_of_ways(race)
-      (1...race.time).count do |t|
-        (race.time - t) * t > race.record
-      end
+      # ways = (1...race.time).count do |t|
+      #   (race.time - t) * t > race.record
+      # end
+
+      left_root =  (-race.time + Math.sqrt(race.time**2 - 4 * race.record)) / -2
+      right_root = (-race.time - Math.sqrt(race.time**2 - 4 * race.record)) / -2
+      quadratic = right_root.ceil - left_root.floor - 1
+
+      # raise "Quad: #{quadratic} vs Counting: #{ways}. Left Root: #{left_root} Right Root: #{right_root}" if quadratic != ways
+
+      quadratic
     end
 
     def number_of_ways_product
