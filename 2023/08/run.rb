@@ -6,5 +6,5 @@ input = File.read('./input.txt')
 
 ad = Advent::Wasteland.new(input)
 puts "Part 1 Steps: #{ad.steps}"
-ad.debug!
+# ad.debug!
 puts "Part 2 Ghost Steps: #{ad.ghost_steps}"

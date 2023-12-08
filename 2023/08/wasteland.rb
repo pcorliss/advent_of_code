@@ -38,14 +38,19 @@ module Advent
     end
 
     # Non-optimized quick LCM
+    # def lcm(counts)
+    #   largest = counts.max
+    #   sums = counts.dup
+    #   current = largest
+    #   until sums.all? { |s| current % s == 0} do
+    #     current += largest
+    #   end
+    #   current
+    # end
+
+    # Efficient LCM for array of numbers
     def lcm(counts)
-      largest = counts.max
-      sums = counts.dup
-      current = largest
-      until sums.all? { |s| current % s == 0} do
-        current += largest
-      end
-      current
+      counts.reduce(1, :lcm)
     end
 
     def ghost_steps
