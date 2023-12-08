@@ -36,5 +36,48 @@ module Advent
       end
       count
     end
+
+    # Non-optimized quick LCM
+    def lcm(counts)
+      largest = counts.max
+      sums = counts.dup
+      current = largest
+      until sums.all? { |s| current % s == 0} do
+        current += largest
+      end
+      current
+    end
+
+    def ghost_steps
+      count = 0
+      start_points = @mapping.keys.select { |k| k.end_with?('A')}
+      end_points = @mapping.keys.select { |k| k.end_with?('Z')}.to_set
+      current_points = start_points
+      end_point_count = []
+      until current_points.to_set == end_points do
+        current_points.each_with_index do |current, idx|
+          if current.end_with?('Z')
+            end_point_count[idx] ||= []
+            end_point_count[idx] << count
+          end
+        end
+
+        if end_point_count.compact.length >= current_points.length && end_point_count.all? { |points| points.length > 1 }
+          puts "Reached a cycle!" if @debug
+          puts "End Point Cycles: #{end_point_count}" if @debug
+          cycle_distance = end_point_count.map {|cycles| a, b = cycles.last(2); b - a }
+          return lcm(cycle_distance)
+        end
+
+        dir = @directions[count % @directions.length]
+        count += 1
+        current_points = current_points.map do |current|
+          @mapping[current][dir == :L ? 0 : 1]
+        end.to_set
+
+      end
+
+      count
+    end
   end
 end
