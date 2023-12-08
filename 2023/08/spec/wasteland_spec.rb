@@ -78,7 +78,6 @@ describe Advent do
     describe "#ghost_steps" do
       it "returns the number of steps to the exit" do
         ad = Advent::Wasteland.new(input_2)
-        ad.debug!
         expect(ad.ghost_steps).to eq(6)
       end
     end

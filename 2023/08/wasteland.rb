@@ -59,7 +59,7 @@ module Advent
       end_points = @mapping.keys.select { |k| k.end_with?('Z')}.to_set
       current_points = start_points
       end_point_count = []
-      until current_points.to_set == end_points do
+      until false do #current_points.to_set == end_points do
         current_points.each_with_index do |current, idx|
           if current.end_with?('Z')
             end_point_count[idx] ||= []
@@ -71,6 +71,7 @@ module Advent
           puts "Reached a cycle!" if @debug
           puts "End Point Cycles: #{end_point_count}" if @debug
           cycle_distance = end_point_count.map {|cycles| a, b = cycles.last(2); b - a }
+          puts "Cycle Distances: #{cycle_distance}" if @debug
           return lcm(cycle_distance)
         end
 
