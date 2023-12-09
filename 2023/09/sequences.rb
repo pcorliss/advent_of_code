@@ -43,9 +43,33 @@ module Advent
       working.last.last
     end
 
+    def prev_number(sequence)
+      working = [sequence.dup]
+      puts "Working A: #{working.inspect}" if @debug
+      until working.last.all?(&:zero?) do
+        working << diffs(working.last)
+        puts "Working B: #{working.inspect}" if @debug
+      end
+
+      while working.length > 1 do
+        puts "Working C: #{working.inspect}" if @debug
+        seq = working.pop
+        working.last.unshift(working.last.first - seq.first)
+      end
+
+      puts "Working D: #{working.inspect}" if @debug
+      working.last.first
+    end
+
     def sum_next_number
       @sequences.sum do |seq|
         next_number(seq)
+      end
+    end
+
+    def sum_prev_number
+      @sequences.sum do |seq|
+        prev_number(seq)
       end
     end
   end
