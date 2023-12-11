@@ -82,10 +82,13 @@ module Advent
       [ 1, 0] => [ 0, 1], # East, Edge is South
     }
 
-    def right_edge(pos, dir)
+    # Need to handle the turning case where the right edge is two positions
+    def right_edges(pos, dir, val)
       pos_x, pos_y = pos
       d_x, d_y = DIR_RIGHT_EDGE[dir]
-      [pos_x + d_x, pos_y + d_y]
+      edges = [[pos_x + d_x, pos_y + d_y]]
+      puts "Pos: #{pos}, Dir: #{dir}, Val: #{val}, Edge: #{[pos_x + d_x, pos_y + d_y]}" if @debug && (pos == [2,4] || pos == [2,3])
+      edges
     end
 
     # Because it's a loop with only one entrance/exit,
@@ -94,7 +97,6 @@ module Advent
       start = starting_point
       @steps = 0
       @visited = {starting_point => 0}
-      @edges = Set.new
       positions = first_steps
 
       until positions.empty? do
@@ -110,9 +112,6 @@ module Advent
             new_pos = [pos_x + dir_x, pos_y + dir_y]
             next if @visited.has_key? new_pos
             new_positions << new_pos
-            # Only on the first position, so that "right" is consistent
-            # puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug && idx == 0
-            @edges << right_edge(new_pos, [dir_x, dir_y]) if idx == 0
           end
         end
         positions = new_positions
@@ -141,14 +140,23 @@ module Advent
             next unless new_pos == start && steps > 1
           end
           new_position = new_pos
+
+          edges += right_edges(new_pos, [dir_x, dir_y], val)
+          # if @grid[pos] == '|' || @grid[pos] == '-'
+          # else
+          #   edges << angle_edge(new_pos, [dir_x, dir_y])
+          # end
+          # Need to handle turns where the right edge catches two positions
           # puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug
-          edges << right_edge(new_pos, [dir_x, dir_y])
+          # edges << right_edge(new_pos, [dir_x, dir_y])
           break
         end
         raise "No new position found for Pos: #{pos} and Val: #{val}" if new_position.nil?
+
         pos = new_position
       end
 
+      # binding.pry if @debug
       [edges, visited]
     end
 
@@ -208,7 +216,7 @@ module Advent
         g[cell] = PIPE_RENDER[@grid[cell]]
       end
       g.render
-      puts g.render
+      # puts g.render
     end
 
     def flood_fill_count

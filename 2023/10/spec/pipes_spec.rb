@@ -153,6 +153,41 @@ describe Advent do
         # .L--JL--J.
         # ..........
       end
+
+      xit "handles all corners" do
+        ad = Advent::Pipes.new(
+          <<~eos
+          .........
+          .S----7..
+          .|....|..
+          .L7...L7.
+          .FJ...FJ.
+          .|....|..
+          .L----J..
+          ........
+          eos
+        )
+        ad.debug!
+        edges = ad.mark_edge
+        edges.each do |cell|
+          ad.grid[cell] = 'E'
+        end
+        puts ad.grid.render
+        expect(ad.mark_edge).to include(
+          [2,2],
+          [3,2],
+          [4,2],
+          [5,2],
+          [3,3],
+          [5,3],
+          [3,4],
+          [5,4],
+          [2,5],
+          [3,5],
+          [4,5],
+          [5,5],
+        )
+      end
     end
 
     describe "#flood_fill_count" do
@@ -175,24 +210,39 @@ describe Advent do
     describe "#horizontal_ray" do
       it "counts for a simple example" do
         ad = Advent::Pipes.new(input_slipping)
-        ad.debug!
+        # ad.debug!
         expect(ad.horizontal_ray.count).to eq(4)
       end
 
       it "counts the marked edges for a moderate example" do
         ad = Advent::Pipes.new(input_larger_slipping)
-        ad.debug!
+        # ad.debug!
         expect(ad.horizontal_ray.count).to eq(8)
       end
 
       it "counts the marked edges for a complex example" do
         ad = Advent::Pipes.new(input_larger_slipping_with_junk)
-        ad.debug!
+        # ad.debug!
         expect(ad.horizontal_ray.count).to eq(10)
       end
     end
 
     context "validation" do
+      let(:file_input) { File.read('./input.txt') }
+      let(:ad) { Advent::Pipes.new(file_input) }
+
+      it "yields the correct number for part 1" do
+        expect(ad.steps).to eq(6846)
+      end
+
+      it "yields the correct number for part 2 - horizontal ray" do
+        expect(ad.horizontal_ray.count).to eq(325)
+      end
+
+      # it "yields the correct number for part 2 - edge and flood" do
+      #   ad.debug!
+      #   expect(ad.flood_fill_count).to eq(325)
+      # end
     end
   end
 end
