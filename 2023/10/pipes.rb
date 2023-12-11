@@ -240,7 +240,9 @@ module Advent
       count
     end
 
-    VERT_KEYS = ['|','F','7'].to_set
+    # Works either way, but wanted to be sure
+    # VERT_KEYS = ['|','F','7'].to_set
+    VERT_KEYS = ['|','J','L'].to_set
 
     # Using the edge finding and flood method from before yielded an answer that was off by one
     # 324 incorrect vs 325 correct. The edge detection likely has a bug in it
