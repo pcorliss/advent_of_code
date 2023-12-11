@@ -57,11 +57,29 @@ describe Advent do
         expect(ad.grid[0,2]).to eq('#')
         expect(ad.grid[8,5]).to eq('#')
       end
+
+      it "takes an abitrary expansion argument" do
+        ad.expand_galaxy!(10)
+        expect(ad.grid[13,0]).to eq('#')
+        expect(ad.grid[0,2]).to eq('#')
+        expect(ad.grid[27,1]).to eq('#')
+        expect(ad.grid[26,14]).to eq('#')
+      end
     end
 
     describe "#shortest_path_sum" do
       it "returns the sum of the shortest path between all galaxies" do
         expect(ad.shortest_path_sum).to eq(374)
+      end
+
+      it "returns the sum with an exansion of 10" do
+        ad.expand_galaxy!(9)
+        expect(ad.shortest_path_sum).to eq(1030)
+      end
+
+      it "returns the sum with an exansion of 10" do
+        ad.expand_galaxy!(99)
+        expect(ad.shortest_path_sum).to eq(8410)
       end
     end
 
