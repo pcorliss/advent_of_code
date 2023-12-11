@@ -18,7 +18,7 @@ module Advent
       @debug = true
     end
 
-    def expand_galaxy!(factor = 1)
+    def expand_galaxy!(mult = 2)
       return if @galaxy_expanded
       new_grid = Grid.new
       grid_row_count = Array.new(@grid.height, 0)
@@ -34,6 +34,7 @@ module Advent
       end
 
       new_galaxies = Set.new
+      factor = mult - 1
       @galaxies.each do |x, y|
         y_offset = grid_row_count[0..y].count(0)
         x_offset = grid_col_count[0..x].count(0)

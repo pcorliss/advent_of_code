@@ -8,5 +8,5 @@ ad = Advent::Cosmic.new(input)
 puts "Part 1 Shortest Path Sum: #{ad.shortest_path_sum}"
 ad = Advent::Cosmic.new(input)
 
-ad.expand_galaxy!(1_000_000 - 1)
+ad.expand_galaxy!(1_000_000)
 puts "Part 2 Shortest Path Sum: #{ad.shortest_path_sum}"

@@ -59,7 +59,7 @@ describe Advent do
       end
 
       it "takes an abitrary expansion argument" do
-        ad.expand_galaxy!(10)
+        ad.expand_galaxy!(11)
         expect(ad.grid[13,0]).to eq('#')
         expect(ad.grid[0,2]).to eq('#')
         expect(ad.grid[27,1]).to eq('#')
@@ -73,12 +73,12 @@ describe Advent do
       end
 
       it "returns the sum with an exansion of 10" do
-        ad.expand_galaxy!(9)
+        ad.expand_galaxy!(10)
         expect(ad.shortest_path_sum).to eq(1030)
       end
 
       it "returns the sum with an exansion of 10" do
-        ad.expand_galaxy!(99)
+        ad.expand_galaxy!(100)
         expect(ad.shortest_path_sum).to eq(8410)
       end
     end
