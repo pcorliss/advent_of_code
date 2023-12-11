@@ -172,6 +172,26 @@ describe Advent do
       end
     end
 
+    describe "#horizontal_ray" do
+      it "counts for a simple example" do
+        ad = Advent::Pipes.new(input_slipping)
+        ad.debug!
+        expect(ad.horizontal_ray.count).to eq(4)
+      end
+
+      it "counts the marked edges for a moderate example" do
+        ad = Advent::Pipes.new(input_larger_slipping)
+        ad.debug!
+        expect(ad.horizontal_ray.count).to eq(8)
+      end
+
+      it "counts the marked edges for a complex example" do
+        ad = Advent::Pipes.new(input_larger_slipping_with_junk)
+        ad.debug!
+        expect(ad.horizontal_ray.count).to eq(10)
+      end
+    end
+
     context "validation" do
     end
   end

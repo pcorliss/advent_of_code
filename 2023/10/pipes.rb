@@ -34,12 +34,26 @@ module Advent
       '7' => [[-1, 0],[ 0, 1]],
     }
 
+  #   ┌────┐┌┐┌┐┌┐┌─┐    
+  #   │┌──┐││││││││┌┘    
+  #   ││ ┌┘││││││││└┐    
+  #  ┌┘└┐└┐└┘└┘││└┘.└─┐  
+  #  └──┘ └┐  .└┘┌┐┌─┐└┐ 
+  #      ┌─┘  ┌┐┌┘│└┐└┐└┐
+  #      └┐ ┌┐││└┐│ └┐└┐│
+  #       │┌┘└┘│┌┘│┌┐│ └┘
+  #      ┌┘└─┐.││.││││   
+  #      └───┘ └┘ └┘└┘      
+
+  #      |I I|OO││O││││   
+  #      └───┘  └┘ └┘└┘      
+
     def starting_directions
       dirs = []
       start = starting_point
-      puts "Start: #{start}" if @debug
+      # puts "Start: #{start}" if @debug
       @grid.neighbors(start).each do |pos, val|
-        puts "Pos: #{pos}, Val: #{val}}" if @debug
+        # puts "Pos: #{pos}, Val: #{val}}" if @debug
         next if val == '.' || val.nil? || PIPE_MAP[val].nil?
         PIPE_MAP[val].each do |dir_x, dir_y|
           pos_x, pos_y = pos
@@ -97,7 +111,7 @@ module Advent
             next if @visited.has_key? new_pos
             new_positions << new_pos
             # Only on the first position, so that "right" is consistent
-            puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug && idx == 0
+            # puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug && idx == 0
             @edges << right_edge(new_pos, [dir_x, dir_y]) if idx == 0
           end
         end
@@ -127,7 +141,7 @@ module Advent
             next unless new_pos == start && steps > 1
           end
           new_position = new_pos
-          puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug
+          # puts "New Pos: #{new_pos}, Dir: #{[dir_x, dir_y]}, Edge: #{right_edge(new_pos, [dir_x, dir_y])}" if @debug
           edges << right_edge(new_pos, [dir_x, dir_y])
           break
         end
@@ -175,15 +189,101 @@ module Advent
       [visited, flood_grid]
     end
 
+    PIPE_RENDER = {
+      '-' => '─',
+      '|' => '│',
+      'L' => '└',
+      'F' => '┌',
+      'J' => '┘',
+      '7' => '┐',
+      'S' => 'S',
+    }
+
+    def debug_grid(flood_grid, visited)
+      g = Grid.new
+      flood_grid.cells.each do |cell, val|
+        g[cell] = '.'
+      end
+      visited.each do |cell, val|
+        g[cell] = PIPE_RENDER[@grid[cell]]
+      end
+      g.render
+      puts g.render
+    end
+
     def flood_fill_count
       visited, flood_grid = flood_fill
       total = @grid.cells.count
       marked = flood_grid.cells.count
+      puts "Total: #{total}, Marked: #{marked}, Visited: #{visited.count}" if @debug
+      puts "Counts: #{marked} vs #{total - marked - visited.count}" if @debug
+
+      debug_grid(flood_grid, visited) if @debug
+
       if flood_grid.cells.keys.flatten.include? 0
         total - marked - visited.count
       else
         marked
       end
+    end
+
+    def count_edges(start, direction)
+      count = 0
+      pos = start
+      dir_x, dir_y = direction
+      until @grid[pos].nil? do
+        count += 1 if @grid[pos] != '.'
+        pos_x, pos_y = pos
+        raise "Nil Check: #{pos}, #{dir_x} #{dir_y}" if pos_x.nil? || pos_y.nil? || dir_x.nil? || dir_y.nil?
+        pos = [pos_x + dir_x, pos_y + dir_y]
+      end
+      count
+    end
+
+    VERT_KEYS = ['|','F','7'].to_set
+
+    # Using the edge finding and flood method from before yielded an answer that was off by one
+    # 324 incorrect vs 325 correct. The edge detection likely has a bug in it
+    # This horizontal ray method which ignores certain angles and just uses an odd
+    # number to determine inside vs outside appears faster and simpler
+    def horizontal_ray
+      visited, _ = flood_fill
+      min_x = 0
+      min_y = 0 
+      max_x = @grid.cells.map(&:first).map(&:first).max
+      max_y = @grid.cells.map(&:first).map(&:last).max
+      inside = Set.new
+
+      start_dirs = starting_directions
+      start_pipe = PIPE_MAP.find do |key, dirs|
+        start_dirs.to_set == dirs.to_set
+      end
+
+      local_grid = Grid.new
+      local_grid.cells = @grid.cells.dup
+      local_grid[starting_point] = start_pipe.first
+      puts "Start Pipe: #{start_pipe} @ #{starting_point}" if @debug
+
+      (max_y + 1).times do |y|
+        counter = 0
+        (max_x + 1).times do |x|
+          if visited.include? [x,y]
+            counter += 1 if VERT_KEYS.include? local_grid[x,y]
+          elsif counter.odd?
+            inside << [x,y]
+          end
+        end
+      end
+
+      if debug
+        g = Grid.new
+        inside.each do |cell|
+          g[cell] = 'X'
+        end
+        debug_grid(g, visited)
+      end
+
+      inside
     end
   end
 end
