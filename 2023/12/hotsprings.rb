@@ -50,9 +50,98 @@ module Advent
       end
 
       true
-    rescue => e
-      puts "Failed at #{spring.inspect} #{count.inspect} Error: #{e}"
-      raise e
+    # rescue => e
+    #   puts "Failed at #{spring.inspect} #{count.inspect} Error: #{e}"
+    #   raise e
+    end
+
+    def chomper(spring, count)
+      # Prune early if not possible to complete
+      return [false] if count.sum + count.length - 1 > spring.length
+
+      cnt = 0
+      cnt_idx = 0
+      spring.each_with_index do |c, idx|
+        case c
+        when '.'
+          next if cnt.zero?
+          return [false] if cnt != count[cnt_idx]
+          cnt_idx += 1
+          cnt = 0
+        when '#'
+          cnt += 1
+          return [false] if cnt_idx >= count.length
+          return [false] if cnt > count[cnt_idx]
+        when '?'
+          return [true, spring[(idx - cnt)..-1], count[cnt_idx..-1]]
+        end
+      end
+
+      if cnt > 0
+        return [false] if cnt != count[cnt_idx]
+        cnt_idx += 1
+      end
+
+      # binding.pry if @debug
+      if cnt_idx == count.length
+        [true, [], []]
+      else
+        [false]
+      end
+    end
+
+    # Could change the partial match to a chomper function
+    # That just eats the dots and hashes and returns the remaining string, and remaining count
+    # memory usage would go down and the speed would go up because we wouldn't have to keep
+    # re-checking the full string
+
+    # Could also something like a trie
+    # where we store just a character in a node, and the index of the count array
+    # then DFS through the tree, increment when we reach bottom, ignore branches that don't match
+    def faster_arrangements(spring, count)
+      branches = {[spring,count] => 1}
+      spring.each_with_index do |c, idx|
+        if c == '?'
+          new_branches = {}
+          branches.each do |(springs, spring_count), branch_count|
+            q_idx = springs.index('?')
+            dot_spring = springs.dup
+            dot_spring[q_idx] = '.'
+            hash_spring = springs
+            hash_spring[q_idx] = '#'
+
+            ## TODO: Could instead add a counter to the branch when dupes occur
+            ## That way we're not processing the same branch multiple times
+            ## Could also try setting the key to something faster to calculate instead
+            ## of instantiating an array
+
+            m, new_spring, new_count = chomper(dot_spring, spring_count)
+            if m
+              new_branches[[new_spring, new_count]] ||= 0
+              new_branches[[new_spring, new_count]] += branch_count
+            end
+
+            m, new_spring, new_count = chomper(hash_spring, spring_count)
+            if m
+              new_branches[[new_spring, new_count]] ||= 0
+              new_branches[[new_spring, new_count]] += branch_count
+            end
+          end
+          branches = new_branches
+          puts "Char: #{c}, Idx: #{idx}, Branch Count: #{branches.length}\n\t#{branches.inspect}" if @debug
+        end
+      end
+
+      possible = branches.sum do |(springs, spring_count), branch_count|
+        match, new_spring, new_count = chomper(springs, spring_count)
+        if match && new_spring.empty? && new_count.empty?
+          branch_count
+        else
+          0
+        end
+      end
+      puts "Branches: #{branches.length}, Possible: #{possible}" if @debug
+      possible
     end
 
     # Could I make this faster by popping off elements of the count and storing with the branch?
