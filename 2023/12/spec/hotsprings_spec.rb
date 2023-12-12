@@ -211,11 +211,23 @@ describe Advent do
           expect(ad.faster_arrangements(spring, count)).to eq(expected)
         end
       end
+
+      it "doesn't mutate the input" do
+        spring = ad.springs[1]
+        count = ad.counts[1]
+        expect(ad.faster_arrangements(spring, count)).to eq(4)
+        expect(ad.faster_arrangements(spring, count)).to eq(4)
+      end
     end
 
     describe "#possible_arrangements" do
       it "returns the sum of all possible arrangements" do
         expect(ad.possible_arrangements).to eq(21)
+      end
+
+      it "returns the sum of all possible arrangements with unfolding" do
+        ad.unfold!
+        expect(ad.possible_arrangements).to eq(525152)
       end
     end
 

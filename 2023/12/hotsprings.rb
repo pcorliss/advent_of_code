@@ -99,7 +99,7 @@ module Advent
     # where we store just a character in a node, and the index of the count array
     # then DFS through the tree, increment when we reach bottom, ignore branches that don't match
     def faster_arrangements(spring, count)
-      branches = {[spring,count] => 1}
+      branches = {[spring.dup,count] => 1}
       spring.each_with_index do |c, idx|
         if c == '?'
           new_branches = {}
@@ -109,11 +109,6 @@ module Advent
             dot_spring[q_idx] = '.'
             hash_spring = springs
             hash_spring[q_idx] = '#'
-
-            ## TODO: Could instead add a counter to the branch when dupes occur
-            ## That way we're not processing the same branch multiple times
-            ## Could also try setting the key to something faster to calculate instead
-            ## of instantiating an array
 
             m, new_spring, new_count = chomper(dot_spring, spring_count)
             if m
