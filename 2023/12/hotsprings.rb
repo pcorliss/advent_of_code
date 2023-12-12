@@ -28,6 +28,67 @@ module Advent
       spring.join.split('.').reject(&:empty?).map(&:length) == count
     end
 
+    # There's some caching we could do here
+    # Could cache segments that have already been computed
+    def partial_match?(spring, count)
+      cnt = 0
+      cnt_idx = 0
+      spring.each do |c|
+        case c
+        when '.'
+          next if cnt.zero?
+          return false if cnt != count[cnt_idx]
+          cnt_idx += 1
+          cnt = 0
+        when '#'
+          cnt += 1
+          return false if cnt_idx >= count.length
+          return false if cnt > count[cnt_idx]
+        when '?'
+          return true
+        end
+      end
+
+      true
+    rescue => e
+      puts "Failed at #{spring.inspect} #{count.inspect} Error: #{e}"
+      raise e
+    end
+
+    # Could I make this faster by popping off elements of the count and storing with the branch?
+    # I could also use parallel to make this faster
+    def fast_arrangements(spring, count)
+      # think of it like a giant binary tree,
+      # each question mark is a split
+      # we prune a branch when partial_match? fails
+      # we go breadth first, and hold multiple states in memory
+      # At the end we count the number of remaining branches
+
+      branches = [[]]
+      spring.each_with_index do |c, idx|
+        if c == '?'
+          new_branches = []
+          branches.each do |branch|
+            b = branch.dup << '.'
+            new_branches << b if partial_match?(b, count)
+            b = branch.dup << '#'
+            # binding.pry if @debug && b == ['#', '#']
+            new_branches << b if partial_match?(b, count)
+          end
+          branches = new_branches
+        else
+          branches.each do |branch|
+            branch << c
+          end
+        end
+        # puts "Char: #{c}, Idx: #{idx}, Branches: #{branches.inspect}" if @debug
+      end
+
+      possible = branches.count { |b| cont_match?(b, count) }
+      # puts "Branches: #{branches.length}, Possible: #{possible}" if @debug
+      possible
+    end
+
     def arrangements(spring, count)
       possible = 0
       missing_spaces = spring.count('?')
@@ -40,8 +101,26 @@ module Advent
     end
 
     def possible_arrangements
+      idx = 0
       @springs.zip(@counts).sum do |spring, count|
-        arrangements(spring, count)
+        s = fast_arrangements(spring, count)
+        puts "#{idx}/#{@springs.length} #{spring} #{count} #{s}" if @debug
+        idx += 1
+        s
+      end
+    end
+
+    def unfold!
+      @springs.map! do |spring|
+        5.times.map do |i|
+          spring.join
+        end.join('?').chars
+      end
+
+      @counts.map! do |count|
+        5.times.map do |i|
+          count
+        end.flatten
       end
     end
   end

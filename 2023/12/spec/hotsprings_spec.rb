@@ -41,6 +41,37 @@ describe Advent do
       end
     end
 
+    describe "#partial_match?" do
+      it "returns true if the current spring setup is a full match" do
+        expect(ad.partial_match?(".##..#...###.".chars, [2, 1, 3])).to be_truthy
+      end
+
+      it "returns true if the current spring setup is a partial match" do
+        expect(ad.partial_match?(".##..?.?.###.".chars, [2, 1, 3])).to be_truthy
+      end
+
+      it "returns false if the current spring doesn't match" do
+        expect(ad.partial_match?(".#...?.?.###.".chars, [2, 1, 3])).to be_falsey
+        expect(ad.partial_match?(".###.?.?.###.".chars, [2, 1, 3])).to be_falsey
+      end
+
+      it "handles shorter strings" do
+        expect(ad.partial_match?(".#".chars, [2, 1, 3])).to be_truthy
+      end
+
+      it "returns false for shorter strings that don't match" do
+        expect(ad.partial_match?(".##".chars, [1, 1, 3])).to be_falsey
+      end
+
+      it "handles multiple dots" do
+        expect(ad.partial_match?(".#...##...#.".chars, [1, 2, 1])).to be_truthy
+      end
+
+      it "handles a problem case" do
+        expect(ad.partial_match?(".###.##.#.#".chars, [3,2,1])).to be_falsey
+      end
+    end
+
     describe "#arrangements" do
       [1, 4, 1, 1, 4, 10].each_with_index do |expected, idx|
       # [1].each_with_index do |expected, idx|
@@ -53,9 +84,53 @@ describe Advent do
       end
     end
 
+    describe "#fast_arrangements" do
+    [1, 4, 1, 1, 4, 10].each_with_index do |expected, idx|
+      it "returns the number of possible arrangements, #{expected}, for spring index #{idx}" do
+        # ad.debug!
+        spring = ad.springs[idx]
+        count = ad.counts[idx]
+        expect(ad.fast_arrangements(spring, count)).to eq(expected)
+      end
+    end
+
+    [
+      1,
+      # 16384,
+      # 1,
+      # 16,
+      # 2500,
+      # 506250,
+    ].each_with_index do |expected, idx|
+      it "returns the number of possible arrangements, #{expected}, for spring index #{idx} when folded 5 times" do
+        # ad.debug!
+        ad.unfold!
+        spring = ad.springs[idx]
+        count = ad.counts[idx]
+        expect(ad.fast_arrangements(spring, count)).to eq(expected)
+      end
+    end
+  end
+
     describe "#possible_arrangements" do
       it "returns the sum of all possible arrangements" do
         expect(ad.possible_arrangements).to eq(21)
+      end
+    end
+
+    describe "#unfold!" do
+      it "multiplies the map by 5" do
+        input = '.# 1'
+        ad = Advent::Hotsprings.new(input)
+        ad.unfold!
+        expect(ad.springs.first.join).to eq('.#?.#?.#?.#?.#')
+        expect(ad.counts.first).to eq([1,1,1,1,1])
+      end
+
+      it "multiplies the map by 5 for larger examples" do
+        ad.unfold!
+        expect(ad.springs.first.join).to eq('???.###????.###????.###????.###????.###')
+        expect(ad.counts.first).to eq([1,1,3,1,1,3,1,1,3,1,1,3,1,1,3])
       end
     end
 
