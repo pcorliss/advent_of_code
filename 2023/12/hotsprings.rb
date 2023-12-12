@@ -192,7 +192,7 @@ module Advent
     def possible_arrangements
       idx = 0
       @springs.zip(@counts).sum do |spring, count|
-        s = fast_arrangements(spring, count)
+        s = faster_arrangements(spring, count)
         puts "#{idx}/#{@springs.length} #{spring} #{count} #{s}" if @debug
         idx += 1
         s
