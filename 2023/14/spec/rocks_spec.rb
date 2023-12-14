@@ -51,6 +51,57 @@ describe Advent do
       end
     end
 
+    describe "#spin!" do
+      let(:cycle) {[(
+        <<~EOS
+        .....#....
+        ....#...O#
+        ...OO##...
+        .OO#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#....
+        ......OOOO
+        #...O###..
+        #..OO#....
+        EOS
+        ),(
+        <<~EOS
+        .....#....
+        ....#...O#
+        .....##...
+        ..O#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#...O
+        .......OOO
+        #..OO###..
+        #.OOO#...O
+        EOS
+        ),(
+        <<~EOS
+        .....#....
+        ....#...O#
+        .....##...
+        ..O#......
+        .....OOO#.
+        .O#...O#.#
+        ....O#...O
+        .......OOO
+        #...O###.O
+        #.OOO#...O
+        EOS
+        )
+      ]}
+
+      3.times do |i|
+        it "spins the rocks clockwise #{i+1} times" do
+          (i+1).times { ad.spin! }
+          expect(ad.grid.render).to eq(cycle[i].chomp)
+        end
+      end
+    end
+
     describe "#total_load" do
       it "returns the total load" do
         ad.tilt!
@@ -58,7 +109,10 @@ describe Advent do
       end
     end
 
-    context "validation" do
+    describe "#multi_spin_load" do
+      it "uses cycle detection to determine the load after many spins" do
+        expect(ad.multi_spin_load(1_000_000_000)).to eq(64)
+      end
     end
   end
 end

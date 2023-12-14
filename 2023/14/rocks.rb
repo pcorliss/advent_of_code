@@ -17,17 +17,31 @@ module Advent
       @debug = true
     end
 
-    def tilt!
+    def transpose(x, y, direction)
+      case direction
+      when :north
+        return [x, y]
+      when :west
+        return [y, x]
+      when :south
+        return [x, @grid.height - y - 1]
+      when :east
+        return [@grid.width - y - 1, x]
+      end
+    end
+
+    def tilt!(direction = :north)
       @grid.width.times do |x|
         blocker = -1
         @grid.height.times do |y|
-          val = @grid[x,y]
+          t_x, t_y = transpose(x, y, direction)
+          val = @grid[t_x, t_y]
           case val
           when 'O'
             new_y = blocker + 1
             if new_y < y
-              @grid[x,y] = '.'
-              @grid[x,new_y] = 'O' 
+              @grid[t_x, t_y] = '.'
+              @grid[transpose(x, new_y, direction)] = 'O' 
               blocker += 1
             else
               blocker = y
@@ -42,6 +56,13 @@ module Advent
       end
     end
 
+    def spin!
+      tilt!(:north)
+      tilt!(:west)
+      tilt!(:south)
+      tilt!(:east)
+    end
+
     def total_load
       @grid.cells.sum do |(x, y), val|
         if val == 'O'
@@ -50,6 +71,39 @@ module Advent
           0
         end
       end
+    end
+
+    def multi_spin_load(cycles)
+      loads = []
+      loads = [total_load]
+      200.times do |i|
+        spin!
+        loads[i + 1] = total_load
+      end
+
+      cycle = nil
+      (5..100).each do |i|
+        a, b, c, _ = loads.each_slice(i).to_a.last(4)
+        if a == b && b == c
+          cycle = a
+          break
+        end
+      end
+      
+      raise "Unable to find cycle" if cycle.nil?
+      puts "Found Cycle: #{cycle}" if @debug
+
+      cycle_start = nil
+      loads.each_with_index do |i, idx|
+        if i == cycle.first && loads[idx..(idx+cycle.length-1)] == cycle
+          cycle_start = idx
+          break
+        end
+      end
+
+      raise "Unable to find cycle start" if cycle_start.nil?
+      puts "Found Cycle Start: #{cycle_start}" if @debug
+      cycle[(cycles - cycle_start) % cycle.length]
     end
   end
 end
