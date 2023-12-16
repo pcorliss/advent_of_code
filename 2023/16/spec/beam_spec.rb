@@ -72,15 +72,25 @@ describe Advent do
 
       it "returns a grid with the beam path rendered" do
         ad.energize
-        ad.debug!
+        # ad.debug!
         expect(ad.render_energized).to eq(energized.chomp)
       end
     end
 
     describe "#energize" do
       it "follows the beam path and returns the number of cells energized" do
-        ad.debug!
+        # ad.debug!
         expect(ad.energize).to eq(46)
+      end
+
+      it "takes an arbitrary starting point and direction" do
+        expect(ad.energize([3,-1,0,1])).to eq(51)
+      end
+    end
+
+    describe "#max_energized" do
+      it "returns the maximum possible energy for the grid" do
+        expect(ad.max_energized).to eq(51)
       end
     end
 

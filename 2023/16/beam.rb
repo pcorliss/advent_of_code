@@ -54,10 +54,10 @@ module Advent
       new_grid.render
     end
 
-    def energize
-      # We start off the grid so we properly handle a cell that's not a '.'
-      # x, y, dx, dy
-      beams = [[-1,0,1,0]]
+    # We start off the grid so we properly handle a cell that's not a '.'
+    # x, y, dx, dy
+    def energize(starting_beam = [-1,0,1,0])
+      beams = [starting_beam]
       @beam_map = {}
       i = 0
       until beams.empty? do
@@ -128,6 +128,33 @@ module Advent
       # puts "BeamMap:\n#{render_grid}" if @debug
 
       return @beam_map.keys.count
+    end
+
+    def max_energized
+      # reset beam_map
+      max = 0
+      #   v v v
+      # > . . . <
+      # > . . . <
+      # > . . . <
+      #   ^ ^ ^
+      starting_positions = []
+      @grid.width.times do |x|
+        starting_positions << [x, -1, 0, 1]
+        starting_positions << [x, @grid.height, 0, -1]
+      end
+      @grid.height.times do |y|
+        starting_positions << [-1, y, 1, 0]
+        starting_positions << [@grid.width, y, -1, 0]
+      end
+
+      starting_positions.each do |s|
+        @beam_map = {}
+        e = energize(s)
+        max = e if e > max
+      end
+
+      max
     end
   end
 end
