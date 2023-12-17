@@ -53,7 +53,7 @@ module Advent
       g.render
     end
 
-    def path_find
+    def path_find(min: 0, max: 3)
       # Pos 0,0; Dir East; HeatLoss: 0, Straight counter: 0
       start = [0,0,1,0,0,0, []]
       dest = [@grid.width-1, @grid.height-1]
@@ -78,7 +78,7 @@ module Advent
         # end
 
         # Post Pruning
-        if [x,y] == dest
+        if [x,y] == dest && straight_counter >= min
           if best_finish.nil? || loss < best_finish
             best_finish = loss 
             best_finish_path = path
@@ -92,10 +92,11 @@ module Advent
 
         [L, R, :S].each do |turn|
           if turn == :S
-            next if straight_counter >= 3
+            next if straight_counter >= max
             ndx, ndy = dx, dy
             new_straight_counter = straight_counter + 1
           else
+            next if straight_counter < min
             ndx, ndy = DIR_MAP[[dx,dy]][turn]
             new_straight_counter = 1
           end

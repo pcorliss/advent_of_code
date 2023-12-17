@@ -55,6 +55,29 @@ describe Advent do
         # ad.debug!
         expect(ad.path_find).to eq(102)
       end
+
+      context "minimum and maximum straight movement" do
+        it "finds the optimal path to the end and returns the heat loss" do
+          # ad.debug!
+          expect(ad.path_find(min: 4, max: 10)).to eq(94)
+        end
+
+        let(:alternate_input) {
+          <<~EOS
+          111111111111
+          999999999991
+          999999999991
+          999999999991
+          999999999991
+          EOS
+        }
+
+        it "travels the minimum distance, even at the end" do
+          ad = Advent::Crucible.new(alternate_input)
+          # ad.debug!
+          expect(ad.path_find(min: 4, max: 10)).to eq(71)
+        end
+      end
     end
 
     context "validation" do
