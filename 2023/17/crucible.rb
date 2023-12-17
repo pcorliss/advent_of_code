@@ -46,7 +46,7 @@ module Advent
     def render_path(path)
       g = Grid.new
       g.cells = @grid.cells.dup
-      path.each do |x, y, dx, dy, loss, sc, p|
+      path.each do |x, y, dx, dy, loss, sc|
         # puts "  #{x},#{y} #{dx},#{dy} #{loss} #{straight_counter} #{path}"
         g[x,y] = DIR_RENDER_MAP[[dx,dy]]
       end
@@ -60,8 +60,8 @@ module Advent
       dest = [@grid.width-1, @grid.height-1]
 
       q = FastContainers::PriorityQueue.new(:min)
-      q.push(east_start, dest.sum)
-      q.push(south_start, dest.sum)
+      q.push(east_start, 0)
+      q.push(south_start, 0)
 
       best_loss_map = {
         [0,0,1,0,0] => 0,
@@ -69,8 +69,6 @@ module Advent
       }
       best_finish = nil
       best_finish_path = nil
-
-      b = true
 
       until q.empty? do
         puts "Q: #{q.count}, TopK: #{q.top_key}, Top: #{q.top.first(5)}" if @debug
@@ -112,20 +110,14 @@ module Advent
           # PrePrune if we've already been here and had a better loss
           # Likely need to only prune on new_pos + dir
           pos_and_dir_and_step = [*new_pos, ndx, ndy, new_straight_counter]
-          # if @debug && pos_and_dir_and_step == [3,1,1,0,1] #&& new_loss == 15
-          #   binding.pry
-          # end
-          # if @debug && pos_and_dir_and_step == [4,1,1,0,2] #&& new_loss == 15
-          #   binding.pry
-          # end
           next if best_loss_map[pos_and_dir_and_step] && best_loss_map[pos_and_dir_and_step] <= new_loss
           best_loss_map[pos_and_dir_and_step] = new_loss
           puts "    New Loss: #{new_loss}" if @debug
           nx, ny = new_pos
           step = [nx, ny, ndx, ndy, new_loss, new_straight_counter]
           new_path = path.dup << step.dup
-          step << new_path 
-          q.push(step, dest.sum - new_pos.sum + new_loss)
+          step << new_path
+          q.push(step, new_loss)
         end
       end
     
