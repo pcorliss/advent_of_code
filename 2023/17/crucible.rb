@@ -55,14 +55,18 @@ module Advent
 
     def path_find(min: 0, max: 3)
       # Pos 0,0; Dir East; HeatLoss: 0, Straight counter: 0
-      start = [0,0,1,0,0,0, []]
+      east_start = [0,0,1,0,0,0, []]
+      south_start = [0,0,0,1,0,0, []]
       dest = [@grid.width-1, @grid.height-1]
 
-      candidates = [start]
       q = FastContainers::PriorityQueue.new(:min)
-      q.push(start, dest.sum)
+      q.push(east_start, dest.sum)
+      q.push(south_start, dest.sum)
 
-      best_loss_map = {[0,0,1,0] => 0}
+      best_loss_map = {
+        [0,0,1,0,0] => 0,
+        [0,0,0,1,0] => 0,
+      }
       best_finish = nil
       best_finish_path = nil
 
@@ -88,7 +92,6 @@ module Advent
         end
 
         next if best_finish && loss >= best_finish
-        # next if it's not possible to make best finish work given avg loss 
 
         [L, R, :S].each do |turn|
           if turn == :S
