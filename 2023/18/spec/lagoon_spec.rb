@@ -36,6 +36,26 @@ describe Advent do
         expect(ad.commands.first).to eq([:R, 6, '70c710'])
         expect(ad.commands.last).to eq([:U, 2, '7a21e3'])
       end
+
+      it "inits hex commands" do
+        expect(ad.hex_commands.count).to eq(14)
+        expect(ad.hex_commands.first).to eq([:R, 461937])
+        expect(ad.hex_commands[2]).to eq([:R, 356671])
+      end
+    end
+
+    describe "#swap_commands" do
+      it "swaps the commands with the hex commands" do
+        ad.swap_commands
+        expect(ad.commands.first).to eq([:R, 461937])
+      end
+
+      # it "test" do
+      #   ad.swap_commands
+      #   ad.commands.each_with_index do |(dir, len, color), idx|
+      #     ad.commands[idx] = [dir, len / 1000, color]
+      #   end
+      # end
     end
 
     describe "#cut_edge" do
@@ -86,7 +106,13 @@ EOS
       it "returns the size of the lagoon" do
         ad.cut_edge
         ad.fill_lagoon
+        expect(ad.lagoon_size_slow).to eq(62)
         expect(ad.lagoon_size).to eq(62)
+      end
+
+      it "returns the size of the lagoon for part 2" do
+        ad.swap_commands
+        expect(ad.lagoon_size).to eq(952408144115)
       end
     end
 
