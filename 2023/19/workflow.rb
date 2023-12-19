@@ -67,5 +67,61 @@ module Advent
         part.values.sum
       end
     end
+
+    def combos
+      ranges = {'x' => (1..4000), 'm' => (1..4000), 'a' => (1..4000), 's' => (1..4000)}
+      workflow = 'in'
+      branches = [[ranges, workflow]]
+      combos = 0
+
+      i = 0
+      until branches.empty? do
+        branch = branches.pop
+        ranges, workflow = branch
+        w = nil
+
+        if workflow == 'A'
+          puts "Accepted: #{ranges}" if @debug
+          combos += ranges.values.inject(1) do |sum, r|
+            sum * r.count
+          end
+          next
+        elsif workflow == 'R'
+          next
+        else
+          w = @workflows[workflow]
+          puts "WF: #{workflow} -> #{w}, Ranges: #{ranges}" if @debug
+        end
+
+        w.each do |wf|
+          # Rejected
+          puts "  WF: #{wf}, Ranges: #{ranges}" if @debug
+          if wf.count == 1
+            branches << [ranges, wf.first]
+            puts "      New Branch: #{branches.last}" if @debug
+          else
+            var, op, val, next_wf = wf
+            min, max = ranges[var].minmax 
+            new_range = ranges.dup
+            if op == :<
+              new_range[var] = (min..val - 1)
+              branches << [new_range, next_wf]
+              ranges[var] = (val..max)
+            elsif op == :>
+              new_range[var] = (val + 1..max)
+              branches << [new_range, next_wf]
+              ranges[var] = (min..val)
+            end
+
+            puts "    New Branch: #{branches.last}, Remaining: #{ranges}" if @debug
+          end
+        end
+
+        i += 1
+        raise "Too many iterations #{i}" if i > 1000
+      end
+
+      combos
+    end
   end
 end

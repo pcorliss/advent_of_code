@@ -6,3 +6,6 @@ input = File.read('./input.txt')
 
 ad = Advent::Workflow.new(input)
 puts "Part 1 Accepted Parts Sum: #{ad.accepted_parts_sum}"
+
+ad = Advent::Workflow.new(input)
+puts "Part 2 Number of Combos: #{ad.combos}"

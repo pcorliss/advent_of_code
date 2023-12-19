@@ -68,6 +68,13 @@ describe Advent do
       end
     end
 
+    describe "#combos" do
+      it "returns the number of combos" do
+        # ad.debug!
+        expect(ad.combos).to eq(167409079868000)
+      end
+    end
+
     context "validation" do
     end
   end
