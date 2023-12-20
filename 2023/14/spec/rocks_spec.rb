@@ -115,16 +115,5 @@ describe Advent do
         expect(ad.multi_spin_load(1_000_000_000)).to eq(64)
       end
     end
-
-    describe "#cycle_detection" do
-      it "returns the cycle and offset" do
-        cycle, offset = ad.cycle_detection do |i|
-          ad.spin!
-          ad.total_load
-        end
-        expect(cycle).to match_array([65, 63, 68, 69, 69, 65, 64])
-        expect(offset).to eq(7)
-      end
-    end
   end
 end

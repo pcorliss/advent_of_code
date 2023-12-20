@@ -1,6 +1,7 @@
 require 'set'
 require '../lib/grid.rb'
 require '../lib/ring.rb'
+require '../lib/cycle_detection.rb'
 
 module Advent
 
@@ -73,45 +74,16 @@ module Advent
       end
     end
 
-    def cycle_detection(&block)
-      results = []
-      200.times do |i|
-        results << block.call(i)
-      end
-
-      cycle = nil
-      (5..100).each do |i|
-        a, b, c, _ = results.each_slice(i).to_a.last(4)
-        if a == b && b == c
-          cycle = a
-          break
-        end
-      end
-
-      raise "Unable to find cycle" if cycle.nil?
-      puts "Found Cycle: #{cycle}" if @debug
-
-      cycle_start = nil
-      results.each_with_index do |i, idx|
-        if i == cycle.first && results[idx..(idx+cycle.length-1)] == cycle
-          cycle_start = idx
-          break
-        end
-      end
-
-      raise "Unable to find cycle start" if cycle_start.nil?
-      puts "Found Cycle Start: #{cycle_start}" if @debug
-
-      [cycle, cycle_start]
-    end
-
     def multi_spin_load(cycles)
-      cycle, cycle_start = cycle_detection do |i|
+      cd = Advent::CycleDetection.new(min_repeats: 3, max_cycle_length: 30, min_cycle_length: 5) do |i|
         spin!
         total_load
       end
 
-      cycle[(cycles - cycle_start) % cycle.length - 1]
+      cycle_length = cd.cycle_finder
+      cycle_start = cd.cycle_first_index
+
+      cd.results[(cycles - cycle_start) % cycle_length + cycle_start - 1]
     end
   end
 end
