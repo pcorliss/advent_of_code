@@ -108,5 +108,32 @@ describe Advent do
         expect(cd.cycle_first_index).to eq(0)
       end
     end
+
+    describe "#[]" do
+      it "returns the value at the index" do
+        cd.cycle_finder
+        expect(cd[7]).to eq(2)
+      end
+
+      it "returns the value of indexes that haven't been calculated" do
+        cd.cycle_finder
+        expect(cd.results[16]).to be_nil
+        expect(cd[16]).to eq(1)
+      end
+
+      it "handles offsets" do
+        cd = described_class.new do |x|
+          if x < 13
+            x
+          else
+            (x - 13) % 7
+          end
+        end
+        cd.cycle_finder
+
+        expect(cd.results[36]).to be_nil
+        expect(cd[36]).to eq(2)
+      end
+    end
   end
 end

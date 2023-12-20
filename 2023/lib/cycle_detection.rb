@@ -44,5 +44,12 @@ module Advent
 
       nil
     end
+
+    def [](index)
+      return @results[index] if @results[index]
+
+      results_index = (index - @cycle_first_index) % @cycle_length + @cycle_first_index
+      @results[results_index]
+    end
   end
 end

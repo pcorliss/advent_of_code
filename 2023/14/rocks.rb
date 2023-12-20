@@ -83,7 +83,8 @@ module Advent
       cycle_length = cd.cycle_finder
       cycle_start = cd.cycle_first_index
 
-      cd.results[(cycles - cycle_start) % cycle_length + cycle_start - 1]
+      # cd.results[(cycles - cycle_start) % cycle_length + cycle_start - 1]
+      cd[cycles - 1]
     end
   end
 end
