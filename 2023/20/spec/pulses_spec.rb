@@ -110,7 +110,7 @@ describe Advent do
 
     describe "#button!" do
       it "sends a broadcast pulse" do
-        expect(ad).to receive(:send_pulse).with('broadcaster', 'button', 0)
+        expect(ad).to receive(:send_pulse).with('broadcaster', 'button', 0, anything, anything)
         ad.button!
         expect(ad.state['a']).to eq(0)
         expect(ad.state['b']).to eq(0)
@@ -180,14 +180,13 @@ describe Advent do
       end
     end
 
-# button -low-> broadcaster
-# broadcaster -low-> a
-# a -low-> inv
-# a -low-> con
-# inv -high-> b
-# con -high-> output
+    describe "#rx_cycles" do
+      let(:input) { File.read('./input.txt') }
 
-    context "validation" do
+      it "returns the number of cycles to send a low pulse to rx" do
+        # ad.debug!
+        expect(ad.rx_cycles).to eq(244178746156661)
+      end
     end
   end
 end
