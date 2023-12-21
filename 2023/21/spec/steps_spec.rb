@@ -49,12 +49,36 @@ describe Advent do
       }.each do |steps, expected_positions|
         it "returns the number of positions, #{expected_positions}, you can visit in #{steps} steps" do
           # ad.debug!
-          positions = ad.steps(ad.start, steps)
-          # puts "Pos: #{positions}"
-          expect(positions.length).to eq(expected_positions)
+          expect(ad.steps(ad.start, steps)).to eq(expected_positions)
+        end
+      end
+
+      context "repeating grid" do
+        {
+          10 => 50,
+          50 => 1594,
+          100 => 6536,
+          500 => 167004,
+          1000 => 668697,
+          5000 => 16733044,
+        }.each do |steps, expected_positions|
+          it "returns the number of positions, #{expected_positions}, you can visit in #{steps} steps" do
+            # ad.debug!
+            expect(ad.steps(ad.start, steps)).to eq(expected_positions)
+          end
         end
       end
     end
+
+    # describe "#cycles" do
+    #   let(:real_input) { File.read('./input.txt') }
+    #   let(:input) { real_input }
+
+    #   it "finds cycles" do
+    #     ad.debug!
+    #     expect(ad.cycles(ad.start)).to_not be_nil
+    #   end
+    # end
 
     context "validation" do
     end
