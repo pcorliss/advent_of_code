@@ -48,24 +48,33 @@ module Advent
       @position_steps = [1]
       positions = Set.new([pos])
       s.times do
-        positions = positions.map do |pos|
-          @grid.neighbor_coords(pos).select do |npos|
-            translate(npos) == '.'
+        new_positions = Set.new
+        positions = positions.each do |pos|
+          @grid.neighbor_coords(pos).each do |npos|
+            new_positions << npos if !new_positions.include?(npos) && translate(npos) == '.'
           end
-        end.flatten(1).to_set
-        @position_steps << positions.length
-        positions
+        end
+        @position_steps << new_positions.length
+        positions = new_positions
       end
       positions
     end
 
     def steps(pos, s)
-      minimum_steps_for_cycles = [@grid.width * 3, 11*7].max
+      t = Time.now
+      # The example input and real input have different behaviors.
+      # The example input doesn't start repeating until at least 40 or so steps
+      # The real input is periodic from the first few values
+      minimum_steps_for_cycles = [@grid.width * 2, 64].max
       generate_steps(pos, [s, minimum_steps_for_cycles].min)
       return @position_steps[s] if @position_steps[s]
 
+      puts "T: #{Time.now - t}s" if @debug
+      t = Time.now
       sub1 = @position_steps.each_cons(2).map { |a, b| b - a }
 
+      # puts @position_steps.each_slice(@grid.width).to_a.last(4).map(&:first).inspect if @debug
+      # puts @position_steps.last(5)
       # sub1.each_slice(@grid.width).to_a.last(2).each do |slice|
       #   puts "Slice: #{slice}" if @debug
       # end
@@ -79,6 +88,7 @@ module Advent
         @position_steps << @position_steps.last + sub1.last
         # puts "New Position: [#{@position_steps.length - 1}] #{@position_steps[-1]}" if @debug
       end
+      puts "T: #{Time.now - t}s" if @debug
 
       @position_steps[s]
     end

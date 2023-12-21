@@ -70,16 +70,6 @@ describe Advent do
       end
     end
 
-    # describe "#cycles" do
-    #   let(:real_input) { File.read('./input.txt') }
-    #   let(:input) { real_input }
-
-    #   it "finds cycles" do
-    #     ad.debug!
-    #     expect(ad.cycles(ad.start)).to_not be_nil
-    #   end
-    # end
-
     context "validation" do
     end
   end
