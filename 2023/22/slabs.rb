@@ -21,7 +21,8 @@ module Advent
           Point.new(*brick.split(",").map(&:to_i))
         end
       end
-      @load_bearing_bricks = {}
+      @bricks_under = {}
+      @bricks_above = {}
     end
 
     # File activesupport/lib/active_support/core_ext/range/overlaps.rb, line 7
@@ -70,9 +71,11 @@ module Advent
         if !intersecting_bricks.empty? || [b1.z,b2.z].min < 1
           b1.z += 1
           b2.z += 1
+
+          @bricks_under[new_brick] = intersecting_bricks
           intersecting_bricks.each do |ibrick|
-            @load_bearing_bricks[ibrick] ||= []
-            @load_bearing_bricks[ibrick] << new_brick
+            @bricks_above[ibrick] ||= []
+            @bricks_above[ibrick] << new_brick
           end
           new_bricks << new_brick
           puts "Adding #{new_brick.map(&:to_a)}" if @debug
@@ -84,18 +87,14 @@ module Advent
     end
 
     def disintegratable_bricks
-      # load bearing hash
-      # key is brick, value is list of bricks supporting it
-
       @bricks.select do |brick|
-        # binding.pry if @debug && brick.first.to_a == [1,0,1]
 
-        bricks_i_support = @load_bearing_bricks[brick] || []
+        bricks_i_support = @bricks_above[brick] || []
 
         no_bricks_that_depend_on_me = bricks_i_support.empty?
         
-        sole_supporter = bricks_i_support.all? do |supporting_brick|
-          @load_bearing_bricks.values.count {|v| v.include? supporting_brick } == 1
+        sole_supporter = bricks_i_support.any? do |supporting_brick|
+          @bricks_under[supporting_brick].count == 1
         end
 
         r = no_bricks_that_depend_on_me || !sole_supporter
