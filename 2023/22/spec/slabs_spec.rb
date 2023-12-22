@@ -98,6 +98,12 @@ describe Advent do
     end
 
     context "validation" do
+      let(:input) { File.read('./input.txt') }
+
+      it "solves part1" do
+        ad.drop_bricks!
+        expect(ad.disintegratable_bricks.count).to eq(473)
+      end
     end
   end
 end

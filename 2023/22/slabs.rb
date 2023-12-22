@@ -88,18 +88,15 @@ module Advent
 
     def disintegratable_bricks
       @bricks.select do |brick|
-
         bricks_i_support = @bricks_above[brick] || []
 
-        no_bricks_that_depend_on_me = bricks_i_support.empty?
-        
-        sole_supporter = bricks_i_support.any? do |supporting_brick|
-          @bricks_under[supporting_brick].count == 1
+        sole_supporter = bricks_i_support.all? do |supporting_brick|
+          # Do any of the bricks resting on top of me, have me as their only suppoert?
+          @bricks_under[supporting_brick].count != 1
         end
 
-        r = no_bricks_that_depend_on_me || !sole_supporter
-        puts "Brick #{brick.map(&:to_a).inspect} #{r ? "is" : "not"} disintegratable" if @debug
-        r
+        puts "Brick #{brick.map(&:to_a).inspect} #{sole_supporter ? "is" : "not"} disintegratable" if @debug
+        sole_supporter
       end
     end
 
