@@ -103,5 +103,40 @@ module Advent
     def debug!
       @debug = true
     end
+
+    def brick_fall_count(bricks_falling)
+      i = 0
+      loop do
+        # take an array of bricks removed
+        puts "Bricks Falling: #{bricks_falling.inspect}" if @debug
+        # find all the bricks they support
+        supported_bricks = bricks_falling.inject(Set.new) { |set, brick| set.merge(@bricks_above[brick] || []) }
+        puts "  Supported Bricks: #{supported_bricks.inspect}" if @debug
+        # subtract bricks already marked falling
+        supported_bricks -= bricks_falling
+        puts "  Supported Bricks: #{supported_bricks.inspect}" if @debug
+        # take bricks previously being supported, and check if all their supports are removed
+        unsupported_bricks = supported_bricks.select do |brick|
+          ((@bricks_under[brick] || []) - bricks_falling).empty?
+        end
+        puts "  Unsupported Bricks: #{unsupported_bricks.inspect}" if @debug
+        # Add new bricks to the list of bricks falling and repeat
+        bricks_falling += unsupported_bricks
+
+        puts "  BREAK" if unsupported_bricks.empty? && @debug
+        break if unsupported_bricks.empty?
+        i+=1
+        raise "Too many iterations #{i}" if i > 1000
+      end
+
+      puts "Bricks Falling: #{bricks_falling.count - 1}" if @debug
+      bricks_falling.count - 1
+    end
+
+    def brick_fall_sum
+      @bricks.sum do |brick|
+        brick_fall_count([brick])
+      end
+    end
   end
 end

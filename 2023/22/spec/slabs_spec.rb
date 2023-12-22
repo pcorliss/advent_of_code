@@ -97,6 +97,29 @@ describe Advent do
       end
     end
 
+    describe "#brick_fall_count" do
+      before do
+        ad.drop_bricks!
+      end
+
+      [6,0,0,0,0,1,0].each_with_index do |expected, idx|
+        it "returns the number of bricks that would fall if a brick was removed" do
+          # ad.debug!
+          expect(ad.brick_fall_count([ad.bricks[idx]])).to eq(expected)
+        end
+      end
+    end
+
+    describe "#brick_fall_sum" do
+      before do
+        ad.drop_bricks!
+      end
+
+      it "returns the number of bricks that would fall if a brick was removed" do
+        expect(ad.brick_fall_sum).to eq(7)
+      end
+    end
+
     context "validation" do
       let(:input) { File.read('./input.txt') }
 
