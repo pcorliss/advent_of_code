@@ -55,9 +55,58 @@ describe Advent do
         # ad.debug!
         expect(ad.longest_hike).to eq(94)
       end
+
+      it "takes an argument to ignore slopes" do
+        ad.debug!
+        expect(ad.longest_hike(ignore_slopes: true)).to eq(154)
+      end
+    end
+
+    describe "#build_graph" do
+      it "Builds a graph" do
+        ad.debug!
+        g = ad.build_graph
+        puts ad.render_graph_on_grid(highlight: false)
+
+        expect(ad.distance('S', 'A')).to eq(15)
+        expect(ad.distance('A', 'C')).to eq(22)
+        expect(ad.distance('C', 'E')).to eq(38)
+        expect(ad.distance('E', 'D')).to eq(10)
+        expect(ad.distance('D', 'B')).to eq(24)
+        expect(ad.distance('B', 'G')).to eq(30)
+        expect(ad.distance('G', 'H')).to eq(10)
+        expect(ad.distance('H', 'F')).to eq(5)
+
+        puts ad.state_diagram
+        # binding.pry
+      end
     end
 
     context "validation" do
     end
+
+#S#####################
+#.......#########...###
+#######.#########.#.###
+###.....#.>B>.###.#.###
+###v#####.#v#.###.#.###
+###A>...#.#.#.....#...#
+###v###.#.#.#########.#
+###...#.#.#.......#...#
+#####.#.#.#######.#.###
+#.....#.#.#.......#...#
+#.#####.#.#.#########v#
+#.#...#...#...###...>G#
+#.#.#v#######v###.###v#
+#...#C>.#...>D>.#.###.#
+#####v#.#.###v#.#.###.#
+#.....#...#...#.#.#...#
+#.#########.###.#.#.###
+#...###...#...#...#.###
+###.###.#.###v#####v###
+#...#...#.#.>E>.#.>H###
+#.###.###.#.###.#.#v###
+#.....###...###...#...#
+#####################F#
   end
 end
