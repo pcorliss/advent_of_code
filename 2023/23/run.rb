@@ -13,4 +13,5 @@ puts ad.render_graph_on_grid
 puts ad.state_diagram
 
 ad = Advent::Hike.new(input)
+ad.debug!
 puts "Part 2 Longest Hike: #{ad.longest_hike(ignore_slopes: true)}"

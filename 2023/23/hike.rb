@@ -191,15 +191,20 @@ module Advent
       branches = [[@start, 0, Set.new([@start])]]
       hikes = []
       longest_hike_path = []
+      longest_hike_steps = 0
 
       i = 0
       until branches.empty? do
-        puts "Branches: #{branches.count} Hikes: #{hikes.count} - #{branches.last} #{hikes.max}" if @debug
+        # puts "Branches: #{branches.count} Hikes: #{hikes.count} - #{branches.last} #{longest_hike_steps}" if @debug
         pos, steps, visited = branches.pop
 
 
         if pos == @finish
-          longest_hike_path = visited if hikes.empty? || steps > hikes.max
+          if steps > longest_hike_steps
+            puts "New Longest: #{steps} in #{i} iterations" if @debug
+            longest_hike_path = visited
+            longest_hike_steps = steps
+          end
           hikes << steps
           next
         end
@@ -221,6 +226,8 @@ module Advent
           puts "#{aname} -> #{bname} : #{@graph[a][b]}"
         end
       end
+
+      puts "Iterations to finish: #{i}, Total Hikes: #{hikes.count}" if @debug
       hikes.max
     end
 
