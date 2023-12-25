@@ -113,7 +113,7 @@ module Advent
       raise "Unable to find path"
     end
 
-    def find_common_paths(top: 3, iterations: 1000)
+    def find_common_paths(top: 3, iterations: 10000)
       paths = {}
 
       node_list = @nodes.to_a
@@ -124,6 +124,12 @@ module Advent
           p = [a,b].sort
           paths[p] ||= 0
           paths[p] += 1
+        end
+        # Short circuits early if we discovered cuts that work
+        if j % 100 == 0
+          best_paths = paths.sort_by {|k,v| v }.reverse.first(top).map(&:first)
+          a, b = group_count(best_paths)
+          return best_paths if a != nodes.count
         end
       end
 
