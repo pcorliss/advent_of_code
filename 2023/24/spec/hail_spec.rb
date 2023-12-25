@@ -71,15 +71,29 @@ describe Advent do
 
     describe "#matching_intersections" do
       it "#returns intersections within bounding box" do
-        ad.debug!
+        # ad.debug!
         expect(ad.matching_intersections([[7,7],[27,27]])).to eq(2)
       end
     end
 
+    describe "#solve_axis" do
+      it "returns the position and velocity for an axis" do
+        # ad.debug!
+        expect(ad.solve_rock([-3, 1, 2])).to eq([24, 13, 10])
+      end
+    end
+
+    describe "#full_solve" do
+      it "returns the position and velocity for an axis" do
+        # ad.debug!
+        expect(ad.full_solve).to eq([24, 13, 10])
+      end
+    end
 
     context "validation" do
       it "input file present" do
         expect(real_input).to_not be_empty
+        # binding.pry
       end
     end
   end
