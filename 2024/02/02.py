@@ -35,8 +35,7 @@ def safe_vals(vals):
 
   return True
 
-
-def safe(vals, tolerations=0):
+def safe(vals):
   if safe_vals(vals):
     return True
 
@@ -48,8 +47,6 @@ def safe(vals, tolerations=0):
     
   return False
 
-
-
 def part1(input_text):
   data = parse(input_text)
   # print(data)
@@ -57,7 +54,7 @@ def part1(input_text):
 
 def part2(input_text):
   data = parse(input_text)
-  return sum(map(lambda p: safe(p, 1), data))
+  return sum(map(safe, data))
 
 sample = """
 7 6 4 2 1
