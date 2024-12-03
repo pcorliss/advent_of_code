@@ -8,30 +8,56 @@ def parse(input_text):
     out.append(list(map(int, line.split())))
   return out
 
-def safe(vals):
-  increasing = True
-  if vals[0] > vals[1]:
-    increasing = False
-  prev = vals[0]
+def safe_vals(vals):
+  inc = 0
+  dec = 0
+  prev = None
   for i in range(len(vals)):
     if i == 0:
+      prev = vals[i]
       continue
-    if increasing:
-      if vals[i] < prev:
-        return False
+
+    if vals[i] > prev:
+      inc += 1
+    elif vals[i] < prev:
+      dec += 1
     else:
-      if vals[i] > prev:
-        return False
+      return False
+    
+    if min(inc, dec) > 0:
+      return False
+    
     diff = abs(vals[i] - prev)
     if diff < 1 or diff > 3:
       return False
+
     prev = vals[i]
+
   return True
+
+
+def safe(vals, tolerations=0):
+  if safe_vals(vals):
+    return True
+
+  for i in range(len(vals)):
+    # remove i from the list
+    new_vals = vals[:i] + vals[i+1:]
+    if safe_vals(new_vals):
+      return True
+    
+  return False
+
+
 
 def part1(input_text):
   data = parse(input_text)
   # print(data)
-  return sum(map(safe, data))
+  return sum(map(safe_vals, data))
+
+def part2(input_text):
+  data = parse(input_text)
+  return sum(map(lambda p: safe(p, 1), data))
 
 sample = """
 7 6 4 2 1
@@ -46,3 +72,11 @@ print(part1(sample))
 if len(sys.argv) >= 2:
   with open(sys.argv[1], 'r') as file:
     print(part1(file.read()))
+
+print(part2(sample))
+if len(sys.argv) >= 2:
+  with open(sys.argv[1], 'r') as file:
+    print(part2(file.read()))
+
+# 450 is not right
+# 442 That's not the right answer; your answer is too low.
