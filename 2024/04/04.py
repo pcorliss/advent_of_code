@@ -61,12 +61,59 @@ def part1(input_text):
 
   return sum
 
+def part2(input_text):
+  data = parse(input_text)
+
+  sum = 0
+  match_sets = [
+    {
+      (-1, -1): 'M',
+      (-1, 1): 'M',
+      (1, -1): 'S',
+      (1, 1): 'S',
+    },
+    {
+      (-1, -1): 'M',
+      (-1, 1): 'S',
+      (1, -1): 'M',
+      (1, 1): 'S',
+    },
+    {
+      (-1, -1): 'S',
+      (-1, 1): 'S',
+      (1, -1): 'M',
+      (1, 1): 'M',
+    },
+    {
+      (-1, -1): 'S',
+      (-1, 1): 'M',
+      (1, -1): 'S',
+      (1, 1): 'M',
+    },
+  ]
+
+  for y in range(1, len(data) - 1):
+    for x in range(1, len(data[y]) - 1):
+      if data[y][x] != "A":
+        continue
+
+      for match_set in match_sets:
+        if all(
+          data[y + coord[1]][x + coord[0]] == char
+          for coord, char in match_set.items()
+        ):
+          sum += 1
+          break
+
+  return sum
+
+
 print(part1(sample))
 if len(sys.argv) >= 2:
   with open(sys.argv[1], 'r') as file:
     print(part1(file.read()))
 
-# print(part2(sample2))
-# if len(sys.argv) >= 2:
-#   with open(sys.argv[1], 'r') as file:
-#     print(part2(file.read()))
+print(part2(sample))
+if len(sys.argv) >= 2:
+  with open(sys.argv[1], 'r') as file:
+    print(part2(file.read()))
