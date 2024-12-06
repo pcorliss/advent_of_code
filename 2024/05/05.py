@@ -1,4 +1,5 @@
 import sys
+import functools
 
 sample = """
 47|53
@@ -44,6 +45,18 @@ def sorted_pages(pages, before_map, after_map):
 
   return True
 
+def sort_pages(pages, before_map, after_map):
+  def cmp(a, b):
+    if before_map[a] and b in before_map[a]:
+      return -1
+    elif before_map[b] and a in before_map[b]:
+      return 1
+    else:
+      return 0
+
+  return sorted(pages, key=functools.cmp_to_key(cmp))
+
+
 def parse(input_text):
   page_lists = []
   before_map = {}
@@ -58,8 +71,10 @@ def parse(input_text):
       # after_map[75] == [47]
       before_map[b] = before_map.get(b, set())
       before_map[b].add(a)
+      before_map[a] = before_map.get(a, set())
       after_map[a] = after_map.get(a, set())
       after_map[a].add(b)
+      after_map[b] = after_map.get(b, set())
     elif ',' in line:
       page_list = [int(n) for n in line.split(',')]
       page_lists.append(page_list)
@@ -76,12 +91,25 @@ def part1(input_text):
 
   return sum
 
+def part2(input_text):
+  page_lists, before_map, after_map = parse(input_text)
+
+  sum = 0
+  for page_list in page_lists:
+    if sorted_pages(page_list, before_map, after_map):
+      continue
+    else:
+      sorted_p = sort_pages(page_list, before_map, after_map)
+      sum += middle_number(sorted_p)
+
+  return sum
+
 print(part1(sample))
 if len(sys.argv) >= 2:
   with open(sys.argv[1], 'r') as file:
     print(part1(file.read()))
 
-# print(part2(sample))
-# if len(sys.argv) >= 2:
-#   with open(sys.argv[1], 'r') as file:
-#     print(part2(file.read()))
+print(part2(sample))
+if len(sys.argv) >= 2:
+  with open(sys.argv[1], 'r') as file:
+    print(part2(file.read()))
