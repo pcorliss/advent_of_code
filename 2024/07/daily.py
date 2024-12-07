@@ -11,6 +11,32 @@ def parse(input_text):
     out[int(goal)] = list(map(int, nums))
   return out
 
+def add_symbols_recursive(goal, nums, symbols, sum=None):
+  # print(f"Goal: {goal} Num: {nums} Symbols: {symbols} Sum: {sum}")
+  if sum == None:
+    return add_symbols_recursive(goal, nums[1:], symbols, sum=nums[0])
+
+  if sum > goal: 
+    return False
+
+  if len(nums) == 0:
+    return goal == sum
+
+  for symbol in symbols:
+    if symbol == '*':
+      if add_symbols_recursive(goal, nums[1:], symbols, sum=(sum * nums[0])):
+        return True
+    elif symbol == '+':
+      if add_symbols_recursive(goal, nums[1:], symbols, sum=(sum + nums[0])):
+        return True
+    elif symbol == '||':
+      if add_symbols_recursive(goal, nums[1:], symbols, sum=int(f"{sum}{nums[0]}")):
+        return True
+    else:
+      raise f"Unknown symbol {symbol}"
+
+  return False
+
 def add_symbols(goal, nums, symbols):
   for symbols in itertools.product(symbols, repeat=len(nums) - 1):
     sum = nums[0]
@@ -41,8 +67,7 @@ def part1(input_text):
   data = parse(input_text)
   sum = 0
   for goal, nums in data.items():
-    equation = add_symbols(goal, nums, ['*', '+'])
-    if equation:
+    if add_symbols_recursive(goal, nums, ['*', '+']):
       sum += goal
   return sum
 
@@ -50,8 +75,7 @@ def part2(input_text):
   data = parse(input_text)
   sum = 0
   for goal, nums in data.items():
-    equation = add_symbols(goal, nums, ['*', '+', '||'])
-    if equation:
+    if add_symbols_recursive(goal, nums, ['*', '+', '||']):
       sum += goal
   return sum
 

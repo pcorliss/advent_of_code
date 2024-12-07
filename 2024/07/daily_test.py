@@ -21,6 +21,16 @@ def test_parse(sample_data):
     assert len(parsed_data) == 9
     assert parsed_data[192] == [17, 8, 14]
 
+def test_add_symbols_recursive():
+    assert add_symbols_recursive(190, [10, 19], ['+', '*'])
+    assert add_symbols_recursive(3267,[81, 40, 27], ['+', '*'])
+    assert add_symbols_recursive(292, [11, 6, 16, 20], ['+', '*'])
+    assert not add_symbols_recursive(83, [17, 5], ['+', '*'])
+
+    assert add_symbols_recursive(156, [15, 6], ['+', '*', '||'])
+    assert add_symbols_recursive(7290, [6, 8, 6, 15], ['+', '*', '||'])
+    assert add_symbols_recursive(192, [17, 8, 14], ['+', '*', '||'])
+
 def test_add_symbols_one_pos(sample_data):
     symbolized_data = add_symbols(190, [10, 19], ['+', '*'])
 
