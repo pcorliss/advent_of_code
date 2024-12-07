@@ -13,11 +13,8 @@ def parse(input_text):
 
 def add_symbols(goal, nums, symbols):
   for symbols in itertools.product(symbols, repeat=len(nums) - 1):
-    equation = [nums[0]]
     sum = nums[0]
     for i in range(1, len(nums)):
-      equation.append(symbols[i - 1])
-      equation.append(nums[i])
       if symbols[i - 1] == '*':
         sum *= nums[i]
       elif symbols[i - 1] == '+':
@@ -26,8 +23,16 @@ def add_symbols(goal, nums, symbols):
         sum = int(f"{sum}{nums[i]}")
       else:
         raise f"Unknown symbol {equation}"
+      
+      if sum > goal:
+        break
 
     if goal == sum:
+      # Only really used for tests
+      equation = [nums[0]]
+      for i in range(1, len(nums)):
+        equation.append(symbols[i - 1])
+        equation.append(nums[i])
       return equation
     
   return None
