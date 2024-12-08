@@ -36,3 +36,12 @@ def test_antinodes(sample_data):
 
 def test_part1(sample_data):
   assert part1(sample_data) == 14
+
+def test_repeating_antinodes(sample_data):
+  parsed_data = parse(sample_data)
+  anti = repeating_antinodes(parsed_data)
+
+  assert len(anti) == 34
+
+def test_part2(sample_data):
+  assert part2(sample_data) == 34
