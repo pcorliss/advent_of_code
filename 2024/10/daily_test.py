@@ -25,5 +25,14 @@ def test_path_find(sample_data):
   # relies on trail heads being in reading order
   assert path_find(grid) == [5, 6, 5, 3, 1, 3, 5, 3, 5]
 
+def test_path_score(sample_data):
+  grid = parse(sample_data)
+  assert len(path_score(grid)) == 9
+  # relies on trail heads being in reading order
+  assert path_score(grid) == [20, 24, 10, 4, 1, 4, 5, 8, 5]
+
 def test_part1(sample_data):
   assert part1(sample_data) == 36
+
+def test_part2(sample_data):
+  assert part2(sample_data) == 81
