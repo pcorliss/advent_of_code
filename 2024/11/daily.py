@@ -33,14 +33,32 @@ def blink(stones):
 
   return out
 
+STONE_CACHE = {}
+
+def recursive_blink(stones, iterations):
+  if iterations == 0:
+    return len(stones)
+
+  sum = 0
+  for stone in stones:
+    if (stone, iterations) in STONE_CACHE:
+      sum += STONE_CACHE[(stone, iterations)]
+      continue
+
+    stone_count = recursive_blink(blink([stone]), iterations - 1)
+    sum += stone_count
+    # print(f"stone: {stone} iterations: {iterations} count: {stone_count}")
+    STONE_CACHE[(stone, iterations)] = stone_count
+
+  return sum
+
 def part1(input_text):
   stones = parse(input_text)
-  for _ in range(25):
-    stones = blink(stones)
-  return len(stones)
+  return recursive_blink(stones, 25)
 
 def part2(input_text):
-  return 0
+  stones = parse(input_text)
+  return recursive_blink(stones, 75)
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:

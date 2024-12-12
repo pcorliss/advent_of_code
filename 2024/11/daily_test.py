@@ -30,6 +30,19 @@ def test_blink(parsed_data, times, expected):
 
   assert d == expected
 
+@pytest.mark.parametrize("times, expected", [
+  (1, 3),
+  (2, 4),
+  (3, 5),
+  (4, 9),
+  (5, 13),
+  (6, 22),
+])
+def test_recursive_blink(parsed_data, times, expected):
+  count = recursive_blink(parsed_data, times)
+
+  assert count == expected
+
 def test_part1(sample_data):
   assert part1(sample_data) == 55312
 
