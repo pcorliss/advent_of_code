@@ -46,8 +46,7 @@ def solver(machine):
 
   # Solve the system of equations
   solution = np.linalg.solve(A, B)
-  print(f"Solution: {solution}")
-
+  # print(f"Solution: {solution}")
 
   a, b = list(map(round, solution))
   if a_x * a + b_x * b == p_x and a_y * a + b_y * b == p_y:
