@@ -52,6 +52,36 @@ def perimeter(grid, block):
 
   return sum
 
+def corners(block):
+  sum = 0
+
+  for x, y in block:
+    #  X#X
+    #  ###
+    #  X#X
+    if (x-1,y) in block and (x,y-1) in block and not (x-1,y-1) in block:
+      sum += 1
+    if (x+1,y) in block and (x,y-1) in block and not (x+1,y-1) in block:
+      sum += 1
+    if (x+1,y) in block and (x,y+1) in block and not (x+1,y+1) in block:
+      sum += 1
+    if (x-1,y) in block and (x,y+1) in block and not (x-1,y+1) in block:
+      sum += 1
+    #   _
+    #  _#_
+    #   _
+    if (x-1,y) not in block and (x,y-1) not in block:
+      sum += 1
+    if (x+1,y) not in block and (x,y-1) not in block:
+      sum += 1
+    if (x-1,y) not in block and (x,y+1) not in block:
+      sum += 1
+    if (x+1,y) not in block and (x,y+1) not in block:
+      sum += 1
+
+  return sum
+
+
 def sides(grid, block):
   sum = 0
 
@@ -139,7 +169,7 @@ def part2(input_text):
 
   sum = 0
   for block in block_sets:
-    s = sides(grid, block)
+    s = corners(block)
     sum += s * len(block)
 
   return sum

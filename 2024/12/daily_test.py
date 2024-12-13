@@ -68,6 +68,14 @@ def test_sides_ab_grid(ab_grid):
   b = blocks(ab_grid, 0, 0)
   assert sides(ab_grid, b) == 12
 
+def test_corners_e_grid(e_grid):
+  b = blocks(e_grid, 0, 0)
+  assert corners(b) == 12
+
+def test_corners_ab_grid(ab_grid):
+  b = blocks(ab_grid, 0, 0)
+  assert corners(b) == 12
+
 def test_part1(sample_data):
   assert part1(sample_data) == 1930
 
