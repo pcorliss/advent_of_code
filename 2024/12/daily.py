@@ -53,31 +53,34 @@ def perimeter(grid, block):
   return sum
 
 def corners(block):
-  sum = 0
+  #  X#X
+  #  ###
+  #  X#X
+  inner_corners = [
+    ((-1,0), (0,-1), (-1,-1)),
+    ((1,0), (0,-1), (1,-1)),
+    ((1,0), (0,1), (1,1)),
+    ((-1,0), (0,1), (-1,1)),
+  ]
 
+  #  X_X
+  #  _#_
+  #  X_X
+  outer_corners = [
+    ((-1,0), (0,-1)),
+    ((1,0), (0,-1)),
+    ((1,0), (0,1)),
+    ((-1,0), (0,1)),
+  ]
+
+  sum = 0
   for x, y in block:
-    #  X#X
-    #  ###
-    #  X#X
-    if (x-1,y) in block and (x,y-1) in block and not (x-1,y-1) in block:
-      sum += 1
-    if (x+1,y) in block and (x,y-1) in block and not (x+1,y-1) in block:
-      sum += 1
-    if (x+1,y) in block and (x,y+1) in block and not (x+1,y+1) in block:
-      sum += 1
-    if (x-1,y) in block and (x,y+1) in block and not (x-1,y+1) in block:
-      sum += 1
-    #   _
-    #  _#_
-    #   _
-    if (x-1,y) not in block and (x,y-1) not in block:
-      sum += 1
-    if (x+1,y) not in block and (x,y-1) not in block:
-      sum += 1
-    if (x-1,y) not in block and (x,y+1) not in block:
-      sum += 1
-    if (x+1,y) not in block and (x,y+1) not in block:
-      sum += 1
+    for (xa, ya), (xb, yb), (xc, yc) in inner_corners:
+      if (x+xa,y+ya) in block and (x+xb,y+yb) in block and not (x+xc,y+yc) in block:
+        sum += 1
+    for (xa, ya), (xb, yb) in outer_corners:
+      if (x+xa,y+ya) not in block and (x+xb,y+yb) not in block:
+        sum += 1
 
   return sum
 
