@@ -69,7 +69,16 @@ def part1(input_text):
   return sum
 
 def part2(input_text):
-  return 0
+  machines = parse(input_text)
+  sum = 0
+  for machine in machines:
+    prize = machine['prize']
+    prize = (prize[0] + 10000000000000, prize[1] + 10000000000000)
+    machine['prize'] = prize
+    tokens = solver(machine)
+    if tokens:
+      sum += cost(tokens)
+  return sum
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:

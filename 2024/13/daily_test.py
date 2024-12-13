@@ -46,8 +46,7 @@ def test_cost(parsed_data):
   assert cost([38, 86]) == 200
 
 def test_part1(sample_data):
-  breakpoint()
   assert part1(sample_data) == 480
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 81
+def test_part2(sample_data):
+  assert part2(sample_data) == 875318608908
