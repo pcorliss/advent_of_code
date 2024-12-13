@@ -1,7 +1,3 @@
-import itertools
-import sys
-import numpy as np
-
 def parse(input_text):
   machines = []
   next_machine = {}
@@ -37,26 +33,22 @@ def solver(machine):
   b_x, b_y = machine['B']
   p_x, p_y = machine['prize']
 
-  # Coefficient matrix
-  A = np.array([[a_x, b_x],
-                [a_y, b_y]])
+  # We're solving for this system of equations
+  # a_x * a + b_x * b = p_x
+  # a_y * a + b_y * b = p_y
 
-  # Right-hand side vector
-  B = np.array([p_x, p_y])
+  determinant = a_x * b_y - a_y * b_x
+  a = (p_x * b_y - p_y * b_x) / determinant
+  b = (p_y * a_x - p_x * a_y) / determinant
 
-  # Solve the system of equations
-  solution = np.linalg.solve(A, B)
-  # print(f"Solution: {solution}")
-
-  a, b = list(map(round, solution))
-  if a_x * a + b_x * b == p_x and a_y * a + b_y * b == p_y:
-    return [a, b]
+  if a.is_integer() and b.is_integer():
+    return [a,b]
 
   return None
 
 def cost(tokens):
   a, b = tokens
-  return 3 * a + 1 * b
+  return int(3 * a + 1 * b)
 
 def part1(input_text):
   machines = parse(input_text)
