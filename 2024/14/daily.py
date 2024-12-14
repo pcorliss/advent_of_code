@@ -68,10 +68,7 @@ def count_quads(robots, dims):
 
   return sum
 
-
-def part1(input_text, dims):
-  parsed = parse(input_text)
-  robots = tick(parsed, dims, 100)
+def danger_level(robots, dims):
   count = count_quads(robots, dims)
   # multiply count together
   sum = 1
@@ -79,15 +76,10 @@ def part1(input_text, dims):
     sum *= c
   return sum
 
-def symetrical(positions, dims):
-  # breakpoint()
-  dim_x = dims[0]
-  for x, y in positions:
-    alt_x = dim_x - x - 1
-    if (alt_x, y) not in positions:
-      return False
-    
-  return True
+def part1(input_text, dims):
+  parsed = parse(input_text)
+  robots = tick(parsed, dims, 100)
+  return danger_level(robots, dims)
 
 VARIANCE_TRACKER = []
 SUM_VARIANCE = [0,0]
@@ -116,8 +108,13 @@ def variance(positions):
 def find_cycle(robots, dims):
   new_robots = robots
   count = 0
+  min_danger_level = danger_level(robots, dims)
   while count < 10000:
     new_robots = tick(new_robots, dims, 1)
+    new_danger_level = danger_level(new_robots, dims)
+    if new_danger_level < min_danger_level:
+      print(f"New Min: {new_danger_level} at {count}")
+      min_danger_level = new_danger_level
     positions = tuple(set(tuple(pos) for pos, _ in new_robots))
     v = variance(positions)
     variance_threshold = 200
