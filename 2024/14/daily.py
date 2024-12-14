@@ -79,10 +79,66 @@ def part1(input_text, dims):
     sum *= c
   return sum
 
-def part2(input_text):
+def symetrical(positions, dims):
+  # breakpoint()
+  dim_x = dims[0]
+  for x, y in positions:
+    alt_x = dim_x - x - 1
+    if (alt_x, y) not in positions:
+      return False
+    
+  return True
+
+VARIANCE_TRACKER = []
+AVG_VARIANCE = []
+
+def variance(positions):
+  import numpy as np
+
+  data_x = [x for x, _ in positions]
+  data_y = [y for _, y in positions]
+
+  stdev_x = np.std(data_x)
+  stdev_y = np.std(data_y)
+
+  VARIANCE_TRACKER.append((stdev_x, stdev_y))
+  sum_x = 0
+  sum_y = 0
+  for x, y in VARIANCE_TRACKER:
+    sum_x += x
+    sum_y += y
+
+  avg_x = sum_x / len(VARIANCE_TRACKER)
+  avg_y = sum_y / len(VARIANCE_TRACKER)
+
+  global AVG_VARIANCE
+  AVG_VARIANCE = [avg_x, avg_y]
+
+  return stdev_x, stdev_y
+
+
+def find_cycle(robots, dims):
+  new_robots = robots
+  count = 0
+  while count < 10000:
+    new_robots = tick(new_robots, dims, 1)
+    positions = tuple(set(tuple(pos) for pos, _ in new_robots))
+    v = variance(positions)
+    if count > 100 and abs(v[0] - AVG_VARIANCE[0]) > 2 and abs(v[1] - AVG_VARIANCE[1]) > 2:
+      print(f"High Variance {v} compared to {AVG_VARIANCE} at {count}")
+      render_grid(new_robots, dims)
+      print()
+
+      return count + 1
+
+    count += 1
+
+
+
+def part2(input_text, dims):
   parsed = parse(input_text)
-  sum = 0
-  return sum
+  count = find_cycle(parsed, dims)
+  return count
 
 # 101 tiles wide and 103 tiles tall (when viewed from above)
 if __name__ == "__main__":
@@ -90,4 +146,4 @@ if __name__ == "__main__":
     print(part1(file.read(), (101, 103)))
 
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
-    print(part2(file.read()))
+    print(part2(file.read(), (101, 103)))

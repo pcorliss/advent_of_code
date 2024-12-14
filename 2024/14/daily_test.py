@@ -62,6 +62,3 @@ def test_count_quads(parsed_data, sample_dims):
 
 def test_part1(sample_data, sample_dims):
   assert part1(sample_data, sample_dims) == 12
-
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 875318608908
