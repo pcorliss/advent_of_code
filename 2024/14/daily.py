@@ -90,6 +90,7 @@ def symetrical(positions, dims):
   return True
 
 VARIANCE_TRACKER = []
+SUM_VARIANCE = [0,0]
 AVG_VARIANCE = []
 
 def variance(positions):
@@ -98,23 +99,18 @@ def variance(positions):
   data_x = [x for x, _ in positions]
   data_y = [y for _, y in positions]
 
-  stdev_x = np.std(data_x)
-  stdev_y = np.std(data_y)
+  var_x = np.var(data_x)
+  var_y = np.var(data_y)
 
-  VARIANCE_TRACKER.append((stdev_x, stdev_y))
-  sum_x = 0
-  sum_y = 0
-  for x, y in VARIANCE_TRACKER:
-    sum_x += x
-    sum_y += y
-
-  avg_x = sum_x / len(VARIANCE_TRACKER)
-  avg_y = sum_y / len(VARIANCE_TRACKER)
+  VARIANCE_TRACKER.append((var_x, var_y))
 
   global AVG_VARIANCE
-  AVG_VARIANCE = [avg_x, avg_y]
+  global SUM_VARIANCE
+  SUM_VARIANCE[0] += var_x
+  SUM_VARIANCE[1] += var_y
+  AVG_VARIANCE = [SUM_VARIANCE[0] / len(VARIANCE_TRACKER), SUM_VARIANCE[1] / len(VARIANCE_TRACKER)]
 
-  return stdev_x, stdev_y
+  return var_x, var_y 
 
 
 def find_cycle(robots, dims):
@@ -124,7 +120,8 @@ def find_cycle(robots, dims):
     new_robots = tick(new_robots, dims, 1)
     positions = tuple(set(tuple(pos) for pos, _ in new_robots))
     v = variance(positions)
-    if count > 100 and abs(v[0] - AVG_VARIANCE[0]) > 2 and abs(v[1] - AVG_VARIANCE[1]) > 2:
+    variance_threshold = 200
+    if count > 100 and abs(v[0] - AVG_VARIANCE[0]) > variance_threshold and abs(v[1] - AVG_VARIANCE[1]) > variance_threshold:
       print(f"High Variance {v} compared to {AVG_VARIANCE} at {count}")
       render_grid(new_robots, dims)
       print()
