@@ -43,6 +43,20 @@ def small_sample():
 """
 
 @pytest.fixture
+def part_2_sample():
+  return """
+#######
+#...#.#
+#.....#
+#..OO@#
+#..O..#
+#.....#
+#######
+
+<vv<<^^<<^^
+"""
+
+@pytest.fixture
 def parsed_data(sample_data):
   return parse(sample_data)
 
@@ -145,5 +159,43 @@ def test_part1(small_sample_data):
 def test_part1(sample_data):
   assert part1(sample_data) == 10092
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 875318608908
+def test_parse_part_2(sample_data):
+  grid, moves, start = parse_part_2(sample_data)
+  assert len(grid) == 10
+  assert len(grid[0]) == 20
+  assert grid[0][0] == '#'
+  assert grid[0][1] == '#'
+  assert grid[9][19] == '#'
+  assert grid[9][18] == '#'
+  assert grid[1][6] == '['
+  assert grid[1][7] == ']'
+
+  assert start == (8,4)
+
+  assert len(moves) == 700
+  assert moves[0] == '<'
+  assert moves[-1] == '^'
+
+def test_move_part_2(part_2_sample):
+  grid, moves, start = parse_part_2(part_2_sample)
+  new_grid, new_pos = move_part_2(grid, start, moves)
+
+  # expected_grid
+  ##############
+  ##...[].##..##
+  ##...@.[]...##
+  ##....[]....##
+  ##..........##
+  ##..........##
+  ##############
+
+  assert new_pos == (5,2)
+  assert new_grid[1][5] == '['
+  assert new_grid[1][6] == ']'
+  assert new_grid[2][7] == '['
+  assert new_grid[2][8] == ']'
+  assert new_grid[3][6] == '['
+  assert new_grid[3][7] == ']'
+
+def test_part2(sample_data):
+  assert part2(sample_data) == 9021
