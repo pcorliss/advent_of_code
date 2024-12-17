@@ -107,16 +107,18 @@ def test_turn():
 
 def test_find_end_path(parsed_data_a):
   grid, graph, s, dir, e = parsed_data_a
-  score = find_end_path(grid, graph, s, dir, e)
+  score, path_tiles = find_end_path(grid, graph, s, dir, e)
   assert score == 7036
+  assert len(path_tiles) == 45
 
 def test_find_end_path(parsed_data_b):
   grid, graph, s, dir, e = parsed_data_b
-  score = find_end_path(grid, graph, s, dir, e)
+  score, path_tiles = find_end_path(grid, graph, s, dir, e)
   assert score == 11048
+  assert len(path_tiles) == 64
 
 def test_part1(sample_data_a):
   assert part1(sample_data_a) == 7036
 
-# def test_part2(sample_data_a):
-#   assert part2(sample_data_a) == 9021
+def test_part2(sample_data_a):
+  assert part2(sample_data_a) == 45

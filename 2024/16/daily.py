@@ -160,7 +160,7 @@ def starts(grid, s, dir):
 
     dx, dy = turn(dir, i)
     if grid[y+dy][x+dx] == '.':
-      out.append((s, (dx, dy), t * 1000))
+      out.append((s, (dx, dy), t * 1000, [s]))
 
   return out
 
@@ -168,20 +168,23 @@ def find_end_path(grid, graph, s, dir, e):
   candidates = starts(grid, s, dir)
   visited = {}
   best_score = None
+  best_paths = []
   intersections = build_intersections(grid)
 
+  counter = 0
   while candidates:
-    pos, dir, score = candidates.pop()
+    counter += 1
+    if counter % 100000 == 0:
+      print(f"Counter: {counter} Candidates: {len(candidates)} Best Score: {best_score} Best Paths: {len(best_paths)}")
+    pos, dir, score, path = candidates.pop()
 
     if (pos, dir) in visited:
-      if visited[(pos, dir)] > score:
+      if visited[(pos, dir)] >= score:
         visited[(pos, dir)] = score
       else:
         continue
     else:
       visited[(pos, dir)] = score
-
-
 
     # Walk forward until we hit a wall or an intersection
     dx, dy = dir
@@ -189,31 +192,50 @@ def find_end_path(grid, graph, s, dir, e):
     while True:
       nx, ny = nx + dx, ny + dy
       score += 1
+      path.append((nx, ny))
       if (nx, ny) in intersections:
         break
       if grid[ny][nx] == '#':
         nx, ny = nx - dx, ny - dy
         score -= 1
+        path.pop()
         break
 
     if (nx, ny) == e:
       if best_score == None or score < best_score:
         best_score = score
+        best_paths = [path]
+      elif score == best_score:
+        best_paths.append(path)
+
       continue
 
-    for pos, dir, score_adj in starts(grid, (nx, ny), dir):
-      candidates.append((pos, dir, score + score_adj))
-    
-  
-  return best_score
+    path_copied = False
+    for pos, dir, score_adj, _ in starts(grid, (nx, ny), dir):
+      new_path = path
+      if path_copied:
+        new_path = path.copy()
+      else:
+        path_copied = True
+      candidates.append((pos, dir, score + score_adj, new_path))
+
+  best_path_tiles = set()
+  for path in best_paths:
+    best_path_tiles.update(path)
+
+  return best_score, best_path_tiles
 
 def part1(input_text):
   grid, graph, s, dir, e = parse(input_text)
-  return find_end_path(grid, graph, s, dir, e)
+  score, tiles = find_end_path(grid, graph, s, dir, e)
+  print(f"Score: {score}")
+  print(f"Tiles: {len(tiles)}")
+  return score
 
 def part2(input_text):
-  sum = 0
-  return sum
+  grid, graph, s, dir, e = parse(input_text)
+  _, tiles = find_end_path(grid, graph, s, dir, e)
+  return len(tiles)
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
