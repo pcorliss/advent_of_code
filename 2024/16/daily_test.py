@@ -110,9 +110,13 @@ def test_find_end_path(parsed_data_a):
   score = find_end_path(grid, graph, s, dir, e)
   assert score == 7036
 
+def test_find_end_path(parsed_data_b):
+  grid, graph, s, dir, e = parsed_data_b
+  score = find_end_path(grid, graph, s, dir, e)
+  assert score == 11048
 
-# def test_part1(sample_data_a):
-#   assert part1(sample_data_a) == 10092
+def test_part1(sample_data_a):
+  assert part1(sample_data_a) == 7036
 
 # def test_part2(sample_data_a):
 #   assert part2(sample_data_a) == 9021

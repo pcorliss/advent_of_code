@@ -208,8 +208,8 @@ def find_end_path(grid, graph, s, dir, e):
   return best_score
 
 def part1(input_text):
-  sum = 0
-  return sum
+  grid, graph, s, dir, e = parse(input_text)
+  return find_end_path(grid, graph, s, dir, e)
 
 def part2(input_text):
   sum = 0
