@@ -1,3 +1,5 @@
+import queue
+
 def parse(input_text):
   grid = []
   s = None
@@ -165,18 +167,21 @@ def starts(grid, s, dir):
   return out
 
 def find_end_path(grid, graph, s, dir, e):
-  candidates = starts(grid, s, dir)
+  start_points = starts(grid, s, dir)
   visited = {}
   best_score = None
   best_paths = []
   intersections = build_intersections(grid)
 
+  candidates = queue.PriorityQueue()
+  for pos, dir, score, path in start_points:
+    candidates.put((score, pos, dir, path))
   counter = 0
-  while candidates:
+  while not candidates.empty():
     counter += 1
     if counter % 100000 == 0:
-      print(f"Counter: {counter} Candidates: {len(candidates)} Best Score: {best_score} Best Paths: {len(best_paths)}")
-    pos, dir, score, path = candidates.pop()
+      print(f"Counter: {counter} Candidates: {candidates.qsize()} Best Score: {best_score} Best Paths: {len(best_paths)}")
+    score, pos, dir, path = candidates.get()
 
     if (pos, dir) in visited:
       if visited[(pos, dir)] >= score:
@@ -217,7 +222,7 @@ def find_end_path(grid, graph, s, dir, e):
         new_path = path.copy()
       else:
         path_copied = True
-      candidates.append((pos, dir, score + score_adj, new_path))
+      candidates.put((score + score_adj, pos, dir, new_path))
 
   best_path_tiles = set()
   for path in best_paths:
@@ -227,9 +232,7 @@ def find_end_path(grid, graph, s, dir, e):
 
 def part1(input_text):
   grid, graph, s, dir, e = parse(input_text)
-  score, tiles = find_end_path(grid, graph, s, dir, e)
-  print(f"Score: {score}")
-  print(f"Tiles: {len(tiles)}")
+  score, _ = find_end_path(grid, graph, s, dir, e)
   return score
 
 def part2(input_text):
