@@ -181,10 +181,7 @@ def find_end_path(grid, graph, s, dir, e):
     else:
       visited[(pos, dir)] = score
 
-    if pos == e:
-      if best_score == None or score < best_score:
-        best_score = score
-      continue
+
 
     # Walk forward until we hit a wall or an intersection
     dx, dy = dir
@@ -198,6 +195,11 @@ def find_end_path(grid, graph, s, dir, e):
         nx, ny = nx - dx, ny - dy
         score -= 1
         break
+
+    if (nx, ny) == e:
+      if best_score == None or score < best_score:
+        best_score = score
+      continue
 
     for pos, dir, score_adj in starts(grid, (nx, ny), dir):
       candidates.append((pos, dir, score + score_adj))
