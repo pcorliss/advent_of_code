@@ -11,10 +11,6 @@ Register C: 0
 Program: 0,1,5,4,3,0
 """
 
-@pytest.fixture
-def parsed_data_a(sample_data):
-  return parse(sample_data)
-
 def test_parse(sample_data):
   registers, program = parse(sample_data)
 
@@ -73,5 +69,44 @@ def test_run_program(initial_registers, program, expected_registers, expected_ou
 def test_part1(sample_data):
   assert part1(sample_data) == [4,6,3,5,6,3,5,2,1,0]
 
-# def test_part2(sample_data_a):
-#   assert part2(sample_data_a) == 45
+@pytest.fixture
+def sample_data_part_2():
+  return """
+Register A: 2024
+Register B: 0
+Register C: 0
+
+Program: 0,3,5,4,3,0
+"""
+
+def test_part2_checks(sample_data_part_2):
+  start_registers, program = parse(sample_data_part_2)
+  registers, output = run_program(start_registers, program)
+ 
+  print(f"Registers: {registers}")
+  print(f"Output: {output}")
+
+  start_registers, program = parse(sample_data_part_2)
+  start_registers['A'] = 117440
+  registers, output = run_program(start_registers, program)
+ 
+  print(f"Registers: {registers}")
+  print(f"Output: {output}")
+  # assert False == True
+
+def test_quinify(sample_data_part_2):
+  start_registers, program = parse(sample_data_part_2)
+  register_a = quinify(start_registers, program)
+
+  assert register_a == 117440
+
+def test_verify():
+  r = {'A': 62343326, 'B': 0, 'C': 0}
+  program = [2,4,1,5,7,5,1,6,4,3,5,5,0,3,3,0]
+
+  _, output = run_program(r, program)
+  assert output == [6, 4, 3, 5, 5, 0, 3, 3, 0]
+
+
+# def test_part2(sample_data_part_2):
+#   assert part2(sample_data_part_2) == 117440

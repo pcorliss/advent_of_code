@@ -65,8 +65,7 @@ def run_program(registers, program):
       ip += 1
     # The bst instruction (opcode 2) calculates the value of its combo operand modulo 8
     elif op == 2:
-      # TODO this would be faster if we just grabbed the 3 lowest bits instead
-      registers['B'] = get_combo(program[ip], registers) % 8
+      registers['B'] = get_combo(program[ip], registers) & 7
       ip += 1
     # The jnz instruction (opcode 3) does nothing if the A register is 0.
     # However, if the A register is not zero, it jumps by setting the instruction pointer
@@ -86,10 +85,37 @@ def run_program(registers, program):
     # The out instruction (opcode 5) calculates the value of its combo operand modulo 8,
     # then outputs that value.
     elif op == 5:
-      output.append(get_combo(program[ip], registers) % 8)
+      output.append(get_combo(program[ip], registers) & 7)
       ip += 1
       
   return registers, output
+
+def quinify_slow(registers, program):
+  # iterate from registers['a'] in increments of 8
+  for i in range(registers['A'], 1000000000, 8):
+    registers['A'] = i
+    _, output = run_program(registers, program)
+    if output == program:
+      return i
+
+  return -1
+
+def quinify(registers, target_output):
+  candidate_ras = [0]
+  for i in range(len(target_output)):
+    new_candidates = []
+    for ra in candidate_ras:
+      for j in range(2**3):
+        candidate_ra = (ra << 3) + j
+        _, out = run_program({'A': candidate_ra, 'B': 0, 'C': 0},target_output)
+        if target_output[-(i + 1):] == out:
+          # print(f"Possibility: {candidate_ra} I: {i}")
+          # print(f"Output: {out} Target: {target_output[-(i + 1):]}")
+          new_candidates.append(candidate_ra)
+
+    candidate_ras = new_candidates
+
+  return min(candidate_ras)
 
 def part1(input_text):
   registers, program = parse(input_text)
@@ -97,7 +123,9 @@ def part1(input_text):
   return output
 
 def part2(input_text):
-  return 0
+  start_registers, program = parse(input_text)
+  register_a = quinify(start_registers, program)
+  return register_a
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
