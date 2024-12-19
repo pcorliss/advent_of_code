@@ -60,7 +60,7 @@ def pathfinder(fb_map, time_code, s, e):
   counter = 0
   while not candidates.empty():
     counter += 1
-    score, pos, steps = candidates.get()
+    _, pos, steps = candidates.get()
 
     if pos in visited:
       if visited[pos] > steps:
@@ -91,19 +91,29 @@ def pathfinder(fb_map, time_code, s, e):
       # print(f"Putting: {nx}, {ny}, {steps + 1}")
       candidates.put((distance((nx, ny), e)*3 + steps + 1, (nx, ny), steps + 1))
 
-  print(f"Counter: {counter}")
+  print(f"Best Steps: {best_steps} Iterations: {counter}, TC: {time_code}")
   return best_steps
+
+def find_blocker(fb_map, time_code, s, e):
+  max_timecode = max(fb_map.values())
+  for tc in range(time_code, max_timecode + 1):
+    if pathfinder(fb_map, tc, s, e) == 99999999:
+      print(f"Found TC: {tc}")
+      for k, v in fb_map.items():
+        if v == tc - 1:
+          return k
 
 def part1(input_text, time_code, s, e):
     fb_map, _ = parse(input_text)
     return pathfinder(fb_map, time_code, s, e)
 
-def part2(input_text):
-  return 0
+def part2(input_text, starting_time_code, s, e):
+  fb_map, _ = parse(input_text)
+  return find_blocker(fb_map, starting_time_code, s, e)
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
     print(part1(file.read(), 1024, (0, 0), (70, 70)))
 
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
-    print(part2(file.read()))
+    print(part2(file.read(), 1024, (0, 0), (70, 70)))

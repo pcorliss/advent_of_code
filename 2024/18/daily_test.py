@@ -47,8 +47,12 @@ def test_pathfinder(parsed_data):
   render(grid, 12)
   assert pathfinder(fb_map, 12, (0,0), (6,6)) == 22
 
+def test_time_codes(parsed_data):
+  fb_map, _ = parsed_data
+  assert find_blocker(fb_map, 12, (0,0), (6,6)) == (6,1)
+
 def test_part1(sample_data):
   assert part1(sample_data, 12, (0,0), (6,6)) == 22
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 45
+def test_part2(sample_data):
+  assert part2(sample_data, 12, (0,0), (6,6)) == (6,1)
