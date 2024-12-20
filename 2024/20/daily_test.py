@@ -61,5 +61,5 @@ def test_cheat_options(parsed_data):
 def test_part1(sample_data):
   assert part1(sample_data, 36) == 4
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 16
+def test_part2(sample_data):
+  assert part2(sample_data, 50) == 285

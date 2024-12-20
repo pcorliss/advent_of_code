@@ -1,3 +1,5 @@
+import itertools
+
 def parse(input_text):
   grid = []
   s = None
@@ -56,8 +58,23 @@ def part1(input_text, cheat_threshold=100):
 
   return len([o for o in options if o >= cheat_threshold])
 
-def part2(input_text):
-  return 0
+def part2(input_text, cheat_threshold=100):
+  grid, s, e = parse(input_text)
+  steps = fill_path(grid, s, e)
+
+  counter = 0
+  for (pos_a, steps_a), (pos_b, steps_b) in itertools.combinations(steps.items(), 2):
+    distance = abs(pos_a[0] - pos_b[0]) + abs(pos_a[1] - pos_b[1])
+    if distance > 20:
+      continue
+    diff = abs(steps_a - steps_b)
+    if diff - distance >= cheat_threshold:
+      counter += 1
+
+  return counter
+
+# Too High - 42297218
+# Too low - 947532
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
