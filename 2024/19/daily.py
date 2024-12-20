@@ -30,12 +30,44 @@ def string_contains(str, trie):
     
   return False
 
+cache = {}
+def string_sums(str, trie):
+  if str in cache:
+    return cache[str]
+
+  sum = 0
+  for prefix, _ in trie.prefixes(str):
+    if prefix == str:
+      sum += 1
+      continue
+
+    sum += string_sums(str[len(prefix):], trie)
+
+  cache[str] = sum
+  return sum
+
+def all_combos(full_str, trie):
+  combos = [(full_str, [])]
+  out = []
+  while combos:
+    str, combo = combos.pop()
+    for prefix, _ in trie.prefixes(str):
+      new_combo = combo + [prefix]
+      if prefix == str:
+        out.append(new_combo)
+      else:
+        combos.append((str[len(prefix):], new_combo))
+
+  print(f"Out: {out}")
+  return out
+
 def part1(input_text):
   tokens, words, trie = parse(input_text)
   return sum(string_contains(word, trie) for word in words)
 
 def part2(input_text):
-  return 0
+  tokens, words, trie = parse(input_text)
+  return sum(string_sums(word, trie) for word in words)
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
