@@ -41,8 +41,12 @@ def test_parse(sample_data):
 def test_code_directions(code, expected):
   assert len(code_directions(code)) == len(expected)
 
-# def test_part1(sample_data):
-#   assert part1(sample_data) == 4
+def test_complexity():
+  code = ['0','2','9','A']
+  assert complexity(code, 68) == 68 * 29
+
+def test_part1(sample_data):
+  assert part1(sample_data) == 126384
 
 # def test_part2(sample_data):
 #   assert part2(sample_data) == 285

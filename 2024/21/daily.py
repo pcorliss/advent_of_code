@@ -110,8 +110,18 @@ def code_directions(code):
 
   return commands[3]
 
+def complexity(code, length):
+  return int(''.join(code[0:3])) * length
+
 def part1(input_text):
-  return 0
+  codes = parse(input_text)
+  total_complexity = 0
+  for code in codes:
+    directions = code_directions(code)
+    total_complexity += complexity(code, len(directions))
+  return total_complexity
+
+# 212128 - too high
 
 def part2(input_text):
   return 0
