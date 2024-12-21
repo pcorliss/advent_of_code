@@ -47,6 +47,14 @@ START_POS = 'A'
 DIGIT = 0
 DPAD = 1
 
+# optimal_dpad = {
+#     'A': {"A": [""], "^": ["<"], ">": ["v"], "v": ["<v", "v<"], "<": ["v<<"]},
+#     '^': {"^": [""], "A": [">"], "v": ["v"], "<": ["v<"], ">": ["v>"]},
+#     'v': {"v": [""], "A": ["^>", ">^"], "^": ["^"], "<": ["<"], ">": [">"]},
+#     '<': {"<": [""], "A": [">>^"], "^": [">^"], "v": [">"], ">": [">>"]},
+#     '>': {">": [""], "A": ["^"], "^": ["^<", "<^"], "v": ["<"], "<": ["<<"]},
+# }
+
 # One directional keypad that you are using.
 # Two directional keypads that robots are using.
 # One numeric keypad (on a door) that a robot is using.
@@ -90,17 +98,17 @@ def code_directions(code):
   # E: <A^A>^^AvvvA
   # E: 029A
 
-# Line 3: 456A
-# v<<A^>>AAv<A<A^>>AAvAA^<A>Av<A^>A<A>Av<A^>A<A>Av<<A>A^>AAvA^<A>A [human]
-#    <   AA  v <   AA >>  ^ A  v  A ^ A  v  A ^ A   < v  AA >  ^ A [robot 3]
-#        ^^        <<       A     >   A     >   A        vv      A [robot 2]
-#                           4         5         6                A [keypad robot]
+  # Line 3: 456A
+  # v<<A^>>AAv<A<A^>>AAvAA^<A>Av<A^>A<A>Av<A^>A<A>Av<<A>A^>AAvA^<A>A [human]
+  #    <   AA  v <   AA >>  ^ A  v  A ^ A  v  A ^ A   < v  AA >  ^ A [robot 3]
+  #        ^^        <<       A     >   A     >   A        vv      A [robot 2]
+  #                           4         5         6                A [keypad robot]
 
-# Commands: 456A
-# Commands: <<^^A>A>AvvA
-# Me        <AAv<AA>>^AvA^AvA^A<vAA>^A
-# Commands: <<vAA>^AA>AvA^AvA^A<vAA>^A
-# Commands: 60 <<vAA>A>^AAvA<^A>AAvA^A<vA>^A<A>A<vA>^A<A>A<<vA>A>^AAvA<^A>A
+  # Commands: 456A
+  # Commands: <<^^A>A>AvvA
+  # Me        <AAv<AA>>^AvA^AvA^A<vAA>^A
+  # Commands: <<vAA>^AA>AvA^AvA^A<vAA>^A
+  # Commands: 60 <<vAA>A>^AAvA<^A>AAvA^A<vA>^A<A>A<vA>^A<A>A<<vA>A>^AAvA<^A>A
 
   # print(f"Commands: {commands}")
   print(f"Commands: {"".join(commands[0])}")
