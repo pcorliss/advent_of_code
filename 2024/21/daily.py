@@ -31,6 +31,7 @@ digit_pos = {
   '7': (0, 0),
   '8': (1, 0),
   '9': (2, 0),
+  'B': (0, 3),
 }
 
 dpad_pos = {
@@ -39,6 +40,7 @@ dpad_pos = {
   '<': (0, 1),
   'v': (1, 1),
   '>': (2, 1),
+  'B': (0, 0),
 }
 
 START_POS = 'A'
@@ -62,12 +64,15 @@ def code_directions(code):
         target_pos = digit_pos[command] if pad_type == DIGIT else dpad_pos[command]
         dx = target_pos[0] - pad_pos[0]
         dy = target_pos[1] - pad_pos[1]
-        # Account for the blank space we're trying to avoid?
         new_commands = []
-        if dx != 0:
-          new_commands += (list('>' * dx if dx > 0 else '<' * -dx))
-        if dy != 0:
-          new_commands += (list('v' * dy if dy > 0 else '^' * -dy))
+        # Account for the blank space we're trying to avoid
+        blank_pos = digit_pos['B'] if pad_type == DIGIT else dpad_pos['B']
+        x_cmds = list('>' * dx if dx > 0 else '<' * -dx) if dx != 0 else []
+        y_cmds = list('v' * dy if dy > 0 else '^' * -dy) if dy != 0 else []
+        if dx + pad_pos[0] == blank_pos[0] and pad_pos[1] == blank_pos[1]:
+          new_commands += y_cmds + x_cmds
+        else:
+          new_commands += x_cmds + y_cmds
         new_commands.append('A')
         pos[pos_idx] = (pad_type, target_pos)
         pad_pos = target_pos
