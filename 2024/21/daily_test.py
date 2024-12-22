@@ -86,5 +86,5 @@ def test_complexity():
 def test_part1(sample_data):
   assert part1(sample_data) == 126384
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 285
+def test_part2(sample_data):
+  assert part2(sample_data) == 154115708116294

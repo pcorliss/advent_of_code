@@ -61,9 +61,15 @@ def direction_options(pad_pos, target_pos, pad_type):
   else:
     return [x_cmds + y_cmds, y_cmds + x_cmds]
 
+dlength_cache = {}
+
 def direction_length(directions, depth, start_pos = (2, 3), pad_type = DIGIT):
   if depth == 0:
     return len(directions)
+
+  cache_key = (tuple(directions), depth, start_pos, pad_type)
+  if cache_key in dlength_cache:
+    return dlength_cache[cache_key]
 
   new_pad_type = pad_type
   pad_start = dpad_pos[START_POS]
@@ -78,12 +84,20 @@ def direction_length(directions, depth, start_pos = (2, 3), pad_type = DIGIT):
     sum += min(direction_length(option + ['A'], depth - 1, pad_start, new_pad_type) for option in options)
     pos = target_pos
 
+  dlength_cache[cache_key] = sum
   return sum
 
-
+# Part 1 - 4 keypads (depth 3)
 # One directional keypad that you are using.
 # Two directional keypads that robots are using.
 # One numeric keypad (on a door) that a robot is using.
+
+# Part 2 - 27 keypads (depth 26)
+# One directional keypad that you are using.
+# 25 directional keypads that robots are using.
+# One numeric keypad (on a door) that a robot is using.
+
+# Abandoned this approach because it doesn't handle possible branching paths
 def code_directions(code):
   pos = [(DIGIT, digit_pos[START_POS]), (DPAD, dpad_pos['A']), (DPAD, dpad_pos['A'])]
   commands = [[], [], [], [], [], []]
@@ -158,7 +172,12 @@ def part1(input_text):
 # 212128 - too high
 
 def part2(input_text):
-  return 0
+  codes = parse(input_text)
+  total_complexity = 0
+  for code in codes:
+    dir_length = direction_length(code, 26)
+    total_complexity += complexity(code, dir_length)
+  return total_complexity
 
 if __name__ == "__main__":
   with open(__file__.rsplit('/', 1)[0] + "/input.txt", 'r') as file:
