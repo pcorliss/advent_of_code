@@ -11,6 +11,15 @@ def sample_data():
 """
 
 @pytest.fixture
+def sample_data_2():
+  return """
+1
+2
+3
+2024
+"""
+
+@pytest.fixture
 def parsed_data(sample_data):
   return parse(sample_data)
 
@@ -42,5 +51,7 @@ def test_gen_code(secret_number, generation, expected):
 def test_part1(sample_data):
   assert part1(sample_data) == 37327623
 
-# def test_part2(sample_data):
-#   assert part2(sample_data) == 154115708116294
+def test_part2(sample_data_2):
+  sequence, bananas = part2(sample_data_2)
+  assert sequence == (-2,1,-1,3)
+  assert bananas == 23
