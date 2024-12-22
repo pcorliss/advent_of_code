@@ -47,13 +47,39 @@ START_POS = 'A'
 DIGIT = 0
 DPAD = 1
 
-# optimal_dpad = {
-#     'A': {"A": [""], "^": ["<"], ">": ["v"], "v": ["<v", "v<"], "<": ["v<<"]},
-#     '^': {"^": [""], "A": [">"], "v": ["v"], "<": ["v<"], ">": ["v>"]},
-#     'v': {"v": [""], "A": ["^>", ">^"], "^": ["^"], "<": ["<"], ">": [">"]},
-#     '<': {"<": [""], "A": [">>^"], "^": [">^"], "v": [">"], ">": [">>"]},
-#     '>': {">": [""], "A": ["^"], "^": ["^<", "<^"], "v": ["<"], "<": ["<<"]},
-# }
+def direction_options(pad_pos, target_pos, pad_type):
+  dx = target_pos[0] - pad_pos[0]
+  dy = target_pos[1] - pad_pos[1]
+  blank_pos = digit_pos['B'] if pad_type == DIGIT else dpad_pos['B']
+  x_cmds = list('>' * dx if dx > 0 else '<' * -dx) if dx != 0 else []
+  y_cmds = list('v' * dy if dy > 0 else '^' * -dy) if dy != 0 else []
+  # Account for the blank space we're trying to avoid
+  if dx + pad_pos[0] == blank_pos[0] and pad_pos[1] == blank_pos[1]:
+    return [y_cmds + x_cmds]
+  elif dy + pad_pos[1] == blank_pos[1] and pad_pos[0] == blank_pos[0]:
+    return [x_cmds + y_cmds]
+  else:
+    return [x_cmds + y_cmds, y_cmds + x_cmds]
+
+def direction_length(directions, depth, start_pos = (2, 3), pad_type = DIGIT):
+  if depth == 0:
+    return len(directions)
+
+  new_pad_type = pad_type
+  pad_start = dpad_pos[START_POS]
+  if pad_type == DIGIT:
+    new_pad_type = DPAD
+
+  pos = start_pos
+  sum = 0
+  for d in directions:
+    target_pos = digit_pos[d] if pad_type == DIGIT else dpad_pos[d]
+    options = direction_options(pos, target_pos, pad_type)
+    sum += min(direction_length(option + ['A'], depth - 1, pad_start, new_pad_type) for option in options)
+    pos = target_pos
+
+  return sum
+
 
 # One directional keypad that you are using.
 # Two directional keypads that robots are using.
@@ -125,8 +151,8 @@ def part1(input_text):
   codes = parse(input_text)
   total_complexity = 0
   for code in codes:
-    directions = code_directions(code)
-    total_complexity += complexity(code, len(directions))
+    dir_length = direction_length(code, 3)
+    total_complexity += complexity(code, dir_length)
   return total_complexity
 
 # 212128 - too high
