@@ -52,10 +52,20 @@ def test_triplets(parsed_data):
   triplets = find_triplets(parsed_data)
   assert len(triplets) == 12
 
+def test_largest_group(parsed_data):
+  triplets = find_triplets(parsed_data)
+  largest = largest_group(parsed_data, triplets)
+  assert largest == set(['co', 'de', 'ka', 'ta'])
+
+def test_valid_cluster(parsed_data):
+  assert valid_cluster(parsed_data, set(['co', 'de', 'ka', 'ta']))
+  assert not valid_cluster(parsed_data, set(['co', 'de', 'ka', 'ta', 'tc']))
+
+def test_prune_intersection(parsed_data):
+  assert prune_intersection(parsed_data, ('co', 'ka', 'ta'), set(['co', 'de', 'ka', 'ta'])) == ('co', 'de', 'ka', 'ta')
+
 def test_part1(sample_data):
   assert part1(sample_data) == 7
 
-# def test_part2(sample_data_2):
-#   sequence, bananas = part2(sample_data_2)
-#   assert sequence == (-2,1,-1,3)
-#   assert bananas == 23
+def test_part2(sample_data):
+  assert part2(sample_data) == "co,de,ka,ta"
