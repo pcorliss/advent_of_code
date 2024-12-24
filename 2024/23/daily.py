@@ -89,9 +89,28 @@ def largest_group(graph, triplets):
   print(f"Valid?: {valid_cluster(graph, largest)}")
   return largest
 
+def hacky_largest_group(graph, triplets):
+  counter = {}
+  for a, b, c in triplets:
+    if a not in counter:
+      counter[a] = 0
+    if b not in counter:
+      counter[b] = 0
+    if c not in counter:
+      counter[c] = 0
+
+    counter[a] += 1
+    counter[b] += 1
+    counter[c] += 1
+
+  max_c = max(counter.values())
+  keys = [k for k, v in counter.items() if v == max_c]
+  return keys
+
 def part1(input_text):
   graph = parse(input_text)
   triplets = find_triplets(graph)
+  print(f"Triplets: {len(triplets)}")
   counter = 0
   for a, b, c in triplets:
     if a[0] == 't' or b[0] == 't' or c[0] == 't':
@@ -101,7 +120,9 @@ def part1(input_text):
 def part2(input_text):
   graph = parse(input_text)
   triplets = find_triplets(graph)
-  largest = largest_group(graph, triplets)
+  print(f"Triplets: {len(triplets)}")
+  largest = hacky_largest_group(graph, triplets)
+  # prune_intersection(graph, tuple(), set(largest))
   return ",".join(sorted(largest))
 
 # Not right answer
