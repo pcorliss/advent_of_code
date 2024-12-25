@@ -1,0 +1,18 @@
+# Swap 1 - This seems to work
+jvj XOR mvs -> mkk
+mvs AND jvj -> z10
+
+# Swap 2 - Works!
+vjh OR fhq -> z14
+ndm XOR tsp -> qbw
+
+# Swap 3 - Works!
+x25 AND y25 -> cvp
+x25 XOR y25 -> wjb
+
+# Swap 4
+y34 AND x34 -> z34
+jmq XOR mdh -> wcb
+
+
+cvp,mkk,qbw,wcb,wjb,z10,z14,z34

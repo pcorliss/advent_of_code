@@ -71,23 +71,23 @@ def test_parse(sample_data):
 def test_power_up(parsed_data):
   connections, values = parsed_data
   
-  assert power_up('x00', connections, values) == 1
-  assert power_up('x01', connections, values) == 0
-  assert power_up('x02', connections, values) == 1
+  assert power_up('x00', connections, values)[0] == 1
+  assert power_up('x01', connections, values)[0] == 0
+  assert power_up('x02', connections, values)[0] == 1
 
-  assert power_up('z00', connections, values) == 0
-  assert power_up('z01', connections, values) == 0
-  assert power_up('z02', connections, values) == 0
-  assert power_up('z03', connections, values) == 1
-  assert power_up('z04', connections, values) == 0
-  assert power_up('z05', connections, values) == 1
-  assert power_up('z06', connections, values) == 1
-  assert power_up('z07', connections, values) == 1
-  assert power_up('z08', connections, values) == 1
-  assert power_up('z09', connections, values) == 1
-  assert power_up('z10', connections, values) == 1
-  assert power_up('z11', connections, values) == 0
-  assert power_up('z12', connections, values) == 0
+  assert power_up('z00', connections, values)[0] == 0
+  assert power_up('z01', connections, values)[0] == 0
+  assert power_up('z02', connections, values)[0] == 0
+  assert power_up('z03', connections, values)[0] == 1
+  assert power_up('z04', connections, values)[0] == 0
+  assert power_up('z05', connections, values)[0] == 1
+  assert power_up('z06', connections, values)[0] == 1
+  assert power_up('z07', connections, values)[0] == 1
+  assert power_up('z08', connections, values)[0] == 1
+  assert power_up('z09', connections, values)[0] == 1
+  assert power_up('z10', connections, values)[0] == 1
+  assert power_up('z11', connections, values)[0] == 0
+  assert power_up('z12', connections, values)[0] == 0
 
 def test_part1(sample_data):
   assert part1(sample_data) == 2024
