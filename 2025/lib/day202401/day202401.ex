@@ -28,12 +28,7 @@ defmodule Day012024 do
     freq = Enum.frequencies(right)
 
     left
-    |> Enum.map(fn n ->
-      case Map.fetch(freq, n) do
-        {:ok, value} -> value * n
-        :error -> 0
-      end
-    end)
+    |> Enum.map(fn n -> n * Map.get(freq, n, 0) end)
     |> Enum.sum()
   end
 
