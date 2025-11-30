@@ -1,4 +1,4 @@
-defmodule Day01 do
+defmodule Day012024 do
   def input(infile) do
     values =
       File.read!(infile)

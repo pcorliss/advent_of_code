@@ -1,4 +1,4 @@
-defmodule Day01Test do
+defmodule Day012024Test do
   use ExUnit.Case, async: true
 
   setup do
@@ -19,10 +19,10 @@ defmodule Day01Test do
   end
 
   test "part1", %{temp_file: temp_file} do
-    assert Day01.part1(temp_file) == 11
+    assert Day012024.part1(temp_file) == 11
   end
 
   test "part2", %{temp_file: temp_file} do
-    assert Day01.part2(temp_file) == 31
+    assert Day012024.part2(temp_file) == 31
   end
 end
