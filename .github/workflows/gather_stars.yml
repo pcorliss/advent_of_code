@@ -12,7 +12,7 @@ jobs:
     # is jq installed?
     - name: Download Leaderboards
       run: |
-        for YEAR in `seq 2015 2024`; do
+        for YEAR in `seq 2015 2025`; do
           curl -s -o $YEAR.json --cookie "session=$SESSION" https://adventofcode.com/$YEAR/leaderboard/private/view/$USERID.json
         done
         echo STARS=$(cat *.json | jq ".members[\"$USERID\"].stars" | jq -s '. | add') >> $GITHUB_ENV
