@@ -22,13 +22,26 @@ defmodule Day01 do
     |> Enum.sum()
   end
 
-  def part2 do
-    # your logic here
+  def part2(infile) do
+    {left, right} = input(infile)
+
+    freq = Enum.frequencies(right)
+
+    left
+    |> Enum.map(fn n ->
+      case Map.fetch(freq, n) do
+        {:ok, value} -> value * n
+        :error -> 0
+      end
+    end)
+    |> Enum.sum()
   end
 
   def main do
     input_path = "lib/day202401/input.txt"
     answer = part1(input_path)
     IO.puts("Part 1: #{answer}")
+    answer = part2(input_path)
+    IO.puts("Part 2: #{answer}")
   end
 end

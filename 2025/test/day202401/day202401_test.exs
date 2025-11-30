@@ -22,7 +22,7 @@ defmodule Day01Test do
     assert Day01.part1(temp_file) == 11
   end
 
-  # test "part2" do
-  #   assert Day01.part2() == :not_implemented
-  # end
+  test "part2", %{temp_file: temp_file} do
+    assert Day01.part2(temp_file) == 31
+  end
 end
