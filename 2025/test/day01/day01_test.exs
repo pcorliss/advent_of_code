@@ -32,7 +32,7 @@ defmodule Day01Test do
     assert Day01.part1(temp_file) == 3
   end
 
-  # test "part2", %{temp_file: temp_file} do
-  #   assert Day01.part2(temp_file) == 31
-  # end
+  test "part2 example input", %{temp_file: temp_file} do
+    assert Day01.part2(temp_file) == 6
+  end
 end
