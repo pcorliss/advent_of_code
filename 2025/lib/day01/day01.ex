@@ -39,47 +39,17 @@ defmodule Day01 do
         d_cycles = div(distance, 100)
         d_offset = rem(distance, 100)
 
-        new_pos =
-          case dir do
-            :L -> cur_pos - d_offset
-            :R -> cur_pos + d_offset
-          end
-
+        new_pos = move(cur_pos, dir, d_offset)
         # IO.puts("New Pos A: #{new_pos}")
 
         # if I end up on zero or 100 add one
-        end_on_zero =
-          if rem(new_pos, 100) == 0 do
-            1
-          else
-            0
-          end
+        end_on_zero = if rem(new_pos, 100) == 0, do: 1, else: 0
 
-        # If I crossed from positive to negative or vice versa
-        # Or we cross from 95 to 105
-        crossed_zero =
-          if (cur_pos < 0 && new_pos > 0) || (new_pos < 0 && cur_pos > 0) ||
-               (cur_pos < 100 && new_pos > 100) do
-            1
-          else
-            0
-          end
+        # If I crossed from positive to negative or vice versa or we cross from 95 to 105
+        crossed_zero = crossed_zero?(cur_pos, new_pos)
 
-        # Ensure we're always working with a positive number
-        new_pos =
-          if new_pos < 0 do
-            new_pos + 100
-          else
-            new_pos
-          end
-
-        # Ensure we're working with numbers < 100
-        new_pos =
-          if new_pos >= 100 do
-            rem(new_pos, 100)
-          else
-            new_pos
-          end
+        # Ensure we're working with numbers < 100 and > 0
+        new_pos = wrap(new_pos)
 
         cycles = d_cycles + crossed_zero + end_on_zero
 
@@ -92,6 +62,22 @@ defmodule Day01 do
       end)
 
     Enum.sum(rotation_list)
+  end
+
+  defp move(pos, :L, offset), do: pos - offset
+  defp move(pos, :R, offset), do: pos + offset
+
+  defp wrap(pos) when pos < 0, do: pos + 100
+  defp wrap(pos) when pos >= 100, do: rem(pos, 100)
+  defp wrap(pos), do: pos
+
+  defp crossed_zero?(old, new) do
+    cond do
+      old < 0 and new > 0 -> 1
+      old > 0 and new < 0 -> 1
+      old < 100 and new > 100 -> 1
+      true -> 0
+    end
   end
 
   def main do
