@@ -57,7 +57,46 @@ defmodule Day02Test do
     assert Day02.part1(temp_file) == 1_227_775_554
   end
 
-  # test "part2 example input", %{temp_file: temp_file} do
-  #   assert Day02.part2(temp_file) == 6
-  # end
+  test "repeating_pattern" do
+    assert Day02.repeating_pattern(1) == false
+    assert Day02.repeating_pattern(2) == false
+
+    assert Day02.repeating_pattern(11) == true
+    assert Day02.repeating_pattern(12) == false
+
+    assert Day02.repeating_pattern(111) == true
+    assert Day02.repeating_pattern(121) == false
+
+    assert Day02.repeating_pattern(1111) == true
+    assert Day02.repeating_pattern(1212) == true
+    assert Day02.repeating_pattern(1113) == false
+    assert Day02.repeating_pattern(1213) == false
+
+    assert Day02.repeating_pattern(11111) == true
+    assert Day02.repeating_pattern(12121) == false
+    assert Day02.repeating_pattern(12312) == false
+
+    assert Day02.repeating_pattern(111_111) == true
+    assert Day02.repeating_pattern(121_212) == true
+    assert Day02.repeating_pattern(123_123) == true
+    assert Day02.repeating_pattern(123_124) == false
+  end
+
+  test "collecting_matches_part_2" do
+    assert Day02.collect_matches_part_2({11, 22}) == [11, 22]
+    assert Day02.collect_matches_part_2({95, 115}) == [99, 111]
+    assert Day02.collect_matches_part_2({998, 1012}) == [999, 1010]
+    assert Day02.collect_matches_part_2({1_188_511_880, 1_188_511_890}) == [1_188_511_885]
+    assert Day02.collect_matches_part_2({222_220, 222_224}) == [222_222]
+    assert Day02.collect_matches_part_2({1_698_522, 1_698_528}) == []
+    assert Day02.collect_matches_part_2({446_443, 446_449}) == [446_446]
+    assert Day02.collect_matches_part_2({38_593_856, 38_593_862}) == [38_593_859]
+    assert Day02.collect_matches_part_2({565_653, 565_659}) == [565_656]
+    assert Day02.collect_matches_part_2({824_824_821, 824_824_827}) == [824_824_824]
+    assert Day02.collect_matches_part_2({2_121_212_118, 2_121_212_124}) == [2_121_212_121]
+  end
+
+  test "part2 example input", %{temp_file: temp_file} do
+    assert Day02.part2(temp_file) == 4_174_379_265
+  end
 end
