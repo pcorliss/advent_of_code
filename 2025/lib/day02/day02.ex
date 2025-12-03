@@ -64,10 +64,9 @@ defmodule Day02 do
     end
   end
 
-  # Has a repeating pattern if the sequence repeats 2 or more times
-
   def repeating_pattern(n) when n < 10, do: false
 
+  # Has a repeating pattern if the sequence repeats 2 or more times
   def repeating_pattern(n) do
     # get length of number in base 10
     n_str = Integer.to_string(n)
@@ -77,11 +76,13 @@ defmodule Day02 do
 
     1..max_pattern_l
     |> Enum.filter(&(rem(l, &1) == 0))
-    |> Enum.any?(fn x ->
-      slice = String.slice(n_str, 0, x)
-      segments = div(l, x)
-      regex = ~r/^(#{slice}){#{segments}}$/
-      String.match?(n_str, regex)
+    |> Enum.any?(fn chunk_size ->
+      slice = String.slice(n_str, 0, chunk_size)
+      chunks = div(l, chunk_size)
+
+      # build the repeated pattern and compare
+      repeated = String.duplicate(slice, chunks)
+      repeated == n_str
     end)
   end
 
