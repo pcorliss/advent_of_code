@@ -65,34 +65,29 @@ defmodule Day02 do
   end
 
   # Has a repeating pattern if the sequence repeats 2 or more times
+
+  def repeating_pattern(n) when n < 10, do: false
+
   def repeating_pattern(n) do
-    cond do
-      n < 10 ->
-        false
+    # get length of number in base 10
+    n_str = Integer.to_string(n)
+    l = String.length(n_str)
+    # max length of repeating pattern
+    max_pattern_l = div(l, 2)
 
-      true ->
-        # get length of number in base 10
-        n_str = Integer.to_string(n)
-        l = String.length(n_str)
-        # max length of repeating pattern
-        max_pattern_l = div(l, 2)
-
-        1..max_pattern_l
-        |> Enum.filter(&(rem(l, &1) == 0))
-        |> Enum.any?(fn x ->
-          slice = String.slice(n_str, 0, x)
-          segments = div(l, x)
-          # regex = ~r/^#{slice}{#{segments}}$/
-          regex = ~r/^(?:#{Regex.escape(slice)}){#{segments}}$/
-          String.match?(n_str, regex)
-        end)
-    end
+    1..max_pattern_l
+    |> Enum.filter(&(rem(l, &1) == 0))
+    |> Enum.any?(fn x ->
+      slice = String.slice(n_str, 0, x)
+      segments = div(l, x)
+      regex = ~r/^(#{slice}){#{segments}}$/
+      String.match?(n_str, regex)
+    end)
   end
 
   def collect_matches_part_2({min_n, max_n}) do
     min_n..max_n
     |> Enum.filter(&repeating_pattern/1)
-    |> Enum.to_list()
   end
 
   def part2(infile) do
