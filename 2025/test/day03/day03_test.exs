@@ -30,7 +30,19 @@ defmodule Day03Test do
     assert Day03.max_joltage(Enum.at(result, 3)) == 92
   end
 
+  test "max_joltage_2", %{temp_file: temp_file} do
+    result = Day03.input(temp_file)
+    assert Day03.max_joltage(Enum.at(result, 0), 12) == 987_654_321_111
+    assert Day03.max_joltage(Enum.at(result, 1), 12) == 811_111_111_119
+    assert Day03.max_joltage(Enum.at(result, 2), 12) == 434_234_234_278
+    assert Day03.max_joltage(Enum.at(result, 3), 12) == 888_911_112_111
+  end
+
   test "part1", %{temp_file: temp_file} do
     assert Day03.part1(temp_file) == 357
+  end
+
+  test "part2", %{temp_file: temp_file} do
+    assert Day03.part2(temp_file) == 3_121_910_778_619
   end
 end
