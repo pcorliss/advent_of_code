@@ -14,24 +14,21 @@ defmodule Day03 do
     end)
   end
 
-  def max_joltage(nums, digits \\ 2) do
-    {max_n, max_idx} =
-      Enum.slice(nums, 0..-digits//1)
-      |> Enum.with_index()
-      |> Enum.reduce({0, -1}, fn {n, idx}, {acc, acc_idx} ->
-        if n > acc do
-          {n, idx}
-        else
-          {acc, acc_idx}
-        end
-      end)
+  def max_joltage(nums, digits \\ 2)
 
-    if digits <= 1 do
-      max_n
-    else
-      new_slice = Enum.slice(nums, (max_idx + 1)..-1//1)
-      max_n * 10 ** (digits - 1) + max_joltage(new_slice, digits - 1)
-    end
+  def max_joltage(_nums, 0), do: 0
+  def max_joltage([], _digits), do: 0
+  def max_joltage(nums, 1), do: Enum.max(nums)
+
+  def max_joltage(nums, digits) do
+    {max_n, idx} =
+      Enum.take(nums, length(nums) - digits + 1)
+      |> Enum.with_index()
+      |> Enum.max_by(&elem(&1, 0))
+
+    rest = Enum.drop(nums, idx + 1)
+
+    max_n * Integer.pow(10, digits - 1) + max_joltage(rest, digits - 1)
   end
 
   def part1(infile) do
