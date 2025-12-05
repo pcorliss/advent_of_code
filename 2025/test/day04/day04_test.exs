@@ -24,10 +24,10 @@ defmodule Day04Test do
 
   test "input", %{temp_file: temp_file} do
     result = Day04.input(temp_file)
-    assert length(Map.keys(result)) == 71
-    assert result[{1, 1}] == true
-    assert result[{2, 0}] == true
-    assert result[{0, 0}] == nil
+    assert MapSet.size(result) == 71
+    assert MapSet.member?(result, {1, 1}) == true
+    assert MapSet.member?(result, {2, 0}) == true
+    assert MapSet.member?(result, {0, 0}) == false
   end
 
   test "adjacent", %{temp_file: temp_file} do
@@ -45,11 +45,11 @@ defmodule Day04Test do
     step1 = Day04.remove_rolls(grid)
 
     # (71 - 13 removed rolls)
-    assert length(Map.keys(step1)) == 58
+    assert MapSet.size(step1) == 58
 
     step2 = Day04.remove_rolls(step1)
 
-    assert length(Map.keys(step2)) == 46
+    assert MapSet.size(step2) == 46
   end
 
   test "recursive_remove_rolls", %{temp_file: temp_file} do
@@ -57,7 +57,7 @@ defmodule Day04Test do
 
     final_grid = Day04.recursive_roll_removal(grid)
 
-    assert length(Map.keys(final_grid)) == 28
+    assert MapSet.size(final_grid) == 28
   end
 
   test "part2", %{temp_file: temp_file} do
