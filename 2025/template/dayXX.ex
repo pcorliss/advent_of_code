@@ -8,10 +8,12 @@ defmodule DayXX do
 
   def part1(infile) do
     input(infile)
+    0
   end
 
   def part2(infile) do
     input(infile)
+    0
   end
 
   def main do

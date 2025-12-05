@@ -18,11 +18,11 @@ defmodule DayXXTest do
     assert List.first(result) == ""
   end
 
-  # test "part1", %{temp_file: temp_file} do
-  #   assert DayXX.part1(temp_file) == 0
-  # end
+  test "part1", %{temp_file: temp_file} do
+    assert DayXX.part1(temp_file) == 0
+  end
 
-  # test "part2", %{temp_file: temp_file} do
-  #   assert DayXX.part2(temp_file) == 0
-  # end
+  test "part2", %{temp_file: temp_file} do
+    assert DayXX.part2(temp_file) == 0
+  end
 end
