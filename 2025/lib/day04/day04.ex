@@ -1,18 +1,19 @@
 defmodule Day04 do
-  def input(infile) do
-    File.read!(infile)
-    |> String.trim()
-    |> String.split("\n")
+  def input(file) do
+    file
+    |> File.read!()
+    |> String.split("\n", trim: true)
     |> Enum.with_index()
-    |> Enum.reduce(MapSet.new(), fn {line, y}, grid ->
-      String.trim(line)
+    |> Enum.flat_map(fn {line, y} ->
+      line
       |> String.graphemes()
       |> Enum.with_index()
-      |> Enum.filter(fn {char, _} -> char == "@" end)
-      |> Enum.reduce(grid, fn {_, x}, grid_x_acc ->
-        MapSet.put(grid_x_acc, {x, y})
+      |> Enum.flat_map(fn
+        {"@", x} -> [{x, y}]
+        _ -> []
       end)
     end)
+    |> MapSet.new()
   end
 
   @neighbors [
@@ -27,39 +28,29 @@ defmodule Day04 do
   ]
 
   def adjacent(grid, {x, y}) do
-    @neighbors
-    |> Enum.count(fn {d_x, d_y} ->
-      MapSet.member?(grid, {x + d_x, y + d_y})
+    Enum.count(@neighbors, fn {dx, dy} ->
+      MapSet.member?(grid, {x + dx, y + dy})
     end)
   end
 
   def remove_rolls(grid) do
-    grid
-    |> Enum.filter(fn pos ->
-      adjacent(grid, pos) < 4
-    end)
-    |> Enum.reduce(grid, fn pos, grid_acc ->
-      MapSet.delete(grid_acc, pos)
-    end)
+    MapSet.reject(grid, fn pos -> adjacent(grid, pos) < 4 end)
   end
 
   def recursive_roll_removal(grid) do
     new_grid = remove_rolls(grid)
 
-    cond do
-      MapSet.size(new_grid) == MapSet.size(grid) -> grid
-      true -> recursive_roll_removal(new_grid)
+    if new_grid == grid do
+      grid
+    else
+      recursive_roll_removal(new_grid)
     end
   end
 
-  def part1(infile) do
-    grid = input(infile)
+  def part1(file) do
+    grid = input(file)
 
-    grid
-    |> Enum.filter(fn pos ->
-      adjacent(grid, pos) < 4
-    end)
-    |> Enum.count()
+    Enum.count(grid, fn pos -> adjacent(grid, pos) < 4 end)
   end
 
   def part2(infile) do
