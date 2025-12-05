@@ -36,6 +36,6 @@ defmodule Day05Test do
   end
 
   test "part2", %{temp_file: temp_file} do
-    assert Day05.part2(temp_file) == 0
+    assert Day05.part2(temp_file) == 14
   end
 end
