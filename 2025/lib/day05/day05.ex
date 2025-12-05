@@ -45,25 +45,26 @@ defmodule Day05 do
 
     # MapSet.size(range_set)
 
-    # IO.puts("")
+    IO.puts("")
 
     {_, size} =
       Enum.sort(ranges)
       |> Enum.reduce({.., 0}, fn range, {prev_range, acc_size} ->
-        # IO.puts(
-        #   "Range: #{range_to_s(range)} - Prev Range: #{range_to_s(prev_range)} - Size: #{acc_size}"
-        # )
+        IO.puts(
+          "Range: #{range_to_s(range)} - Prev Range: #{range_to_s(prev_range)} - Size: #{acc_size}"
+        )
 
         if Range.disjoint?(prev_range, range) do
-          # IO.puts(
-          #   "  Disjoint - Range: #{range_to_s(range)} - Size: #{acc_size + Range.size(range)}"
-          # )
+          IO.puts(
+            "  Disjoint - Range: #{range_to_s(range)} - Size: #{acc_size + Range.size(range)}"
+          )
 
           {range, acc_size + Range.size(range)}
         else
-          new_range = prev_range.first..range.last
+          # There's a bug here where if the range is completely contained there will be an issue
+          new_range = prev_range.first..max(range.last, prev_range.last)
           new_size = acc_size - Range.size(prev_range) + Range.size(new_range)
-          # IO.puts("  Not Dis - Range: #{range_to_s(new_range)} - Size: #{new_size}")
+          IO.puts("  Not Dis - Range: #{range_to_s(new_range)} - Size: #{new_size}")
           {new_range, new_size}
         end
       end)
