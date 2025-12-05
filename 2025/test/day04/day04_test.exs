@@ -40,7 +40,27 @@ defmodule Day04Test do
     assert Day04.part1(temp_file) == 13
   end
 
-  # test "part2", %{temp_file: temp_file} do
-  #   assert Day04.part2(temp_file) == 0
-  # end
+  test "remove_rolls", %{temp_file: temp_file} do
+    grid = Day04.input(temp_file)
+    step1 = Day04.remove_rolls(grid)
+
+    # (71 - 13 removed rolls)
+    assert length(Map.keys(step1)) == 58
+
+    step2 = Day04.remove_rolls(step1)
+
+    assert length(Map.keys(step2)) == 46
+  end
+
+  test "recursive_remove_rolls", %{temp_file: temp_file} do
+    grid = Day04.input(temp_file)
+
+    final_grid = Day04.recursive_roll_removal(grid)
+
+    assert length(Map.keys(final_grid)) == 28
+  end
+
+  test "part2", %{temp_file: temp_file} do
+    assert Day04.part2(temp_file) == 43
+  end
 end

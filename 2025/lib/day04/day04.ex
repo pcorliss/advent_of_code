@@ -15,20 +15,43 @@ defmodule Day04 do
     end)
   end
 
+  @neighbors [
+    {-1, -1},
+    {-1, 0},
+    {-1, 1},
+    {0, -1},
+    {0, 1},
+    {1, -1},
+    {1, 0},
+    {1, 1}
+  ]
+
+  # TODO convert grid to a set
+
   def adjacent(grid, {x, y}) do
-    [
-      {-1, -1},
-      {-1, 0},
-      {-1, 1},
-      {0, -1},
-      {0, 1},
-      {1, -1},
-      {1, 0},
-      {1, 1}
-    ]
+    @neighbors
     |> Enum.count(fn {d_x, d_y} ->
       grid[{x + d_x, y + d_y}]
     end)
+  end
+
+  def remove_rolls(grid) do
+    grid
+    |> Enum.filter(fn {pos, _} ->
+      adjacent(grid, pos) < 4
+    end)
+    |> Enum.reduce(grid, fn {pos, _}, grid_acc ->
+      Map.delete(grid_acc, pos)
+    end)
+  end
+
+  def recursive_roll_removal(grid) do
+    new_grid = remove_rolls(grid)
+
+    cond do
+      length(Map.keys(new_grid)) == length(Map.keys(grid)) -> grid
+      true -> recursive_roll_removal(new_grid)
+    end
   end
 
   def part1(infile) do
@@ -42,7 +65,10 @@ defmodule Day04 do
   end
 
   def part2(infile) do
-    input(infile)
+    grid = input(infile)
+    new_grid = recursive_roll_removal(grid)
+
+    length(Map.keys(grid)) - length(Map.keys(new_grid))
   end
 
   def main do
@@ -50,7 +76,7 @@ defmodule Day04 do
 
     answer = part1(input_path)
     IO.puts("Part 1: #{answer}")
-    # answer = part2(input_path)
-    # IO.puts("Part 2: #{answer}")
+    answer = part2(input_path)
+    IO.puts("Part 2: #{answer}")
   end
 end
