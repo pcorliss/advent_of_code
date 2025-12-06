@@ -13,21 +13,62 @@ defmodule Day06 do
 
     chunk_size = div(length(elements), length(lines))
 
-    rotate_grid(elements, chunk_size)
+    elements
+    |> Enum.chunk_every(chunk_size)
+    |> Enum.zip()
+    |> Enum.map(&Tuple.to_list/1)
     |> Enum.map(fn list ->
       {Enum.drop(list, -1), List.last(list)}
     end)
   end
 
-  defp rotate_grid(list, length) do
-    list
-    |> Enum.chunk_every(length)
+  def part2(infile) do
+    lines =
+      File.read!(infile)
+      |> String.trim()
+      |> String.split("\n")
+
+    max_line_length =
+      Enum.map(lines, &String.length/1)
+      |> Enum.max()
+
+    lines
+    |> Enum.map(&String.pad_trailing(&1, max_line_length, " "))
+    |> Enum.map(&String.graphemes/1)
     |> Enum.zip()
     |> Enum.map(&Tuple.to_list/1)
+    |> Enum.map(fn n ->
+      Enum.map(n, &parse_token/1)
+      |> Enum.reject(&is_nil/1)
+    end)
+    |> Enum.chunk_by(&Enum.empty?/1)
+    |> Enum.reject(fn group ->
+      group == [[]]
+    end)
+    |> Enum.map(fn group ->
+      [first | rest] = group
+      {operator, first} = List.pop_at(first, -1)
+
+      nums =
+        [first | rest]
+        |> Enum.map(fn digits ->
+          digits
+          |> Enum.join()
+          |> String.to_integer()
+        end)
+
+      if operator == :* do
+        Enum.reduce(nums, 1, fn n, acc -> n * acc end)
+      else
+        Enum.reduce(nums, 0, fn n, acc -> n + acc end)
+      end
+    end)
+    |> Enum.sum()
   end
 
   defp parse_token("*"), do: :*
   defp parse_token("+"), do: :+
+  defp parse_token(" "), do: nil
 
   defp parse_token(token) do
     {int, ""} = Integer.parse(token)
@@ -44,11 +85,6 @@ defmodule Day06 do
       end
     end)
     |> Enum.sum()
-  end
-
-  def part2(infile) do
-    input(infile)
-    0
   end
 
   def main do
