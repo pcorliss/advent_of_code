@@ -30,41 +30,19 @@ defmodule Day05 do
     end)
   end
 
-  defp range_to_s(range) do
-    "#{range.first}..#{range.last}"
-  end
-
   def part2(infile) do
     {ranges, _} = input(infile)
-
-    # Worth a try, OOM
-    # range_set =
-    #   Enum.reduce(ranges, MapSet.new(), fn r, s ->
-    #     MapSet.union(s, MapSet.new(r))
-    #   end)
-
-    # MapSet.size(range_set)
-
-    IO.puts("")
 
     {_, size} =
       Enum.sort(ranges)
       |> Enum.reduce({.., 0}, fn range, {prev_range, acc_size} ->
-        IO.puts(
-          "Range: #{range_to_s(range)} - Prev Range: #{range_to_s(prev_range)} - Size: #{acc_size}"
-        )
-
         if Range.disjoint?(prev_range, range) do
-          IO.puts(
-            "  Disjoint - Range: #{range_to_s(range)} - Size: #{acc_size + Range.size(range)}"
-          )
-
           {range, acc_size + Range.size(range)}
         else
           # There's a bug here where if the range is completely contained there will be an issue
+          # Set the top of the range to the max of both ranges
           new_range = prev_range.first..max(range.last, prev_range.last)
           new_size = acc_size - Range.size(prev_range) + Range.size(new_range)
-          IO.puts("  Not Dis - Range: #{range_to_s(new_range)} - Size: #{new_size}")
           {new_range, new_size}
         end
       end)
