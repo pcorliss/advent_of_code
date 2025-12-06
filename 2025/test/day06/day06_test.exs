@@ -19,8 +19,8 @@ defmodule Day06Test do
   test "input", %{temp_file: temp_file} do
     result = Day06.input(temp_file)
     assert length(result) == 4
-    assert List.first(result) == {[123, 45, 6], :*}
-    assert List.last(result) == {[64, 23, 314], :+}
+    assert List.first(result) == {[123, 45, 6], &Enum.product/1}
+    assert List.last(result) == {[64, 23, 314], &Enum.sum/1}
   end
 
   test "part1", %{temp_file: temp_file} do

@@ -15,8 +15,7 @@ defmodule Day06 do
 
     elements
     |> Enum.chunk_every(chunk_size)
-    |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.zip_with(& &1)
     |> Enum.map(fn list ->
       {Enum.drop(list, -1), List.last(list)}
     end)
@@ -35,18 +34,14 @@ defmodule Day06 do
     lines
     |> Enum.map(&String.pad_trailing(&1, max_line_length, " "))
     |> Enum.map(&String.graphemes/1)
-    |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
+    |> Enum.zip_with(& &1)
     |> Enum.map(fn n ->
       Enum.map(n, &parse_token/1)
       |> Enum.reject(&is_nil/1)
     end)
     |> Enum.chunk_by(&Enum.empty?/1)
-    |> Enum.reject(fn group ->
-      group == [[]]
-    end)
-    |> Enum.map(fn group ->
-      [first | rest] = group
+    |> Enum.reject(&(&1 == [[]]))
+    |> Enum.map(fn [first | rest] ->
       {operator, first} = List.pop_at(first, -1)
 
       nums =
@@ -57,17 +52,13 @@ defmodule Day06 do
           |> String.to_integer()
         end)
 
-      if operator == :* do
-        Enum.reduce(nums, 1, fn n, acc -> n * acc end)
-      else
-        Enum.reduce(nums, 0, fn n, acc -> n + acc end)
-      end
+      operator.(nums)
     end)
     |> Enum.sum()
   end
 
-  defp parse_token("*"), do: :*
-  defp parse_token("+"), do: :+
+  defp parse_token("*"), do: &Enum.product/1
+  defp parse_token("+"), do: &Enum.sum/1
   defp parse_token(" "), do: nil
 
   defp parse_token(token) do
@@ -78,11 +69,7 @@ defmodule Day06 do
   def part1(infile) do
     input(infile)
     |> Enum.map(fn {list, op} ->
-      if op == :+ do
-        Enum.sum(list)
-      else
-        Enum.reduce(list, 1, fn n, acc -> n * acc end)
-      end
+      op.(list)
     end)
     |> Enum.sum()
   end
