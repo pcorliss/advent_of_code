@@ -87,7 +87,13 @@ defmodule Day08Test do
     assert Day08.part1(temp_file, 10) == 40
   end
 
-  # test "part2", %{temp_file: temp_file} do
-  #   assert Day08.part2(temp_file) == 0
-  # end
+  test "last_connection", %{temp_file: temp_file} do
+    points = Day08.input(temp_file)
+    edges = Day08.edges(points)
+    assert Day08.last_connection(points, edges) == {{117, 168, 530}, {216, 146, 977}}
+  end
+
+  test "part2", %{temp_file: temp_file} do
+    assert Day08.part2(temp_file) == 25272
+  end
 end

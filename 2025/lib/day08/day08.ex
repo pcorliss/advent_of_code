@@ -36,11 +36,6 @@ defmodule Day08 do
     end)
   end
 
-  # sort the edges
-  # keep track of points already in a circuit and which circuit they're in
-  # Connect the X smallest edges
-  # Sum the different circuit sizes and return
-
   def connect_points(points, edges, connections) do
     circuits = MapSet.new(Enum.map(points, fn p -> MapSet.new([p]) end))
 
@@ -48,24 +43,45 @@ defmodule Day08 do
     |> Enum.sort()
     |> Enum.take(connections)
     |> Enum.reduce(circuits, fn edge, new_circuits ->
-      {a, b} = edges[edge]
+      connect_points_edges(new_circuits, edges[edge])
+    end)
+  end
 
-      # Two map sets with a and b members
-      groups =
-        new_circuits
-        |> MapSet.filter(fn group ->
-          MapSet.member?(group, a) or MapSet.member?(group, b)
-        end)
+  def connect_points_edges(circuits, edge) do
+    {a, b} = edge
 
-      # if a and b are already connected then group size will be 1
-      # Doesn't seem to matter we just waste some cycles without checking here
-      # if group size is 2 then we needto merge them
-      # Remove from existing mapset
-      new_circuits =
-        Enum.reduce(groups, new_circuits, &MapSet.delete(&2, &1))
+    groups =
+      circuits
+      |> MapSet.filter(fn group ->
+        MapSet.member?(group, a) or MapSet.member?(group, b)
+      end)
 
-      new_group = Enum.reduce(groups, MapSet.new(), &MapSet.union(&2, &1))
-      MapSet.put(new_circuits, new_group)
+    new_circuits =
+      Enum.reduce(groups, circuits, &MapSet.delete(&2, &1))
+
+    new_group = Enum.reduce(groups, MapSet.new(), &MapSet.union(&2, &1))
+    MapSet.put(new_circuits, new_group)
+  end
+
+  # the first connection which causes all of the junction boxes to form a single circuit
+  def last_connection(points, edges) do
+    circuits = MapSet.new(Enum.map(points, fn p -> MapSet.new([p]) end))
+
+    Map.keys(edges)
+    |> Enum.sort()
+    |> Enum.reduce_while(circuits, fn edge_d, circ_acc ->
+      edge = edges[edge_d]
+      new_circuits = connect_points_edges(circ_acc, edge)
+
+      # IO.puts(
+      #   "Connecting #{inspect(edge)} - Distance #{edge_d} - Size #{MapSet.size(new_circuits)} "
+      # )
+
+      if MapSet.size(new_circuits) > 1 do
+        {:cont, new_circuits}
+      else
+        {:halt, edge}
+      end
     end)
   end
 
@@ -86,8 +102,12 @@ defmodule Day08 do
   end
 
   def part2(infile) do
-    input(infile)
-    0
+    points = input(infile)
+    edges = edges(points)
+
+    {{a_x, _, _}, {b_x, _, _}} = last_connection(points, edges)
+
+    a_x * b_x
   end
 
   def main do
