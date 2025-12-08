@@ -51,16 +51,6 @@ defmodule Day07Test do
     assert MapSet.to_list(new_beams) == [{6, 2}, {8, 2}]
   end
 
-  test "increment_map" do
-    a = Day07.increment_map(%{}, [:a, :b], 1)
-    assert a[:a] == 1
-    assert a[:b] == 1
-
-    b = Day07.increment_map(%{a: 2, b: 3}, [:a, :b], 1)
-    assert b[:a] == 3
-    assert b[:b] == 4
-  end
-
   test "quantum_split_row", %{temp_file: temp_file} do
     {start, splitters, _} = Day07.input(temp_file)
     beams = %{start => 1}

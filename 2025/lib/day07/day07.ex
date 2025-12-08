@@ -5,26 +5,21 @@ defmodule Day07 do
       |> File.read!()
       |> String.split("\n", trim: true)
 
+    # I don't totally get this for comprehension
     splitters =
-      lines
-      |> Enum.with_index()
-      |> Enum.flat_map(fn {line, y} ->
-        line
-        |> String.graphemes()
-        |> Enum.with_index()
-        |> Enum.flat_map(fn
-          {"^", x} -> [{x, y}]
-          _ -> []
-        end)
-      end)
-      |> MapSet.new()
+      for {line, y} <- Enum.with_index(lines),
+          {char, x} <- Enum.with_index(String.graphemes(line)),
+          char == "^",
+          into: MapSet.new() do
+        {x, y}
+      end
 
     [first_line | _] = lines
 
     start_x =
       first_line
       |> String.graphemes()
-      |> Enum.find_index(fn char -> char == "S" end)
+      |> Enum.find_index(&(&1 == "S"))
 
     max_y = length(lines) - 1
 
@@ -47,29 +42,15 @@ defmodule Day07 do
     end)
   end
 
-  def increment_map(m, keys, incr) do
-    Enum.reduce(keys, m, fn k, acc ->
-      {_, new_m} =
-        Map.get_and_update(acc, k, fn cur ->
-          if cur == nil do
-            {cur, incr}
-          else
-            {cur, cur + incr}
-          end
-        end)
-
-      new_m
-    end)
-  end
-
   def quantum_split_row(splitters, beams, y) do
     beams
     |> Enum.reduce(%{}, fn {{b_x, _}, b_c}, new_beams ->
       if MapSet.member?(splitters, {b_x, y}) do
-        new_beams = increment_map(new_beams, [{b_x - 1, y}, {b_x + 1, y}], b_c)
         new_beams
+        |> Map.update({b_x - 1, y}, b_c, &(&1 + b_c))
+        |> Map.update({b_x + 1, y}, b_c, &(&1 + b_c))
       else
-        increment_map(new_beams, [{b_x, y}], b_c)
+        Map.update(new_beams, {b_x, y}, b_c, &(&1 + b_c))
       end
     end)
   end
@@ -89,9 +70,8 @@ defmodule Day07 do
   def part2(infile) do
     {start, splitters, max_y} = input(infile)
 
-    Enum.reduce(1..max_y, %{start => 1}, fn y, beams ->
-      quantum_split_row(splitters, beams, y)
-    end)
+    1..max_y
+    |> Enum.reduce(%{start => 1}, &quantum_split_row(splitters, &2, &1))
     |> Map.values()
     |> Enum.sum()
   end
