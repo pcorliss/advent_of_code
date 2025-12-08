@@ -1,9 +1,12 @@
 defmodule Day07 do
   def input(infile) do
-    splitters =
+    lines =
       infile
       |> File.read!()
       |> String.split("\n", trim: true)
+
+    splitters =
+      lines
       |> Enum.with_index()
       |> Enum.flat_map(fn {line, y} ->
         line
@@ -16,20 +19,12 @@ defmodule Day07 do
       end)
       |> MapSet.new()
 
-    [first_line | _] =
-      infile
-      |> File.read!()
-      |> String.split("\n", trim: true)
+    [first_line | _] = lines
 
     start_x =
       first_line
       |> String.graphemes()
       |> Enum.find_index(fn char -> char == "S" end)
-
-    lines =
-      infile
-      |> File.read!()
-      |> String.split("\n", trim: true)
 
     max_y = length(lines) - 1
 
@@ -38,8 +33,6 @@ defmodule Day07 do
 
   def split_row(splitters, beams, y) do
     beams
-    # Reject not strictly necessary in our implementation
-    |> Enum.reject(fn {_, b_y} -> b_y != y - 1 end)
     |> Enum.reduce({0, MapSet.new()}, fn {b_x, _}, {count, new_beams} ->
       if MapSet.member?(splitters, {b_x, y}) do
         new_beams =
@@ -71,12 +64,12 @@ defmodule Day07 do
 
   def quantum_split_row(splitters, beams, y) do
     beams
-    |> Enum.reduce({0, %{}}, fn {{b_x, _}, b_c}, {count, new_beams} ->
+    |> Enum.reduce(%{}, fn {{b_x, _}, b_c}, new_beams ->
       if MapSet.member?(splitters, {b_x, y}) do
         new_beams = increment_map(new_beams, [{b_x - 1, y}, {b_x + 1, y}], b_c)
-        {count + 1, new_beams}
+        new_beams
       else
-        {count, increment_map(new_beams, [{b_x, y}], b_c)}
+        increment_map(new_beams, [{b_x, y}], b_c)
       end
     end)
   end
@@ -96,18 +89,10 @@ defmodule Day07 do
   def part2(infile) do
     {start, splitters, max_y} = input(infile)
 
-    {_, new_beams} =
-      Enum.reduce(1..max_y, {0, %{start => 1}}, fn y, {count, beams} ->
-        {new_count, new_beams} = quantum_split_row(splitters, beams, y)
-
-        # if new_count > 0 do
-        #   IO.puts("Row: #{y} Splits: #{new_count}, Beams: #{inspect(new_beams)}")
-        # end
-
-        {count + new_count, new_beams}
-      end)
-
-    Map.values(new_beams)
+    Enum.reduce(1..max_y, %{start => 1}, fn y, beams ->
+      quantum_split_row(splitters, beams, y)
+    end)
+    |> Map.values()
     |> Enum.sum()
   end
 

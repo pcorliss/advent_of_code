@@ -65,28 +65,22 @@ defmodule Day07Test do
     {start, splitters, _} = Day07.input(temp_file)
     beams = %{start => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, beams, 1)
-    assert count == 0
+    new_beams = Day07.quantum_split_row(splitters, beams, 1)
     assert new_beams == %{{7, 1} => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, new_beams, 2)
-    assert count == 1
+    new_beams = Day07.quantum_split_row(splitters, new_beams, 2)
     assert new_beams == %{{6, 2} => 1, {8, 2} => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, new_beams, 3)
-    assert count == 0
+    new_beams = Day07.quantum_split_row(splitters, new_beams, 3)
     assert new_beams == %{{6, 3} => 1, {8, 3} => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, new_beams, 4)
-    assert count == 2
+    new_beams = Day07.quantum_split_row(splitters, new_beams, 4)
     assert new_beams == %{{5, 4} => 1, {7, 4} => 2, {9, 4} => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, new_beams, 5)
-    assert count == 0
+    new_beams = Day07.quantum_split_row(splitters, new_beams, 5)
     assert new_beams == %{{5, 5} => 1, {7, 5} => 2, {9, 5} => 1}
 
-    {count, new_beams} = Day07.quantum_split_row(splitters, new_beams, 6)
-    assert count == 3
+    new_beams = Day07.quantum_split_row(splitters, new_beams, 6)
     assert new_beams == %{{4, 6} => 1, {6, 6} => 3, {8, 6} => 3, {10, 6} => 1}
   end
 
