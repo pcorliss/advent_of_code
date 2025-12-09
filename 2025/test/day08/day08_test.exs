@@ -50,16 +50,15 @@ defmodule Day08Test do
   end
 
   test "connect_points", %{temp_file: temp_file} do
-    points = Day08.input(temp_file)
-    edges = Day08.edges(points)
+    {e, c} = Day08.loader(temp_file)
 
     # Connects the closest circuits into one group
-    circuits = Day08.connect_points(points, edges, 1)
+    circuits = Day08.connect_points(c, e, 1)
     assert MapSet.size(circuits) == 19
 
     assert MapSet.member?(circuits, MapSet.new([{162, 817, 812}, {425, 690, 689}])) == true
 
-    circuits = Day08.connect_points(points, edges, 2)
+    circuits = Day08.connect_points(c, e, 2)
     assert MapSet.size(circuits) == 18
 
     assert MapSet.member?(
@@ -67,7 +66,7 @@ defmodule Day08Test do
              MapSet.new([{162, 817, 812}, {425, 690, 689}, {431, 825, 988}])
            ) == true
 
-    circuits = Day08.connect_points(points, edges, 3)
+    circuits = Day08.connect_points(c, e, 3)
     assert MapSet.size(circuits) == 17
 
     assert MapSet.member?(
@@ -76,24 +75,25 @@ defmodule Day08Test do
            ) == true
 
     #  The next two junction boxes are 431,825,988 and 425,690,689. Because these two junction boxes were already in the same circuit, nothing happens!
-    circuits = Day08.connect_points(points, edges, 4)
+    circuits = Day08.connect_points(c, e, 4)
     assert MapSet.size(circuits) == 17
 
-    circuits = Day08.connect_points(points, edges, 10)
+    circuits = Day08.connect_points(c, e, 10)
     assert MapSet.size(circuits) == 11
   end
 
   test "part1", %{temp_file: temp_file} do
-    assert Day08.part1(temp_file, 10) == 40
+    {e, c} = Day08.loader(temp_file)
+    assert Day08.part1(e, c, 10) == 40
   end
 
   test "last_connection", %{temp_file: temp_file} do
-    points = Day08.input(temp_file)
-    edges = Day08.edges(points)
-    assert Day08.last_connection(points, edges) == {{216, 146, 977}, {117, 168, 530}}
+    {e, c} = Day08.loader(temp_file)
+    assert Day08.last_connection(e, c) == {{216, 146, 977}, {117, 168, 530}}
   end
 
   test "part2", %{temp_file: temp_file} do
-    assert Day08.part2(temp_file) == 25272
+    {e, c} = Day08.loader(temp_file)
+    assert Day08.part2(e, c) == 25272
   end
 end
