@@ -11,33 +11,33 @@ defmodule Day08 do
     |> Enum.map(&List.to_tuple/1)
   end
 
+  # We skip the sqrt here to save CPU cycles, we still compare apples to apples
   def distance(a, b) do
     {a_x, a_y, a_z} = a
     {b_x, b_y, b_z} = b
-    # TODO I don't think abx is necessary here
-    x_d = abs(a_x - b_x)
-    y_d = abs(a_y - b_y)
-    z_d = abs(a_z - b_z)
+    x_d = a_x - b_x
+    y_d = a_y - b_y
+    z_d = a_z - b_z
     Integer.pow(x_d, 2) + Integer.pow(y_d, 2) + Integer.pow(z_d, 2)
   end
 
   # Hash keyed on edge distance, mapped to a set of two points
+  # If two distances are the same we'll run into trouble but not the case for our data set
   def edges(points) do
-    Enum.reduce(points, %{}, fn a, a_acc ->
-      Enum.reduce(points, a_acc, fn b, h_acc ->
-        if a == b do
-          h_acc
-        else
-          d = distance(a, b)
-          # TODO There's a bug here where we compute the distance twice
-          Map.put(h_acc, d, {a, b})
-        end
-      end)
-    end)
+    for {a, i} <- Enum.with_index(points),
+        {b, j} <- Enum.with_index(points),
+        j > i,
+        into: %{} do
+      {distance(a, b), {a, b}}
+    end
+  end
+
+  defp points_to_circuits(points) do
+    MapSet.new(Enum.map(points, fn p -> MapSet.new([p]) end))
   end
 
   def connect_points(points, edges, connections) do
-    circuits = MapSet.new(Enum.map(points, fn p -> MapSet.new([p]) end))
+    circuits = points_to_circuits(points)
 
     Map.keys(edges)
     |> Enum.sort()
@@ -50,32 +50,24 @@ defmodule Day08 do
   def connect_points_edges(circuits, edge) do
     {a, b} = edge
 
-    groups =
-      circuits
-      |> MapSet.filter(fn group ->
-        MapSet.member?(group, a) or MapSet.member?(group, b)
+    {edge_groups, remaining_circuits} =
+      MapSet.split_with(circuits, fn circuit ->
+        MapSet.member?(circuit, a) or MapSet.member?(circuit, b)
       end)
 
-    new_circuits =
-      Enum.reduce(groups, circuits, &MapSet.delete(&2, &1))
-
-    new_group = Enum.reduce(groups, MapSet.new(), &MapSet.union(&2, &1))
-    MapSet.put(new_circuits, new_group)
+    new_group = Enum.reduce(edge_groups, &MapSet.union(&2, &1))
+    MapSet.put(remaining_circuits, new_group)
   end
 
-  # the first connection which causes all of the junction boxes to form a single circuit
+  # the last connection which causes all of the junction boxes to form a single circuit
   def last_connection(points, edges) do
-    circuits = MapSet.new(Enum.map(points, fn p -> MapSet.new([p]) end))
+    circuits = points_to_circuits(points)
 
     Map.keys(edges)
     |> Enum.sort()
     |> Enum.reduce_while(circuits, fn edge_d, circ_acc ->
       edge = edges[edge_d]
       new_circuits = connect_points_edges(circ_acc, edge)
-
-      # IO.puts(
-      #   "Connecting #{inspect(edge)} - Distance #{edge_d} - Size #{MapSet.size(new_circuits)} "
-      # )
 
       if MapSet.size(new_circuits) > 1 do
         {:cont, new_circuits}
@@ -89,10 +81,6 @@ defmodule Day08 do
     points = input(infile)
     edges = edges(points)
     circuits = connect_points(points, edges, connections)
-
-    # Enum.each(circuits, fn c ->
-    #   IO.puts("Circuit: #{inspect(c)} Size: #{MapSet.size(c)}")
-    # end)
 
     Enum.map(circuits, &MapSet.size/1)
     |> Enum.sort()

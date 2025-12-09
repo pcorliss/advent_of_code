@@ -46,7 +46,7 @@ defmodule Day08Test do
     # First and last distance
     f = List.first(points)
     l = List.last(points)
-    assert edges[100_427] == {l, f}
+    assert edges[100_427] == {f, l}
   end
 
   test "connect_points", %{temp_file: temp_file} do
@@ -90,7 +90,7 @@ defmodule Day08Test do
   test "last_connection", %{temp_file: temp_file} do
     points = Day08.input(temp_file)
     edges = Day08.edges(points)
-    assert Day08.last_connection(points, edges) == {{117, 168, 530}, {216, 146, 977}}
+    assert Day08.last_connection(points, edges) == {{216, 146, 977}, {117, 168, 530}}
   end
 
   test "part2", %{temp_file: temp_file} do
