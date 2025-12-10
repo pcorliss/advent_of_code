@@ -127,25 +127,37 @@ defmodule Day09 do
     rects = rects(points)
     IO.puts("Generated Rects #{length(rects)}")
 
-    border = Day09.draw_border(points)
-    IO.puts("Generated border #{MapSet.size(border)}")
-
-    outside = Day09.outside(border)
-    IO.puts("Generated Outside Border #{MapSet.size(outside)}")
+    edges = Enum.zip(points, tl(points) ++ [hd(points)])
 
     {{_, _, area}, _} =
       Enum.sort_by(rects, fn {_, _, area} -> area end, :desc)
       |> Enum.with_index()
-      |> Enum.find(fn {{a, b, _}, idx} ->
+      |> Enum.find(fn {{{a_x, a_y}, {b_x, b_y}, _}, idx} ->
         if rem(idx, 1000) == 0 do
           IO.puts("Considered #{idx} rects")
         end
 
-        touches_outside =
-          rect_edge_points(a, b)
-          |> Enum.any?(&MapSet.member?(outside, &1))
+        x1 = min(a_x, b_x)
+        x2 = max(a_x, b_x)
+        y1 = min(a_y, b_y)
+        y2 = max(a_y, b_y)
 
-        not touches_outside
+        rect = {{x1, y1}, {x2, y2}}
+
+        # Any points within the rectangle
+        not Enum.any?(points, fn point ->
+          Geometry.point_in_rect(rect, point)
+        end) and
+          not Enum.any?(edges, fn {{e1_x, e1_y}, {e2_x, e2_y}} ->
+            # Any edge midpoints within the rectangle
+            {min_x, max_x} = Enum.min_max([e1_x, e2_x])
+            {min_y, max_y} = Enum.min_max([e1_y, e2_y])
+
+            m_x = div(max_x - min_x, 2) + min_x
+            m_y = div(max_y - min_y, 2) + min_y
+
+            Geometry.point_in_rect(rect, {m_x, m_y})
+          end)
       end)
 
     area
@@ -158,5 +170,76 @@ defmodule Day09 do
     IO.puts("Part 1: #{answer}")
     answer = part2(input_path)
     IO.puts("Part 2: #{answer}")
+  end
+end
+
+defmodule Geometry do
+  def point_in_rect({{x1, y1}, {x2, y2}}, {p_x, p_y}) do
+    p_x > x1 and p_x < x2 and p_y > y1 and p_y < y2
+  end
+
+  # Return all 4 edges of a rectangle as {{x1,y1},{x2,y2}}
+  def rect_edges({{x1, y1}, {x2, y2}}) do
+    left = {{min(x1, x2), min(y1, y2)}, {min(x1, x2), max(y1, y2)}}
+    right = {{max(x1, x2), min(y1, y2)}, {max(x1, x2), max(y1, y2)}}
+    top = {{min(x1, x2), max(y1, y2)}, {max(x1, x2), max(y1, y2)}}
+    bottom = {{min(x1, x2), min(y1, y2)}, {max(x1, x2), min(y1, y2)}}
+
+    [left, right, top, bottom]
+  end
+
+  # Check if horizontal rectangle edge truly crosses a vertical polygon edge
+  # Returns true only if they overlap in interior, not just endpoints
+  defp h_v_intersect?({{hx1, hy}, {hx2, _}}, {{vx, vy1}, {_, vy2}}) do
+    # strictly inside vertical range
+    # strictly inside horizontal range
+    hy > min(vy1, vy2) and hy < max(vy1, vy2) and
+      vx > min(hx1, hx2) and vx < max(hx1, hx2)
+  end
+
+  # Vertical rectangle edge vs horizontal polygon edge
+  defp v_h_intersect?(v, h), do: h_v_intersect?(h, v)
+
+  defp parallel_intersect?({{x1, y1}, {x2, y2}}, {{px1, py1}, {px2, py2}}) do
+    cond do
+      # both vertical
+      x1 == x2 and px1 == px2 ->
+        x1 == px1 and ranges_overlap?(y1, y2, py1, py2)
+
+      # both horizontal
+      y1 == y2 and py1 == py2 ->
+        y1 == py1 and ranges_overlap?(x1, x2, px1, px2)
+
+      true ->
+        false
+    end
+  end
+
+  defp ranges_overlap?(a1, a2, b1, b2) do
+    min(a1, a2) < max(b1, b2) and min(b1, b2) < max(a1, a2)
+  end
+
+  # Check if two rectangle/polygon edges intersect (excluding touching)
+  defp edge_intersect?(r_edge, p_edge) do
+    {{rx1, ry1}, {rx2, ry2}} = r_edge
+    {{px1, py1}, {px2, py2}} = p_edge
+
+    cond do
+      # perpendicular edges
+      rx1 == rx2 and py1 == py2 -> v_h_intersect?(r_edge, p_edge)
+      ry1 == ry2 and px1 == px2 -> h_v_intersect?(r_edge, p_edge)
+      # parallel edges
+      true -> parallel_intersect?(r_edge, p_edge)
+    end
+  end
+
+  # Returns true if any rectangle edge crosses a polygon edge (excluding touching edges)
+  def rect_intersects_polygon_edges?(rect, polygon_edges) do
+    rect_edges(rect)
+    |> Enum.any?(fn r_edge ->
+      Enum.any?(polygon_edges, fn p_edge ->
+        edge_intersect?(r_edge, p_edge)
+      end)
+    end)
   end
 end

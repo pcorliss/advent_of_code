@@ -87,4 +87,34 @@ defmodule Day09Test do
   test "part2", %{temp_file: temp_file} do
     assert Day09.part2(temp_file) == 24
   end
+
+  # test "geometry module" do
+  #   polygon = [
+  #     {{0, 0}, {0, 5}},
+  #     {{0, 5}, {5, 5}},
+  #     {{5, 5}, {5, 0}},
+  #     {{5, 0}, {0, 0}},
+  #     # a concave notch
+  #     {{2, 2}, {3, 2}},
+  #     {{3, 2}, {3, 3}},
+  #     {{3, 3}, {2, 3}},
+  #     {{2, 3}, {2, 2}}
+  #   ]
+
+  #   # rectangle sharing edges with polygon — not rejected
+  #   rect1 = {{0, 0}, {1, 1}}
+  #   assert Geometry.rect_intersects_polygon_edges?(rect1, polygon) == false
+
+  #   # rectangle crossing concavity — rejected
+  #   rect2 = {{2, 1}, {3, 4}}
+  #   assert Geometry.rect_intersects_polygon_edges?(rect2, polygon) == true
+  # end
 end
+
+# #
+# #|
+# ###
+#  |#
+# ###
+# #|
+# #
