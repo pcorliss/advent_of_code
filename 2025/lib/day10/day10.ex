@@ -35,6 +35,9 @@ defmodule Day10 do
       String.slice(str, 1..-2//1)
       |> String.split(",")
       |> Enum.map(&String.to_integer/1)
+      |> Enum.reduce(0, fn idx, acc ->
+        acc ||| 1 <<< idx
+      end)
     end)
   end
 
@@ -45,9 +48,46 @@ defmodule Day10 do
     |> Enum.map(&String.to_integer/1)
   end
 
+  def combinations(list, k), do: do_combinations(list, k)
+
+  defp do_combinations(_, 0), do: [[]]
+  defp do_combinations([], _k), do: []
+
+  defp do_combinations([h | t], k) do
+    # combinations that include h
+    with_h =
+      do_combinations(t, k - 1)
+      |> Enum.map(fn rest -> [h | rest] end)
+
+    # combinations that exclude h
+    without_h =
+      do_combinations(t, k)
+
+    with_h ++ without_h
+  end
+
+  def find_buttons(start, target, buttons) do
+    max_len = length(buttons)
+
+    1..max_len
+    |> Enum.find_value(fn k ->
+      combinations(buttons, k)
+      |> Enum.find(fn combo ->
+        apply_combo(start, combo) == target
+      end)
+    end)
+  end
+
+  defp apply_combo(state, combo) do
+    Enum.reduce(combo, state, fn button, acc -> bxor(acc, button) end)
+  end
+
   def part1(infile) do
     input(infile)
-    0
+    |> Enum.map(fn {target, buttons, _} ->
+      length(find_buttons(0, target, buttons))
+    end)
+    |> Enum.sum()
   end
 
   def part2(infile) do

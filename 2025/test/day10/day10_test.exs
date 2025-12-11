@@ -21,12 +21,25 @@ defmodule Day10Test do
     {target_state, buttons, joltage} = List.first(result)
 
     assert target_state == 6
-    assert buttons == [[3], [1, 3], [2], [2, 3], [0, 2], [0, 1]]
+    assert buttons == [8, 10, 4, 12, 5, 3]
     assert joltage == [3, 5, 4, 7]
   end
 
+  test "find_buttons", %{temp_file: temp_file} do
+    result = Day10.input(temp_file)
+    {target_state, buttons, _} = List.first(result)
+
+    assert length(Day10.find_buttons(0, target_state, buttons)) == 2
+
+    {target_state, buttons, _} = Enum.at(result, 1)
+    assert length(Day10.find_buttons(0, target_state, buttons)) == 3
+
+    {target_state, buttons, _} = List.last(result)
+    assert length(Day10.find_buttons(0, target_state, buttons)) == 2
+  end
+
   test "part1", %{temp_file: temp_file} do
-    assert Day10.part1(temp_file) == 0
+    assert Day10.part1(temp_file) == 7
   end
 
   test "part2", %{temp_file: temp_file} do
