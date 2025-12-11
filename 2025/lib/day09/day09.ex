@@ -125,7 +125,7 @@ defmodule Day09 do
   def part2(infile) do
     points = input(infile)
     rects = rects(points)
-    IO.puts("Generated Rects #{length(rects)}")
+    # IO.puts("Generated Rects #{length(rects)}")
 
     edges = Enum.zip(points, tl(points) ++ [hd(points)])
 
@@ -134,7 +134,7 @@ defmodule Day09 do
       |> Enum.with_index()
       |> Enum.find(fn {{{a_x, a_y}, {b_x, b_y}, _}, idx} ->
         if rem(idx, 1000) == 0 do
-          IO.puts("Considered #{idx} rects")
+          # IO.puts("Considered #{idx} rects")
         end
 
         x1 = min(a_x, b_x)
