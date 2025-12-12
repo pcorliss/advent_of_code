@@ -98,12 +98,12 @@ defmodule Day11 do
     # svr_fft = dfs(graph, "svr", "fft", [], [], "dac")
     # IO.puts("svr->fft: #{length(svr_fft)}")
 
-    svr_fft = all_paths(graph, "svr", "fft", "dac")
-    IO.puts("svr->fft: #{length(svr_fft)}")
+    # svr_fft = all_paths(graph, "svr", "fft", "dac")
+    # IO.puts("svr->fft: #{length(svr_fft)}")
 
     # Fast
     svr_fft = dfs(rev_graph, "fft", "svr", [], [], "dac")
-    IO.puts("svr->fft: #{length(svr_fft)}")
+    # IO.puts("svr->fft: #{length(svr_fft)}")
 
     # Slow
     # svr_dac = dfs(graph, "svr", "dac", [], [], "fft")
@@ -126,11 +126,11 @@ defmodule Day11 do
     # IO.puts("fft->dac: #{length(fft_dac)}")
 
     fft_dac = all_paths(graph, "fft", "dac")
-    IO.puts("fft->dac: #{length(fft_dac)}")
+    # IO.puts("fft->dac: #{length(fft_dac)}")
 
     # Fast
-    dac_fft = dfs(graph, "dac", "fft", [], [])
-    IO.puts("dac->fft: #{length(dac_fft)}")
+    # dac_fft = dfs(graph, "dac", "fft", [], [])
+    # IO.puts("dac->fft: #{length(dac_fft)}")
 
     # Slow
     # fft_out = dfs(graph, "fft", "out", [], [], "dac")
@@ -138,7 +138,7 @@ defmodule Day11 do
 
     # Fast
     dac_out = dfs(graph, "dac", "out", [], [], "fft")
-    IO.puts("dac->out: #{length(dac_out)}")
+    # IO.puts("dac->out: #{length(dac_out)}")
 
     length(svr_fft) * length(fft_dac) * length(dac_out)
     # +
