@@ -134,9 +134,10 @@ defmodule Day10 do
   end
 
   def run_model(model) do
-    File.write!("model_out.lp", model)
+    {:ok, temp_file} = Briefly.create()
+    File.write!(temp_file, model)
 
-    {output, _} = System.cmd("lp_solve", ["model_out.lp", "-S1"])
+    {output, _} = System.cmd("lp_solve", [temp_file, "-S1"])
     # IO.puts(output)
     # IO.puts("Exit code: #{exit_code}")
 
