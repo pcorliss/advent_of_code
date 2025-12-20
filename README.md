@@ -7,5 +7,6 @@ My solutions to https://adventofcode.com/
 * 2018 Written in Typescript
 * 2021 Written in Go
 * 2024 Written in Python
+* 2025 Written in Elixir
 
 All solutions were test-driven and yield the correct answers for my input.
