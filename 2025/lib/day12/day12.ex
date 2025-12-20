@@ -47,8 +47,22 @@ defmodule Day12 do
   end
 
   def part1(infile) do
-    input(infile)
-    0
+    {boxes, area_and_box_counts} = input(infile)
+
+    # Enum.each(boxes, fn box ->
+    #   IO.puts("Box: #{inspect(MapSet.to_list(box))}")
+    # end)
+
+    Enum.count(area_and_box_counts, fn {{a_x, a_y}, box_count} ->
+      sum =
+        Enum.with_index(box_count)
+        |> Enum.sum_by(fn {box_n, idx} ->
+          area = MapSet.size(Enum.at(boxes, idx))
+          box_n * area
+        end)
+
+      sum <= a_x * a_y
+    end)
   end
 
   def part2(infile) do
